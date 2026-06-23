@@ -2,10 +2,11 @@ import { Suspense, useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Text, Float, Sparkles, Grid } from '@react-three/drei'
 import * as THREE from 'three'
-import { Box, Typography, Paper, Chip, CircularProgress, Slider, FormControlLabel, Switch } from '@mui/material'
+import { Box, Typography, Paper, Chip, CircularProgress, FormControlLabel, Switch } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useLatestSensorData } from '../hooks/useSensorData'
 import { devicesApi } from '../services/api'
+import { useThemeMode } from '../context/ThemeContext'
 import type { Device } from '../types'
 
 function tempToColor(temp: number) {
@@ -462,44 +463,93 @@ export default function Visualization3DPage() {
   const [showWireframe, setShowWireframe] = useState(false)
   const [loading, setLoading] = useState(true)
   const { internal } = useLatestSensorData(30000)
+  const { mode } = useThemeMode()
+  const dark = mode === 'dark'
+
+  const textPri    = dark ? '#e2ecf8' : '#111827'
+  const textSec    = dark ? '#8aaccc' : '#4b5e7a'
+  const primary    = dark ? '#00aaff' : '#0060c8'
+  const canvasBord = dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,96,200,0.18)'
 
   useEffect(() => {
     devicesApi.list().then((r) => { setDevices(r.data); setLoading(false) }).catch(() => setLoading(false))
   }, [])
 
-  const fanOn = devices.filter((d) => d.status === 'ON').length
+  const fanOn  = devices.filter((d) => d.status === 'ON').length
   const fanErr = devices.filter((d) => d.status === 'Erreur').length
+
+  const statusChips = [
+    { label: `${fanOn} ventilateurs ON`,                                        color: dark ? '#00ff88' : '#0ea86a' },
+    { label: fanErr > 0 ? `${fanErr} erreurs` : 'Aucune erreur',               color: fanErr > 0 ? '#e8334a' : (dark ? '#00ff88' : '#0ea86a') },
+    { label: internal ? `${internal.temperature?.toFixed(1)}°C` : '…',         color: '#f97316' },
+  ]
 
   return (
     <Box sx={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Controls */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+
+      {/* Header */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#e0e8f8' }}>Jumeau Numérique 3D — Serre Fraisier</Typography>
-          <Typography variant="body2" sx={{ color: '#8aaccc', mt: 0.3 }}>3 gouttières × 8.5 m · 80 plants · Fibre de coco · 6 ventilateurs</Typography>
+          <Typography variant="h5" fontWeight={700} sx={{ color: textPri }}>
+            Jumeau Numérique 3D — Serre Fraisier
+          </Typography>
+          <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
+            3 gouttières × 8.5 m · 80 plants · Fibre de coco · 6 ventilateurs
+          </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {[
-            { label: `${fanOn} ventilateurs ON`, color: '#00ff88' },
-            { label: fanErr > 0 ? `${fanErr} erreurs` : 'Aucune erreur', color: fanErr > 0 ? '#ff3366' : '#00ff88' },
-            { label: internal ? `${internal.temperature?.toFixed(1)}°C` : '...', color: '#ff6644' },
-          ].map((chip) => (
-            <Chip key={chip.label} label={chip.label} size="small" sx={{ bgcolor: `${chip.color}15`, color: chip.color, border: `1px solid ${chip.color}33`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          {statusChips.map((chip) => (
+            <Chip
+              key={chip.label}
+              label={chip.label}
+              size="small"
+              sx={{
+                bgcolor: `${chip.color}15`,
+                color: chip.color,
+                border: `1px solid ${chip.color}40`,
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '0.7rem',
+              }}
+            />
           ))}
           <FormControlLabel
-            control={<Switch size="small" checked={showWireframe} onChange={(e) => setShowWireframe(e.target.checked)} />}
-            label={<Typography variant="caption" sx={{ color: '#8aaccc' }}>Wireframe</Typography>}
+            control={
+              <Switch
+                size="small"
+                checked={showWireframe}
+                onChange={(e) => setShowWireframe(e.target.checked)}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': { color: primary },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: primary },
+                }}
+              />
+            }
+            label={
+              <Typography variant="caption" sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
+                Wireframe
+              </Typography>
+            }
           />
         </Box>
       </Box>
 
       {/* 3D Canvas */}
-      <Paper sx={{ flex: 1, overflow: 'hidden', border: '1px solid rgba(0,170,255,0.2)', position: 'relative',
-        '&::before': { content: '""', position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(0,100,200,0.1) 0%, transparent 60%)', zIndex: 1, pointerEvents: 'none' } }}>
+      <Paper sx={{
+        flex: 1, overflow: 'hidden', position: 'relative',
+        border: `1px solid ${canvasBord}`,
+        bgcolor: dark ? 'rgba(2,5,8,0.97)' : 'rgba(2,8,20,0.95)',
+        '&::before': {
+          content: '""', position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(0,100,200,0.08) 0%, transparent 60%)',
+        },
+      }}>
         {loading ? (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2 }}>
-            <CircularProgress size={32} sx={{ color: '#00aaff' }} />
-            <Typography sx={{ color: '#8aaccc' }}>Chargement de la scène 3D...</Typography>
+            <CircularProgress size={28} sx={{ color: primary }} />
+            <Typography sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.82rem' }}>
+              Chargement de la scène 3D…
+            </Typography>
           </Box>
         ) : (
           <Canvas
@@ -518,31 +568,46 @@ export default function Visualization3DPage() {
           </Canvas>
         )}
 
-        {/* Legend overlay */}
-        <Box sx={{ position: 'absolute', bottom: 16, left: 16, zIndex: 2, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-          <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        {/* Temperature legend — always on dark canvas background */}
+        <Box sx={{
+          position: 'absolute', bottom: 16, left: 16, zIndex: 2,
+          display: 'flex', flexDirection: 'column', gap: 0.4,
+          bgcolor: 'rgba(2,8,20,0.72)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(0,170,255,0.12)',
+          borderRadius: '8px', px: 1.4, py: 1,
+        }}>
+          <Typography sx={{
+            color: 'rgba(138,172,204,0.8)',
+            fontFamily: '"JetBrains Mono", monospace',
+            fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.08em', mb: 0.3,
+          }}>
             Légende Température
           </Typography>
           {[
-            { label: '< 15°C', color: '#0066ff' },
-            { label: '15-22°C', color: '#00aaff' },
-            { label: '22-28°C', color: '#00ff88' },
-            { label: '28-33°C', color: '#ffaa00' },
-            { label: '> 33°C', color: '#ff3344' },
+            { label: '< 15°C',   color: '#0066ff' },
+            { label: '15–22°C',  color: '#00aaff' },
+            { label: '22–28°C',  color: '#00ff88' },
+            { label: '28–33°C',  color: '#ffaa00' },
+            { label: '> 33°C',   color: '#ff3344' },
           ].map((item) => (
-            <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '2px', bgcolor: item.color, boxShadow: `0 0 6px ${item.color}88` }} />
-              <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem' }}>
+            <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+              <Box sx={{ width: 9, height: 9, borderRadius: '2px', bgcolor: item.color, flexShrink: 0, boxShadow: `0 0 5px ${item.color}77` }} />
+              <Typography sx={{ color: 'rgba(226,236,248,0.75)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
                 {item.label}
               </Typography>
             </Box>
           ))}
         </Box>
 
-        {/* Controls hint */}
-        <Box sx={{ position: 'absolute', bottom: 16, right: 16, zIndex: 2 }}>
-          <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem' }}>
-            🖱️ Clic + glisser: Rotation | Scroll: Zoom | Clic droit: Déplacer
+        {/* Controls hint — always on dark canvas */}
+        <Box sx={{
+          position: 'absolute', bottom: 16, right: 16, zIndex: 2,
+          bgcolor: 'rgba(2,8,20,0.6)', backdropFilter: 'blur(6px)',
+          border: '1px solid rgba(0,170,255,0.1)',
+          borderRadius: '6px', px: 1.2, py: 0.6,
+        }}>
+          <Typography sx={{ color: 'rgba(138,172,204,0.7)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
+            🖱 Clic + glisser : Rotation · Scroll : Zoom · Clic droit : Déplacer
           </Typography>
         </Box>
       </Paper>
