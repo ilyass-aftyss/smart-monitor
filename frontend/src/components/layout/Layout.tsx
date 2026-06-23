@@ -18,9 +18,9 @@ export default function Layout() {
       <Box
         component="main"
         sx={{
-          pt: '58px',
+          pt: 'calc(56px + 28px)',
+          pb: 5,
           px: { xs: 2, sm: 3, md: 4 },
-          py: 3,
           maxWidth: 1600,
           mx: 'auto',
         }}

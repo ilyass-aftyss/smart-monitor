@@ -4,10 +4,15 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100%;
+  width: 100%;
 }
 
 body {
@@ -18,38 +23,38 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(10, 20, 40, 0.5);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 170, 255, 0.3);
+  background: rgba(0, 170, 255, 0.25);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 170, 255, 0.5);
+  background: rgba(0, 170, 255, 0.45);
 }
 
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 8px rgba(0, 170, 255, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(0, 170, 255, 0.8); }
+  50%       { box-shadow: 0 0 20px rgba(0, 170, 255, 0.8); }
 }
 
 @keyframes scan-line {
-  0% { transform: translateY(-100%); }
+  0%   { transform: translateY(-100%); }
   100% { transform: translateY(100vh); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50%       { transform: translateY(-6px); }
 }
 
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .neon-text {
@@ -63,3 +68,4 @@ body {
   border: 1px solid rgba(0, 170, 255, 0.15);
   border-radius: 12px;
 }
+ 
