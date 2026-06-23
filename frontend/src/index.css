@@ -15,11 +15,14 @@ html, body {
   width: 100%;
 }
 
+/* body color / background are intentionally NOT set here.
+   MUI CssBaseline applies them from the active theme so they
+   switch correctly between dark and light mode. */
+
 body {
   font-family: 'Inter', sans-serif;
-  background: #050a14;
-  color: #e0e8f0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar {
@@ -30,21 +33,16 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 170, 255, 0.25);
+  background: rgba(0, 100, 180, 0.2);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 170, 255, 0.45);
+  background: rgba(0, 130, 210, 0.4);
 }
 
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 8px rgba(0, 170, 255, 0.4); }
   50%       { box-shadow: 0 0 20px rgba(0, 170, 255, 0.8); }
-}
-
-@keyframes scan-line {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
 }
 
 @keyframes float {
@@ -55,16 +53,4 @@ body {
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
-}
-
-.neon-text {
-  color: #00aaff;
-  text-shadow: 0 0 10px rgba(0, 170, 255, 0.6);
-}
-
-.glass-card {
-  background: rgba(10, 25, 50, 0.7);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 170, 255, 0.15);
-  border-radius: 12px;
 }

@@ -16,20 +16,20 @@ function buildTheme(mode: ColorMode): Theme {
   return createTheme({
     palette: {
       mode,
-      primary:    { main: dark ? '#00aaff' : '#0070d4', light: dark ? '#33bbff' : '#3394e8', dark: dark ? '#0077cc' : '#0050a0' },
-      secondary:  { main: dark ? '#00ffcc' : '#00b89c' },
+      primary:    { main: dark ? '#00aaff' : '#0060c8', light: dark ? '#33bbff' : '#3380e0', dark: dark ? '#0077cc' : '#004aa0' },
+      secondary:  { main: dark ? '#00ffcc' : '#00a88a' },
       error:      { main: '#e8334a' },
       warning:    { main: '#f59e0b' },
-      success:    { main: dark ? '#00e87a' : '#10b981' },
+      success:    { main: dark ? '#00e87a' : '#0ea86a' },
       background: {
-        default: dark ? '#060d1e' : '#f2f5fa',
+        default: dark ? '#060d1e' : '#f0f4f9',
         paper:   dark ? 'rgba(10,22,48,0.92)' : '#ffffff',
       },
       text: {
-        primary:   dark ? '#e2ecf8' : '#1a2540',
-        secondary: dark ? '#8aaccc' : '#5a7090',
+        primary:   dark ? '#e2ecf8' : '#111827',
+        secondary: dark ? '#8aaccc' : '#4b5e7a',
       },
-      divider: dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,100,180,0.1)',
+      divider: dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,80,160,0.1)',
     },
     typography: {
       fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
@@ -43,11 +43,13 @@ function buildTheme(mode: ColorMode): Theme {
     components: {
       MuiCssBaseline: {
         styleOverrides: {
-          '@import': "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap')",
           body: {
-            background: dark ? '#060d1e' : '#f2f5fa',
-            scrollbarColor: dark ? 'rgba(0,170,255,0.25) transparent' : 'rgba(0,100,180,0.18) transparent',
-            '&::-webkit-scrollbar': { width: 5 },
+            backgroundColor: dark ? '#060d1e' : '#f0f4f9',
+            color:           dark ? '#e2ecf8' : '#111827',
+            scrollbarColor:  dark
+              ? 'rgba(0,170,255,0.22) transparent'
+              : 'rgba(0,100,180,0.18) transparent',
+            '&::-webkit-scrollbar':       { width: 5 },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
             '&::-webkit-scrollbar-thumb': {
               borderRadius: 3,
@@ -60,8 +62,8 @@ function buildTheme(mode: ColorMode): Theme {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            background: dark ? 'rgba(10,22,48,0.88)' : '#ffffff',
-            backdropFilter: dark ? 'blur(16px)' : 'none',
+            backgroundColor: dark ? 'rgba(10,22,48,0.88)' : '#ffffff',
+            backdropFilter:  dark ? 'blur(16px)' : 'none',
             border: `1px solid ${dark ? 'rgba(0,170,255,0.09)' : 'rgba(0,80,160,0.09)'}`,
             boxShadow: dark ? 'none' : '0 1px 6px rgba(0,0,0,0.07)',
           },
@@ -81,6 +83,48 @@ function buildTheme(mode: ColorMode): Theme {
         styleOverrides: {
           root: {
             borderBottom: `1px solid ${dark ? 'rgba(0,170,255,0.06)' : 'rgba(0,80,160,0.07)'}`,
+          },
+          head: {
+            color:      dark ? '#8aaccc' : '#4b5e7a',
+            fontWeight: 600,
+            fontSize:   '0.72rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          switchBase: { '&.Mui-checked': { color: dark ? '#00aaff' : '#0060c8' } },
+          track:      { '.Mui-checked.Mui-checked + &': { backgroundColor: dark ? '#00aaff' : '#0060c8' } },
+        },
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            color:       dark ? '#8aaccc' : '#4b5e7a',
+            borderColor: dark ? 'rgba(0,170,255,0.18)' : 'rgba(0,80,160,0.15)',
+            '&.Mui-selected': {
+              backgroundColor: dark ? 'rgba(0,170,255,0.12)' : 'rgba(0,96,200,0.09)',
+              color:           dark ? '#00aaff' : '#0060c8',
+              '&:hover': {
+                backgroundColor: dark ? 'rgba(0,170,255,0.18)' : 'rgba(0,96,200,0.14)',
+              },
+            },
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: {
+            backgroundColor: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
+          },
+        },
+      },
+      MuiSkeleton: {
+        styleOverrides: {
+          root: {
+            backgroundColor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.06)',
           },
         },
       },
