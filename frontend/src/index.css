@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #050a14;
+  color: #e0e8f0;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 20, 40, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 170, 255, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 170, 255, 0.5);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(0, 170, 255, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(0, 170, 255, 0.8); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.neon-text {
+  color: #00aaff;
+  text-shadow: 0 0 10px rgba(0, 170, 255, 0.6);
+}
+
+.glass-card {
+  background: rgba(10, 25, 50, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 170, 255, 0.15);
+  border-radius: 12px;
+}

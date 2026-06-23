@@ -1,0 +1,37 @@
+{
+  "name": "smart-monitor-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "@mui/x-date-pickers": "^7.22.1",
+    "@react-three/drei": "^9.115.0",
+    "@react-three/fiber": "^8.17.10",
+    "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
+    "framer-motion": "^11.11.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "three": "^0.169.0",
+    "zustand": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.169.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}
