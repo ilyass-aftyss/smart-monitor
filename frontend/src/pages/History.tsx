@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Box, Typography, Paper, ToggleButton, ToggleButtonGroup, Grid, Skeleton, TextField, Button } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
 import ReactECharts from 'echarts-for-react'
 import { internalApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
@@ -164,7 +163,7 @@ export default function HistoryPage() {
               <TextField label="Du" type="datetime-local" size="small" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} InputLabelProps={{ shrink: true }} sx={dtFieldSx} />
               <Typography sx={{ color: textSec, fontSize: '0.8rem' }}>→</Typography>
               <TextField label="Au" type="datetime-local" size="small" value={dateTo} onChange={(e) => setDateTo(e.target.value)} InputLabelProps={{ shrink: true }} sx={dtFieldSx} />
-              <Button variant="outlined" size="small" startIcon={<SearchIcon />} onClick={fetchCustom}
+              <Button variant="outlined" size="small" onClick={fetchCustom}
                 sx={{ borderColor: 'rgba(245,158,11,0.4)', color: '#f59e0b', textTransform: 'none', '&:hover': { borderColor: '#f59e0b', bgcolor: 'rgba(245,158,11,0.06)' } }}>
                 Chercher
               </Button>

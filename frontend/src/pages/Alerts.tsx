@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableHead,
-  TableRow, Chip, IconButton, Tooltip, Switch, FormControlLabel, Skeleton,
+  TableRow, Chip, Switch, FormControlLabel, Skeleton,
 } from '@mui/material'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { motion } from 'framer-motion'
 import { alertsApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
@@ -187,12 +186,21 @@ export default function AlertsPage() {
                     </TableCell>
                     <TableCell>
                       {!alert.acknowledged && (
-                        <Tooltip title="Acquitter">
-                          <IconButton size="small" onClick={() => handleAck(alert.id)}
-                            sx={{ color: dark ? '#00e87a' : '#10b981', '&:hover': { bgcolor: dark ? 'rgba(0,232,122,0.1)' : 'rgba(16,185,129,0.1)' } }}>
-                            <CheckCircleOutlineIcon sx={{ fontSize: '1rem' }} />
-                          </IconButton>
-                        </Tooltip>
+                        <Box
+                          onClick={() => handleAck(alert.id)}
+                          sx={{
+                            display: 'inline-flex', alignItems: 'center', gap: 0.4,
+                            px: 1, py: 0.3, borderRadius: '6px', cursor: 'pointer', userSelect: 'none',
+                            color: dark ? '#00e87a' : '#10b981', fontSize: '0.68rem', fontWeight: 600,
+                            fontFamily: '"JetBrains Mono", monospace',
+                            border: `1px solid ${dark ? 'rgba(0,232,122,0.25)' : 'rgba(16,185,129,0.25)'}`,
+                            bgcolor: dark ? 'rgba(0,232,122,0.05)' : 'rgba(16,185,129,0.05)',
+                            transition: 'all 0.15s',
+                            '&:hover': { bgcolor: dark ? 'rgba(0,232,122,0.1)' : 'rgba(16,185,129,0.1)' },
+                          }}
+                        >
+                          ✓ Acquitter
+                        </Box>
                       )}
                     </TableCell>
                   </motion.tr>

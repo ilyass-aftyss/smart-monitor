@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { internalApi, externalApi, WS_URL } from '../services/api'
 import type { InternalData, ExternalData } from '../types'
 
-export function useLatestSensorData(refreshInterval = 60000) {
+export function useLatestSensorData(refreshInterval = 30000) {
   const [internal, setInternal] = useState<InternalData | null>(null)
   const [external, setExternal] = useState<ExternalData | null>(null)
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+  const wsRef = useRef<WebSocket | null>(null)
 
   const fetchData = useCallback(async () => {
     try {
@@ -18,7 +19,7 @@ export function useLatestSensorData(refreshInterval = 60000) {
       setExternal(exRes.data)
       setLastUpdate(new Date())
     } catch (e) {
-      console.error('Fetch error:', e)
+      console.error('Fetch sensor data error:', e)
     } finally {
       setLoading(false)
     }
@@ -31,26 +32,52 @@ export function useLatestSensorData(refreshInterval = 60000) {
   }, [fetchData, refreshInterval])
 
   useEffect(() => {
-    let ws: WebSocket
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+
     const connect = () => {
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return
       try {
-        ws = new WebSocket(WS_URL)
-        ws.onmessage = (evt) => {
-          const msg = JSON.parse(evt.data)
-          if (msg.type === 'internal_update') {
-            // Données internes — fréquence 1 minute
-            setInternal((prev) => prev ? { ...prev, ...msg.data, timestamp: msg.timestamp } : null)
-            setLastUpdate(new Date())
-          } else if (msg.type === 'external_update') {
-            // Données externes — fréquence 15 minutes
-            setExternal((prev) => prev ? { ...prev, ...msg.data, timestamp: msg.timestamp } : null)
-          }
+        const ws = new WebSocket(WS_URL)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+          if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
         }
-        ws.onerror = () => setTimeout(connect, 5000)
-      } catch {}
+
+        ws.onmessage = (evt) => {
+          try {
+            const msg = JSON.parse(evt.data)
+            if (msg.type === 'internal_update' && msg.data) {
+              setInternal((prev) => {
+                const base = prev ?? { id: 0, timestamp: msg.timestamp }
+                return { ...base, ...msg.data, timestamp: msg.timestamp } as InternalData
+              })
+              setLastUpdate(new Date())
+            } else if (msg.type === 'external_update' && msg.data) {
+              setExternal((prev) => {
+                const base = prev ?? { id: 0, timestamp: msg.timestamp }
+                return { ...base, ...msg.data, timestamp: msg.timestamp } as ExternalData
+              })
+            }
+          } catch {}
+        }
+
+        ws.onerror = () => {}
+        ws.onclose = () => {
+          reconnectTimer = setTimeout(connect, 5000)
+        }
+      } catch {
+        reconnectTimer = setTimeout(connect, 5000)
+      }
     }
+
     connect()
-    return () => ws?.close()
+
+    return () => {
+      if (reconnectTimer) clearTimeout(reconnectTimer)
+      wsRef.current?.close()
+      wsRef.current = null
+    }
   }, [])
 
   return { internal, external, loading, lastUpdate, refetch: fetchData }

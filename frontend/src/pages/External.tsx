@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Box, Typography, Paper, Grid, Chip, Skeleton, IconButton, Tooltip, LinearProgress } from '@mui/material'
-import RefreshIcon from '@mui/icons-material/Refresh'
+import { Box, Typography, Paper, Grid, Chip, Skeleton, LinearProgress } from '@mui/material'
 import ReactECharts from 'echarts-for-react'
 import { externalApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
@@ -131,13 +130,18 @@ export default function ExternalPage() {
                 border: `1px solid ${dark ? 'rgba(0,232,122,0.2)' : 'rgba(16,185,129,0.2)'}`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
             />
           )}
-          <Tooltip title="Rafraîchir maintenant">
-            <IconButton onClick={fetchData} size="small"
-              sx={{ color: textSec, border: `1px solid ${dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,80,160,0.15)'}`,
-                '&:hover': { color: dark ? '#00aaff' : '#0070d4' } }}>
-              <RefreshIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          <Box
+            onClick={fetchData}
+            sx={{
+              px: 1.4, py: 0.5, borderRadius: '8px', cursor: 'pointer', userSelect: 'none',
+              border: `1px solid ${dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,80,160,0.15)'}`,
+              color: textSec, fontSize: '0.72rem', fontWeight: 500,
+              transition: 'all 0.18s', fontFamily: '"JetBrains Mono", monospace',
+              '&:hover': { color: dark ? '#00aaff' : '#0070d4', borderColor: dark ? '#00aaff' : '#0070d4', background: dark ? 'rgba(0,170,255,0.06)' : 'rgba(0,112,212,0.05)' },
+            }}
+          >
+            ↻ Rafraîchir
+          </Box>
         </Box>
       </Box>
 

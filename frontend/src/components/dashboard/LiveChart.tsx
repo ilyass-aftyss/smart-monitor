@@ -12,16 +12,15 @@ interface LiveChartProps {
   optHigh?: number
 }
 
-export default function LiveChart({ data, metric, label, color, unit, optLow, optHigh }: LiveChartProps) {
+export default function LiveChart({ data, metric, color, unit, optLow, optHigh }: LiveChartProps) {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
 
-  const axisColor    = dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
-  const labelColor   = dark ? '#8aaccc' : '#5a7090'
-  const gridColor    = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
-  const tooltipBg    = dark ? '#0a1628' : '#ffffff'
-  const tooltipBorder = dark ? `${color}55` : `${color}88`
-  const tooltipText  = dark ? '#e2ecf8' : '#1a2540'
+  const axisColor   = dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
+  const labelColor  = dark ? '#6a8fb0' : '#7a90a8'
+  const gridColor   = dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'
+  const tooltipBg   = dark ? '#0d1c38' : '#ffffff'
+  const tooltipText = dark ? '#e2ecf8' : '#1a2540'
 
   const timestamps = data.map((d) =>
     new Date(d.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -34,29 +33,29 @@ export default function LiveChart({ data, metric, label, color, unit, optLow, op
   const allVals = values.filter((v) => v !== null) as number[]
   const minV = allVals.length ? Math.min(...allVals) : 0
   const maxV = allVals.length ? Math.max(...allVals) : 100
-  const pad  = (maxV - minV) * 0.15 || 1
+  const pad  = (maxV - minV) * 0.18 || 1
 
-  const markArea = (optLow !== undefined && optHigh !== undefined) ? {
-    silent: true,
-    itemStyle: { color: `${color}12`, borderWidth: 0 },
-    data: [[{ yAxis: optLow }, { yAxis: optHigh }]],
-  } : undefined
+  const yMin = Math.floor(minV - pad)
+  const yMax = Math.ceil(maxV + pad)
 
   const option = {
     backgroundColor: 'transparent',
     animation: true,
-    animationDuration: 400,
-    grid: { top: 16, right: 12, bottom: 36, left: 50 },
+    animationDuration: 600,
+    animationEasing: 'cubicOut',
+    grid: { top: 12, right: 10, bottom: 32, left: 48 },
     tooltip: {
       trigger: 'axis',
       backgroundColor: tooltipBg,
-      borderColor: tooltipBorder,
+      borderColor: `${color}44`,
       borderWidth: 1,
-      padding: [8, 12],
+      padding: [9, 14],
+      extraCssText: `box-shadow: 0 4px 20px rgba(0,0,0,${dark ? '0.5' : '0.12'});`,
       textStyle: { color: tooltipText, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
       formatter: (params: any) => {
         const p = params[0]
-        return `<span style="color:${color};font-weight:700;font-size:13px">${p.value ?? '–'} ${unit}</span><br/><span style="opacity:0.6;font-size:10px">${p.axisValue}</span>`
+        if (p.value === null || p.value === undefined) return ''
+        return `<span style="color:${color};font-weight:700;font-size:14px">${p.value} <span style="font-size:11px;opacity:0.7">${unit}</span></span><br/><span style="opacity:0.45;font-size:10px">${p.axisValue}</span>`
       },
     },
     xAxis: {
@@ -65,44 +64,57 @@ export default function LiveChart({ data, metric, label, color, unit, optLow, op
       boundaryGap: false,
       axisLine:  { lineStyle: { color: axisColor } },
       axisTick:  { show: false },
-      axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace', interval: Math.max(0, Math.floor(timestamps.length / 5) - 1) },
+      axisLabel: {
+        color: labelColor, fontSize: 9,
+        fontFamily: '"JetBrains Mono", monospace',
+        interval: Math.max(0, Math.floor(timestamps.length / 5) - 1),
+      },
       splitLine: { show: false },
     },
     yAxis: {
       type: 'value',
-      min: minV - pad,
-      max: maxV + pad,
+      min: yMin, max: yMax,
       axisLine: { show: false },
       axisTick: { show: false },
       axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace' },
-      splitLine: { lineStyle: { color: gridColor, type: 'dashed' } },
+      splitLine: { lineStyle: { color: gridColor, type: 'dashed', dashOffset: 4 } },
     },
     series: [{
       type: 'line',
       data: values,
-      smooth: 0.35,
+      smooth: 0.4,
       symbol: 'circle',
-      symbolSize: (v: number | null) => (v !== null && timestamps.length <= 30) ? 4 : 0,
-      showSymbol: timestamps.length <= 30,
-      lineStyle:  { color, width: 2, shadowColor: `${color}55`, shadowBlur: 6 },
-      itemStyle:  { color, borderColor: dark ? '#0a1628' : '#fff', borderWidth: 2 },
-      areaStyle:  {
+      symbolSize: (v: number | null) => (v !== null && timestamps.length <= 40) ? 5 : 0,
+      showSymbol: timestamps.length <= 40,
+      lineStyle: { color, width: 2.5, shadowColor: `${color}55`, shadowBlur: 8 },
+      itemStyle: { color, borderColor: dark ? '#0d1c38' : '#fff', borderWidth: 2 },
+      areaStyle: {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [{ offset: 0, color: `${color}40` }, { offset: 1, color: `${color}00` }],
+          colorStops: [
+            { offset: 0, color: `${color}4a` },
+            { offset: 0.6, color: `${color}18` },
+            { offset: 1, color: `${color}00` },
+          ],
         },
       },
-      markArea,
-      markLine: {
+      markArea: (optLow !== undefined && optHigh !== undefined) ? {
+        silent: true,
+        itemStyle: { color: `${color}0d`, borderWidth: 0 },
+        data: [[
+          { yAxis: optLow, label: { show: false } },
+          { yAxis: optHigh },
+        ]],
+      } : undefined,
+      markLine: allVals.length ? {
         silent: true,
         symbol: ['none', 'none'],
         lineStyle: { color: `${color}55`, type: 'dashed', width: 1 },
-        data: allVals.length ? [
-          [{ coord: [0, Math.max(...allVals)], label: { show: false } }, { coord: [timestamps.length - 1, Math.max(...allVals)] }],
-        ] : [],
-      },
+        label: { show: false },
+        data: [{ type: 'average' }],
+      } : undefined,
     }],
   }
 
-  return <ReactECharts option={option} style={{ height: 170 }} opts={{ renderer: 'canvas' }} />
+  return <ReactECharts option={option} style={{ height: 180 }} opts={{ renderer: 'canvas' }} />
 }

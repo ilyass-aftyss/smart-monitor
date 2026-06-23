@@ -22,19 +22,19 @@ function buildTheme(mode: ColorMode): Theme {
       warning:    { main: '#f59e0b' },
       success:    { main: dark ? '#00e87a' : '#10b981' },
       background: {
-        default: dark ? '#060d1e' : '#f0f4f8',
+        default: dark ? '#060d1e' : '#f2f5fa',
         paper:   dark ? 'rgba(10,22,48,0.92)' : '#ffffff',
       },
       text: {
         primary:   dark ? '#e2ecf8' : '#1a2540',
         secondary: dark ? '#8aaccc' : '#5a7090',
       },
-      divider: dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,100,180,0.12)',
+      divider: dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,100,180,0.1)',
     },
     typography: {
-      fontFamily: '"Inter", system-ui, sans-serif',
-      h5: { fontWeight: 700 },
-      h6: { fontWeight: 600 },
+      fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
+      h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+      h6: { fontWeight: 600, letterSpacing: '-0.01em' },
       body1: { fontSize: '0.9rem' },
       body2: { fontSize: '0.8rem' },
       caption: { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.72rem' },
@@ -43,12 +43,16 @@ function buildTheme(mode: ColorMode): Theme {
     components: {
       MuiCssBaseline: {
         styleOverrides: {
+          '@import': "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap')",
           body: {
-            background: dark ? '#060d1e' : '#f0f4f8',
-            scrollbarColor: dark ? 'rgba(0,170,255,0.3) rgba(10,20,40,0.5)' : 'rgba(0,100,180,0.2) rgba(240,244,248,0.8)',
-            '&::-webkit-scrollbar': { width: 6 },
+            background: dark ? '#060d1e' : '#f2f5fa',
+            scrollbarColor: dark ? 'rgba(0,170,255,0.25) transparent' : 'rgba(0,100,180,0.18) transparent',
+            '&::-webkit-scrollbar': { width: 5 },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
-            '&::-webkit-scrollbar-thumb': { borderRadius: 3, background: dark ? 'rgba(0,170,255,0.25)' : 'rgba(0,100,180,0.2)' },
+            '&::-webkit-scrollbar-thumb': {
+              borderRadius: 3,
+              background: dark ? 'rgba(0,170,255,0.22)' : 'rgba(0,100,180,0.18)',
+            },
           },
         },
       },
@@ -58,8 +62,8 @@ function buildTheme(mode: ColorMode): Theme {
             backgroundImage: 'none',
             background: dark ? 'rgba(10,22,48,0.88)' : '#ffffff',
             backdropFilter: dark ? 'blur(16px)' : 'none',
-            border: `1px solid ${dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,80,160,0.1)'}`,
-            boxShadow: dark ? 'none' : '0 1px 4px rgba(0,0,0,0.06)',
+            border: `1px solid ${dark ? 'rgba(0,170,255,0.09)' : 'rgba(0,80,160,0.09)'}`,
+            boxShadow: dark ? 'none' : '0 1px 6px rgba(0,0,0,0.07)',
           },
         },
       },
@@ -71,6 +75,13 @@ function buildTheme(mode: ColorMode): Theme {
       MuiChip: {
         styleOverrides: {
           root: { fontFamily: '"JetBrains Mono", monospace', fontWeight: 500 },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            borderBottom: `1px solid ${dark ? 'rgba(0,170,255,0.06)' : 'rgba(0,80,160,0.07)'}`,
+          },
         },
       },
     },
