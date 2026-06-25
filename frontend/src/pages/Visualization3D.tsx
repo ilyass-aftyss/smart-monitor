@@ -1,16 +1,56 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+//  Visualization3D.tsx  —  Jumeau numérique 3D · Serre Fraisier
+//
+//  MODÈLE 3D : "Farmer Greenhouse 3.5x6.0x2.03m 40x20/20x20"
+//  Source    : https://sketchfab.com/3d-models/farmer-greenhouse-35x60x203m-40x2020x20-b032e046389a4194bf6a032620b977a3
+//  Auteur    : MinorEarth (https://sketchfab.com/sanx78)
+//  Licence   : CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+//
+//  PLACEMENT DES FICHIERS (voir section « Où placer le ZIP » en bas) :
+//    public/models/greenhouse/scene.gltf
+//    public/models/greenhouse/scene.bin
+//    public/models/greenhouse/textures/AppAA4_0_baseColor.jpeg
+//    public/models/greenhouse/textures/AppAA4_1_baseColor.jpeg
+// ═══════════════════════════════════════════════════════════════════════════════
+
 import { Suspense, useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { Canvas, useFrame, ThreeEvent } from '@react-three/fiber'
-import { OrbitControls, Text, Float, Sparkles, Html } from '@react-three/drei'
+import { Canvas, useFrame, ThreeEvent, useLoader } from '@react-three/fiber'
+import { OrbitControls, Text, Float, Sparkles, Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { Box, Typography, Paper, Chip, CircularProgress, Slider, FormControlLabel, Switch, IconButton } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLatestSensorData } from '../hooks/useSensorData'
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
-const W = 5     // width  (X axis)  5 m
-const L = 10    // length (Z axis) 10 m
-const H = 3     // wall height      3 m
-const RIDGE_H = H + 1.2  // apex of pitched roof
+// ─── Chemin public vers le modèle GLTF ─────────────────────────────────────────
+// Placez les fichiers extraits du ZIP dans : public/models/greenhouse/
+const GREENHOUSE_GLTF_PATH = '/models/greenhouse/scene.gltf'
+
+// ─── Constants scène (doivent précéder les calculs d'échelle) ─────────────────
+const W = 5     // largeur  (X)  m
+const L = 10    // longueur (Z)  m
+const H = 3     // hauteur mur   m
+
+// ─── Dimensions natives exactes du modèle GLTF (accesseurs positions) ──────────
+// X: [-1.819, 1.819] → width = 3.638 m
+// Y: [-2.035, 0.182] → height = 2.217 m
+// Z: [-6.030, 0.060] → length = 6.090 m
+const MODEL_NATIVE_W = 3.638
+const MODEL_NATIVE_H = 2.217
+const MODEL_NATIVE_L = 6.090
+const MODEL_FLOOR_Y  = -2.035
+const MODEL_Z_CENTER = (-6.030 + 0.060) / 2  // -2.985
+
+// ─── Échelle et position pour coller à W=5, H=3, L=10 ─────────────────────────
+const MODEL_SCALE_X = W / MODEL_NATIVE_W
+const MODEL_SCALE_Y = H / MODEL_NATIVE_H
+const MODEL_SCALE_Z = L / MODEL_NATIVE_L
+const MODEL_Y_OFFSET = -MODEL_FLOOR_Y * MODEL_SCALE_Y
+const MODEL_Z_OFFSET = -MODEL_Z_CENTER * MODEL_SCALE_Z
+// ─── Ajustements manuels (tuning visuel) ────────────────────────────────────
+const TUNE_Y = -2.5   // descendre (négatif) ou monter (positif)
+const TUNE_Z = -9.80     // reculer (négatif) ou avancer (positif)
+const TUNE_X = 0.10      // décalage latéral (dans l'axe X)
+const RIDGE_H = H + 1.2
 
 const GUTTER_LENGTH = 8.5
 const GUTTER_HEIGHT = 1.0
@@ -18,7 +58,7 @@ const GUTTER_POSITIONS_X = [-1.25, 0, 1.25]
 const PLANTS_PER_GUTTER = 27
 const PLANT_SPACING = GUTTER_LENGTH / (PLANTS_PER_GUTTER - 1)
 
-// ─── Colour helpers ─────────────────────────────────────────────────────────────
+// ─── Couleur en fonction de la température ──────────────────────────────────────
 function tempToColor(temp: number): THREE.Color {
   if (temp < 10) return new THREE.Color('#0033ff')
   if (temp < 15) return new THREE.Color('#0066ff')
@@ -29,7 +69,7 @@ function tempToColor(temp: number): THREE.Color {
   return new THREE.Color('#ff2200')
 }
 
-// ─── Window config — 6 windows: 3 upper (roof), 3 lower (walls) ───────────────
+// ─── Interfaces fenêtres ────────────────────────────────────────────────────────
 interface WindowConfig {
   id: string
   label: string
@@ -37,21 +77,21 @@ interface WindowConfig {
   rotation: [number, number, number]
   side: 'south' | 'north'
   row: 'upper' | 'lower'
-  openAngle: number   // degrees 0-90
+  openAngle: number
 }
 
+// Les fenêtres sont des overlays React Three Fiber positionnés sur la structure GLTF
+// Positions ajustées pour coller aux parois du nouveau modèle
 const WINDOWS: WindowConfig[] = [
-  // Lower row — south wall (Z = +5), bottom half
-  { id: 'w-s-l-1', label: 'Fenêtre S1', position: [-1.5, 1.0, L / 2], rotation: [0, 0, 0], side: 'south', row: 'lower', openAngle: 0 },
-  { id: 'w-s-l-2', label: 'Fenêtre S2', position: [ 0,   1.0, L / 2], rotation: [0, 0, 0], side: 'south', row: 'lower', openAngle: 0 },
-  { id: 'w-s-l-3', label: 'Fenêtre S3', position: [ 1.5, 1.0, L / 2], rotation: [0, 0, 0], side: 'south', row: 'lower', openAngle: 0 },
-  // Upper row — north wall (Z = -5), upper half (ridge vents)
+  { id: 'w-s-l-1', label: 'Fenêtre S1', position: [-1.5, 1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
+  { id: 'w-s-l-2', label: 'Fenêtre S2', position: [ 0,   1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
+  { id: 'w-s-l-3', label: 'Fenêtre S3', position: [ 1.5, 1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
   { id: 'w-n-u-1', label: 'Fenêtre N1', position: [-1.5, 2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
   { id: 'w-n-u-2', label: 'Fenêtre N2', position: [ 0,   2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
   { id: 'w-n-u-3', label: 'Fenêtre N3', position: [ 1.5, 2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
 ]
 
-// ─── Internal sensor layout ─────────────────────────────────────────────────────
+// ─── Capteurs ──────────────────────────────────────────────────────────────────
 interface SensorConfig {
   id: string
   label: string
@@ -70,9 +110,9 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     zone: 'Zone Nord',
     getValue: (d) => [
       { label: 'Température', value: `${d.temperature?.toFixed(1)} °C` },
-      { label: 'Humidité', value: `${d.humidity?.toFixed(1)} %` },
-      { label: 'CO₂', value: `${d.co2?.toFixed(0)} ppm` },
-      { label: 'VPD', value: `${d.vpd?.toFixed(2)} kPa` },
+      { label: 'Humidité',    value: `${d.humidity?.toFixed(1)} %` },
+      { label: 'CO₂',        value: `${d.co2?.toFixed(0)} ppm` },
+      { label: 'VPD',        value: `${d.vpd?.toFixed(2)} kPa` },
     ],
   },
   {
@@ -83,9 +123,9 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     zone: 'Zone Centre',
     getValue: (d) => [
       { label: 'Température', value: `${d.temperature?.toFixed(1)} °C` },
-      { label: 'Humidité', value: `${d.humidity?.toFixed(1)} %` },
-      { label: 'VPD', value: `${d.vpd?.toFixed(2)} kPa` },
-      { label: 'VOC', value: `${d.voc?.toFixed(0)} ppb` },
+      { label: 'Humidité',    value: `${d.humidity?.toFixed(1)} %` },
+      { label: 'VPD',        value: `${d.vpd?.toFixed(2)} kPa` },
+      { label: 'VOC',        value: `${d.voc?.toFixed(0)} ppb` },
     ],
   },
   {
@@ -96,9 +136,9 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     zone: 'Zone Sud',
     getValue: (d) => [
       { label: 'Température', value: `${d.temperature?.toFixed(1)} °C` },
-      { label: 'Humidité', value: `${d.humidity?.toFixed(1)} %` },
-      { label: 'Pression', value: `${d.pressure?.toFixed(0)} hPa` },
-      { label: 'Pt. Rosée', value: `${d.dew_point?.toFixed(1)} °C` },
+      { label: 'Humidité',    value: `${d.humidity?.toFixed(1)} %` },
+      { label: 'Pression',   value: `${d.pressure?.toFixed(0)} hPa` },
+      { label: 'Pt. Rosée',  value: `${d.dew_point?.toFixed(1)} °C` },
     ],
   },
   {
@@ -108,49 +148,38 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     color: '#f97316',
     zone: 'Extérieur',
     getValue: (d) => [
-      { label: 'Temp. Ext', value: `${d.temperature?.toFixed(1)} °C` },
-      { label: 'Hum. Ext', value: `${d.humidity?.toFixed(1)} %` },
-      { label: 'Vent', value: `${d.wind_speed?.toFixed(1)} m/s` },
-      { label: 'Radiation', value: `${d.radiation?.toFixed(0)} W/m²` },
+      { label: 'Temp. Ext',  value: `${d.temperature?.toFixed(1)} °C` },
+      { label: 'Hum. Ext',   value: `${d.humidity?.toFixed(1)} %` },
+      { label: 'Vent',       value: `${d.wind_speed?.toFixed(1)} m/s` },
+      { label: 'Radiation',  value: `${d.radiation?.toFixed(0)} W/m²` },
     ],
   },
 ]
 
-// ─── Interior Airflow Lines (wavy, temperature-coloured) ────────────────────────
+// ─── Flux d'air (particules wavy, colorées par température) ────────────────────
 function AirflowParticles({
-  windSpeed,
-  extTemp,
-  intTemp,
-  windowsOpen,
-  allClosed,
+  windSpeed, extTemp, intTemp, windowsOpen, allClosed,
 }: {
-  windSpeed: number
-  extTemp: number
-  intTemp: number
-  windowsOpen: boolean
-  allClosed: boolean
+  windSpeed: number; extTemp: number; intTemp: number
+  windowsOpen: boolean; allClosed: boolean
 }) {
-  // Number of flow lines scales with wind speed
   const lineCount = allClosed ? 0 : Math.min(Math.round(windSpeed * 2.5 + 3), 18)
   const pointsPerLine = 60
 
-  // colour = exterior temp (what's coming in)
   const hexColor = useMemo(() => {
     const c = tempToColor(extTemp)
     return '#' + c.getHexString()
   }, [extTemp])
 
-  // Each line gets a fixed Y lane + phase offset, computed once
-  const laneConfig = useMemo(() => {
-    return Array.from({ length: 18 }).map((_, i) => ({
+  const laneConfig = useMemo(() =>
+    Array.from({ length: 18 }).map((_, i) => ({
       y: 0.25 + (i / 17) * (H - 0.5),
       xOff: (Math.random() - 0.5) * (W * 0.85),
       phase: Math.random() * Math.PI * 2,
       ampY: 0.06 + Math.random() * 0.10,
       ampX: 0.05 + Math.random() * 0.07,
       speedMul: 0.7 + Math.random() * 0.6,
-    }))
-  }, [])
+    })), [])
 
   const meshesRef = useRef<(THREE.Line | null)[]>([])
 
@@ -158,22 +187,17 @@ function AirflowParticles({
     if (allClosed || lineCount === 0) return
     const t = clock.getElapsedTime()
     const baseSpeed = Math.max(0.6, windSpeed * 0.45)
-
     meshesRef.current.forEach((lineObj, i) => {
       if (!lineObj || i >= lineCount) return
       const cfg = laneConfig[i]
       const pos = lineObj.geometry.attributes.position.array as Float32Array
-
       for (let j = 0; j <= pointsPerLine; j++) {
-        const progress = j / pointsPerLine           // 0 → 1 along Z axis (south to north)
+        const progress = j / pointsPerLine
         const zPos = -L / 2 + ((progress * L + t * baseSpeed * cfg.speedMul) % L)
         const xPos = cfg.xOff + Math.sin(progress * Math.PI * 5 + t * 2.2 + cfg.phase) * cfg.ampX
         const yPos = cfg.y + Math.sin(progress * Math.PI * 7 + t * 1.8 + cfg.phase * 1.3) * cfg.ampY
-
         const idx = j * 3
-        pos[idx]     = xPos
-        pos[idx + 1] = yPos
-        pos[idx + 2] = zPos
+        pos[idx] = xPos; pos[idx + 1] = yPos; pos[idx + 2] = zPos
       }
       lineObj.geometry.attributes.position.needsUpdate = true
     })
@@ -204,9 +228,7 @@ function AirflowParticles({
   )
 }
 
-// ─── (WindLines removed per user request) ─────────────────────────────────────
-
-// ─── Rain System ────────────────────────────────────────────────────────────────
+// ─── Pluie ──────────────────────────────────────────────────────────────────────
 function RainSystem({ humidity, windSpeed }: { humidity: number; windSpeed: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const count = humidity > 80 ? 300 : humidity > 70 ? 150 : 0
@@ -245,15 +267,11 @@ function RainSystem({ humidity, windSpeed }: { humidity: number; windSpeed: numb
   )
 }
 
-// ─── Window (panel that rotates open) ─────────────────────────────────────────
+// ─── Fenêtre (panneau animé superposé au modèle GLTF) ──────────────────────────
 function GreenhouseWindow({
-  config,
-  openAngle,
-  onClick,
+  config, openAngle, onClick,
 }: {
-  config: WindowConfig
-  openAngle: number
-  onClick: () => void
+  config: WindowConfig; openAngle: number; onClick: () => void
 }) {
   const panelRef = useRef<THREE.Mesh>(null)
   const targetAngle = (openAngle / 90) * (Math.PI / 2)
@@ -270,19 +288,18 @@ function GreenhouseWindow({
 
   return (
     <group position={config.position} rotation={config.rotation}>
-      {/* Frame */}
       <mesh onClick={onClick}>
         <boxGeometry args={[0.7, 0.6, 0.04]} />
-        <meshStandardMaterial color={frameColor} emissive={frameColor} emissiveIntensity={0.15} metalness={0.8} roughness={0.2} transparent opacity={0.0} />
+        <meshStandardMaterial color={frameColor} emissive={frameColor} emissiveIntensity={0.15}
+          metalness={0.8} roughness={0.2} transparent opacity={0.0} />
       </mesh>
-      {/* Glass panel — hinged at bottom */}
       <group position={[0, -0.3, 0]}>
         <mesh ref={panelRef} position={[0, 0.3, 0.02]}>
           <boxGeometry args={[0.65, 0.55, 0.015]} />
-          <meshStandardMaterial color={glassColor} transparent opacity={0.35} metalness={0.1} roughness={0.05} side={THREE.DoubleSide} />
+          <meshStandardMaterial color={glassColor} transparent opacity={0.35}
+            metalness={0.1} roughness={0.05} side={THREE.DoubleSide} />
         </mesh>
       </group>
-      {/* Frame border */}
       {[[-0.35, 0], [0.35, 0]].map(([x], i) => (
         <mesh key={i} position={[x, 0, 0]}>
           <boxGeometry args={[0.04, 0.62, 0.05]} />
@@ -295,9 +312,7 @@ function GreenhouseWindow({
           <meshStandardMaterial color={frameColor} emissive={frameColor} emissiveIntensity={0.3} metalness={0.9} roughness={0.1} />
         </mesh>
       ))}
-      {/* Open indicator light */}
       {isOpen && <pointLight color="#00ff88" intensity={0.3} distance={1.5} />}
-      {/* Label */}
       <Text position={[0, -0.5, 0.05]} fontSize={0.07} color={isOpen ? '#00ff88' : '#8aaccc'} anchorX="center">
         {config.label} {isOpen ? `${openAngle}°` : 'fermée'}
       </Text>
@@ -305,7 +320,7 @@ function GreenhouseWindow({
   )
 }
 
-// ─── Sensor icons mapped to label keywords ─────────────────────────────────────
+// ─── Icônes capteurs ────────────────────────────────────────────────────────────
 function sensorIcon(label: string): string {
   if (label.includes('Temp')) return '🌡'
   if (label.includes('CO')) return '💨'
@@ -319,7 +334,6 @@ function sensorIcon(label: string): string {
   return '◈'
 }
 
-// Pulsing halo ring around selected sensor
 function PulsingHalo({ color }: { color: string }) {
   const ref = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
@@ -337,17 +351,11 @@ function PulsingHalo({ color }: { color: string }) {
   )
 }
 
-// ─── Clickable Sensor Node — realistic 3D box ──────────────────────────────────
+// ─── Nœud capteur cliquable ─────────────────────────────────────────────────────
 function SensorNode({
-  config,
-  data,
-  selected,
-  onSelect,
+  config, data, selected, onSelect,
 }: {
-  config: SensorConfig
-  data: any
-  selected: boolean
-  onSelect: () => void
+  config: SensorConfig; data: any; selected: boolean; onSelect: () => void
 }) {
   const bodyRef = useRef<THREE.Mesh>(null)
   const ledRef  = useRef<THREE.Mesh>(null)
@@ -355,7 +363,6 @@ function SensorNode({
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
-    // LED blink — fast when selected
     if (ledRef.current) {
       const mat = ledRef.current.material as THREE.MeshStandardMaterial
       mat.emissiveIntensity = selected
@@ -368,160 +375,92 @@ function SensorNode({
 
   return (
     <group position={config.position} onClick={(e: ThreeEvent<MouseEvent>) => { e.stopPropagation(); onSelect() }}>
-
-      {/* ── Mounting pole (only for internal sensors) ── */}
       {!isExternal && (
         <>
-          {/* Pole from floor to sensor */}
           <mesh position={[0, -config.position[1] / 2 - 0.05, 0]}>
             <cylinderGeometry args={[0.012, 0.012, config.position[1] + 0.1, 8]} />
             <meshStandardMaterial color="#334466" metalness={0.9} roughness={0.2} />
           </mesh>
-          {/* Base foot */}
           <mesh position={[0, -config.position[1] + 0.02, 0]}>
             <cylinderGeometry args={[0.055, 0.07, 0.04, 12]} />
             <meshStandardMaterial color="#222244" metalness={0.8} roughness={0.3} />
           </mesh>
         </>
       )}
-
-      {/* ── Main sensor housing ── */}
-      {/* Body — rounded box */}
       <mesh ref={bodyRef} castShadow>
         <boxGeometry args={[0.18, 0.24, 0.12]} />
         <meshStandardMaterial
           color={selected ? config.color : '#1a2a3a'}
           emissive={config.color}
           emissiveIntensity={selected ? 0.35 : 0.08}
-          metalness={0.6}
-          roughness={0.35}
+          metalness={0.6} roughness={0.35}
         />
       </mesh>
-
-      {/* Front face plate (slightly raised) */}
       <mesh position={[0, 0, 0.063]}>
         <boxGeometry args={[0.155, 0.21, 0.008]} />
         <meshStandardMaterial color="#0d1a28" metalness={0.3} roughness={0.6} />
       </mesh>
-
-      {/* Screen / display area on front */}
       <mesh position={[0, 0.03, 0.069]}>
         <boxGeometry args={[0.12, 0.11, 0.003]} />
-        <meshStandardMaterial
-          color={config.color}
-          emissive={config.color}
-          emissiveIntensity={selected ? 0.6 : 0.15}
-          transparent
-          opacity={0.85}
-        />
+        <meshStandardMaterial color={config.color} emissive={config.color}
+          emissiveIntensity={selected ? 0.6 : 0.15} transparent opacity={0.85} />
       </mesh>
-
-      {/* Three tiny buttons on front */}
       {[-0.04, 0, 0.04].map((x, i) => (
         <mesh key={i} position={[x, -0.075, 0.068]}>
           <cylinderGeometry args={[0.008, 0.008, 0.006, 8]} />
           <meshStandardMaterial color="#334455" metalness={0.7} roughness={0.3} />
         </mesh>
       ))}
-
-      {/* LED indicator — top right corner */}
       <mesh ref={ledRef} position={[0.06, 0.085, 0.069]}>
         <sphereGeometry args={[0.012, 8, 8]} />
-        <meshStandardMaterial
-          color={config.color}
-          emissive={config.color}
-          emissiveIntensity={0.8}
-        />
+        <meshStandardMaterial color={config.color} emissive={config.color} emissiveIntensity={0.8} />
       </mesh>
-
-      {/* Ventilation grille — small lines on side */}
       {[0.04, 0.02, 0, -0.02, -0.04].map((y, i) => (
         <mesh key={i} position={[0.092, y, 0]}>
           <boxGeometry args={[0.003, 0.012, 0.08]} />
           <meshStandardMaterial color="#0a1520" metalness={0.5} roughness={0.5} />
         </mesh>
       ))}
-
-      {/* Antenna (rod on top) */}
       <mesh position={[0.055, 0.19, 0]}>
         <cylinderGeometry args={[0.005, 0.005, 0.18, 6]} />
-        <meshStandardMaterial color={config.color} emissive={config.color} emissiveIntensity={0.5} metalness={0.7} roughness={0.2} />
+        <meshStandardMaterial color={config.color} emissive={config.color}
+          emissiveIntensity={0.5} metalness={0.7} roughness={0.2} />
       </mesh>
-      {/* Antenna tip dot */}
       <mesh position={[0.055, 0.285, 0]}>
         <sphereGeometry args={[0.016, 8, 8]} />
         <meshStandardMaterial color={config.color} emissive={config.color} emissiveIntensity={1.2} />
       </mesh>
-
-      {/* Label text below sensor */}
-      <Text
-        position={[0, -0.18, 0.07]}
-        fontSize={0.065}
-        color={selected ? config.color : '#8aaccc'}
-        anchorX="center"
-        anchorY="top"
-      >
+      <Text position={[0, -0.18, 0.07]} fontSize={0.065} color={selected ? config.color : '#8aaccc'}
+        anchorX="center" anchorY="top">
         {config.label}
       </Text>
-
-      {/* Pulsing halo when selected */}
       {selected && <PulsingHalo color={config.color} />}
-
-      {/* Point light glow */}
-      <pointLight
-        color={config.color}
-        intensity={selected ? 1.0 : 0.25}
-        distance={selected ? 3.0 : 1.8}
-      />
-
-      {/* ── Data card — appears on click ── */}
+      <pointLight color={config.color} intensity={selected ? 1.0 : 0.25} distance={selected ? 3.0 : 1.8} />
       {selected && data && (
-        <Html
-          position={[0.45, 0.3, 0]}
-          distanceFactor={3.8}
-          occlude={false}
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
+        <Html position={[0.45, 0.3, 0]} distanceFactor={3.8} occlude={false}
+          style={{ pointerEvents: 'none', userSelect: 'none' }}>
           <div style={{
             fontFamily: '"JetBrains Mono", "Courier New", monospace',
             minWidth: 210,
             filter: 'drop-shadow(0 0 18px ' + config.color + '55)',
           }}>
-            {/* Card header */}
             <div style={{
-              background: config.color,
-              borderRadius: '10px 10px 0 0',
-              padding: '8px 14px 6px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
+              background: config.color, borderRadius: '10px 10px 0 0',
+              padding: '8px 14px 6px', display: 'flex', alignItems: 'center', gap: 7,
             }}>
-              <div style={{
-                width: 8, height: 8, borderRadius: '50%',
-                background: 'white',
-                boxShadow: '0 0 6px white',
-              }} />
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'white', boxShadow: '0 0 6px white' }} />
               <span style={{ color: '#000', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 {config.zone}
               </span>
-              <span style={{ marginLeft: 'auto', color: 'rgba(0,0,0,0.6)', fontSize: 9 }}>
-                {config.label}
-              </span>
+              <span style={{ marginLeft: 'auto', color: 'rgba(0,0,0,0.6)', fontSize: 9 }}>{config.label}</span>
             </div>
-
-            {/* Card body */}
             <div style={{
-              background: 'rgba(4, 10, 24, 0.97)',
-              border: `1px solid ${config.color}55`,
-              borderTop: 'none',
-              borderRadius: '0 0 10px 10px',
-              padding: '10px 14px 10px',
+              background: 'rgba(4, 10, 24, 0.97)', border: `1px solid ${config.color}55`,
+              borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '10px 14px 10px',
             }}>
               {readings.map((r, idx) => (
                 <div key={r.label} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   marginBottom: idx < readings.length - 1 ? 8 : 0,
                   paddingBottom: idx < readings.length - 1 ? 8 : 0,
                   borderBottom: idx < readings.length - 1 ? `1px solid ${config.color}22` : 'none',
@@ -530,30 +469,14 @@ function SensorNode({
                     <span style={{ fontSize: 14 }}>{sensorIcon(r.label)}</span>
                     <span style={{ color: '#8aaccc', fontSize: 10 }}>{r.label}</span>
                   </div>
-                  <span style={{
-                    color: config.color,
-                    fontSize: 13,
-                    fontWeight: 800,
-                    textShadow: `0 0 8px ${config.color}`,
-                    letterSpacing: '0.03em',
-                  }}>
+                  <span style={{ color: config.color, fontSize: 13, fontWeight: 800,
+                    textShadow: `0 0 8px ${config.color}`, letterSpacing: '0.03em' }}>
                     {r.value}
                   </span>
                 </div>
               ))}
-
-              {/* Live pulse bar */}
-              <div style={{
-                marginTop: 10,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}>
-                <div style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: config.color,
-                  boxShadow: `0 0 6px ${config.color}`,
-                }} />
+              <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: config.color, boxShadow: `0 0 6px ${config.color}` }} />
                 <span style={{ color: '#8aaccc', fontSize: 9, letterSpacing: '0.06em' }}>TEMPS RÉEL · Cliquer pour fermer</span>
               </div>
             </div>
@@ -564,7 +487,7 @@ function SensorNode({
   )
 }
 
-// ─── Strawberry plant ────────────────────────────────────────────────────────────
+// ─── Plante fraisier ─────────────────────────────────────────────────────────────
 function StrawberryPlant({ position }: { position: [number, number, number] }) {
   const meshRef = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
@@ -634,130 +557,15 @@ function GutterStructure() {
   )
 }
 
-// ─── Greenhouse structure ───────────────────────────────────────────────────────
-function GreenhouseStructure({
-  tempColor,
-  showWireframe,
-  windows,
-  onWindowClick,
-}: {
-  tempColor: THREE.Color
-  showWireframe: boolean
-  windows: WindowConfig[]
-  onWindowClick: (id: string) => void
-}) {
-  const hw = W / 2
-  const hl = L / 2
-
-  return (
-    <group>
-      {/* Floor */}
-      <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[W, L]} />
-        <meshStandardMaterial color="#0a1428" metalness={0.2} roughness={0.9} />
-      </mesh>
-
-      {/* Floor grid */}
-      <gridHelper args={[Math.max(W, L), 10, '#0033aa', '#001155']} position={[0, 0.01, 0]} />
-
-      {/* Walls (glass) */}
-      {[
-        { pos: [0, H / 2, hl] as [number, number, number],   rot: [0, 0, 0] as [number, number, number],           size: [W, H] as [number, number] },
-        { pos: [0, H / 2, -hl] as [number, number, number],  rot: [0, 0, 0] as [number, number, number],           size: [W, H] as [number, number] },
-        { pos: [hw, H / 2, 0] as [number, number, number],   rot: [0, Math.PI / 2, 0] as [number, number, number], size: [L, H] as [number, number] },
-        { pos: [-hw, H / 2, 0] as [number, number, number],  rot: [0, Math.PI / 2, 0] as [number, number, number], size: [L, H] as [number, number] },
-      ].map((wall, i) => (
-        <mesh key={i} position={wall.pos} rotation={wall.rot}>
-          <planeGeometry args={wall.size} />
-          <meshStandardMaterial color="#1a3a6a" transparent opacity={0.18} side={THREE.DoubleSide} metalness={0.05} roughness={0.05} />
-        </mesh>
-      ))}
-
-      {/* Roof panels */}
-      {[
-        { pos: [-hw / 2 - 0.1, H + 0.35, 0] as [number, number, number], rot: [0, 0, -Math.PI / 5.5] as [number, number, number] },
-        { pos: [ hw / 2 + 0.1, H + 0.35, 0] as [number, number, number], rot: [0, 0,  Math.PI / 5.5] as [number, number, number] },
-      ].map((r, i) => (
-        <mesh key={i} position={r.pos} rotation={r.rot}>
-          <planeGeometry args={[L, 3.2]} />
-          <meshStandardMaterial color="#1a3d7a" transparent opacity={0.15} side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-
-      {/* Structural beams — vertical */}
-      {([-hw, hw] as number[]).flatMap((x) =>
-        ([-hl, -hl / 2, 0, hl / 2, hl] as number[]).map((z) => (
-          <mesh key={`v-${x}-${z}`} position={[x, H / 2, z]}>
-            <boxGeometry args={[0.055, H, 0.055]} />
-            <meshStandardMaterial color="#00aaff" emissive="#0044aa" emissiveIntensity={0.25} metalness={0.9} roughness={0.1} />
-          </mesh>
-        ))
-      )}
-
-      {/* Horizontal ridge beam */}
-      <mesh position={[0, H, 0]}>
-        <boxGeometry args={[0.06, 0.06, L]} />
-        <meshStandardMaterial color="#00aaff" emissive="#0044aa" emissiveIntensity={0.3} metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      {/* Purlins (top of side walls) */}
-      {[-hw, hw].map((x) => (
-        <mesh key={`p-${x}`} position={[x, H, 0]}>
-          <boxGeometry args={[0.06, 0.06, L]} />
-          <meshStandardMaterial color="#00aaff" emissive="#0044aa" emissiveIntensity={0.3} metalness={0.9} roughness={0.1} />
-        </mesh>
-      ))}
-
-      {/* Roof ridge apex beam */}
-      <mesh position={[0, RIDGE_H, 0]}>
-        <boxGeometry args={[0.07, 0.07, L + 0.2]} />
-        <meshStandardMaterial color="#00ccff" emissive="#0066bb" emissiveIntensity={0.4} metalness={0.9} roughness={0.1} />
-      </mesh>
-
-      {/* Temperature haze fill */}
-      {showWireframe && (
-        <mesh position={[0, H / 2, 0]}>
-          <boxGeometry args={[W - 0.2, H, L - 0.2]} />
-          <meshStandardMaterial color={tempColor} transparent opacity={0.04} wireframe={showWireframe} />
-        </mesh>
-      )}
-
-      {/* Corner glow lights */}
-      {([-hw, hw] as number[]).flatMap((x) =>
-        ([-hl, hl] as number[]).map((z) => (
-          <pointLight key={`cl-${x}-${z}`} position={[x, 0.5, z]} color="#0044aa" intensity={0.25} distance={4} />
-        ))
-      )}
-
-      {/* Roof ridge lights */}
-      {[-3.5, 0, 3.5].map((z) => (
-        <pointLight key={`rl-${z}`} position={[0, H + 0.8, z]} color="#00aaff" intensity={0.5} distance={7} />
-      ))}
-
-      {/* 6 Windows */}
-      {windows.map((win) => (
-        <GreenhouseWindow
-          key={win.id}
-          config={win}
-          openAngle={win.openAngle}
-          onClick={() => onWindowClick(win.id)}
-        />
-      ))}
-    </group>
-  )
-}
-
-// ─── Temperature gradient heatmap inside greenhouse ──────────────────────────────
+// ─── Heatmap température (brume intérieure) ─────────────────────────────────────
 function TempHeatmap({ temp }: { temp: number }) {
   const col = tempToColor(temp)
   return (
     <>
-      {/* Subtle temp-coloured fog layer near ceiling */}
       <mesh position={[0, H - 0.3, 0]}>
         <boxGeometry args={[W - 0.3, 0.5, L - 0.3]} />
         <meshStandardMaterial color={col} transparent opacity={0.03} />
       </mesh>
-      {/* Warm layer near plants */}
       <mesh position={[0, GUTTER_HEIGHT + 0.2, 0]}>
         <boxGeometry args={[W - 0.4, 0.3, L - 0.4]} />
         <meshStandardMaterial color={col} transparent opacity={0.025} />
@@ -766,22 +574,72 @@ function TempHeatmap({ temp }: { temp: number }) {
   )
 }
 
-// ─── Scene ──────────────────────────────────────────────────────────────────────
+// ─── MODÈLE GLTF — Serre professionnelle ────────────────────────────────────────
+// Chargement paresseux du modèle GLTF avec useGLTF (drei)
+// Le modèle est préchargé en dehors du composant pour éviter les rechargements
+useGLTF.preload(GREENHOUSE_GLTF_PATH)
+
+function GreenhouseGLTFModel({ showWireframe }: { showWireframe: boolean }) {
+  const { scene } = useGLTF(GREENHOUSE_GLTF_PATH)
+
+  // Clone pour éviter les mutations d'état partagé si plusieurs instances
+  const cloned = useMemo(() => {
+    const c = scene.clone(true)
+    // Appliquer les matériaux wireframe si activé
+    c.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        // Activer les ombres sur le modèle
+        mesh.castShadow = true
+        mesh.receiveShadow = true
+        if (showWireframe) {
+          // En mode wireframe, ajouter une teinte bleu-cyan
+          const mat = (mesh.material as THREE.MeshStandardMaterial).clone()
+          mat.wireframe = true
+          mat.color = new THREE.Color('#00aaff')
+          mesh.material = mat
+        }
+      }
+    })
+    return c
+  }, [scene, showWireframe])
+
+  return (
+    <primitive
+      object={cloned}
+      // Alignement du modèle GLTF :
+      //   X → largeur (W=5), Y → hauteur (H=3), Z → longueur (L=10)
+      // Le modèle natif a Y_min ≈ -2.035 (sol) et Z centre ≈ -2.985
+      // On translate pour que le sol soit à Y=0 et le centre à Z=0
+      position={[TUNE_X, MODEL_Y_OFFSET + TUNE_Y, MODEL_Z_OFFSET + TUNE_Z]}
+      rotation={[0, 0, 0]}
+      scale={[MODEL_SCALE_X, MODEL_SCALE_Y, MODEL_SCALE_Z]}
+    />
+  )
+}
+
+// Fallback pendant le chargement GLTF
+function GreenhouseFallback() {
+  return (
+    <mesh position={[0, H / 2, 0]}>
+      <boxGeometry args={[W, H, L]} />
+      <meshStandardMaterial color="#1a3d7a" transparent opacity={0.18} wireframe />
+    </mesh>
+  )
+}
+
+// ─── Scène principale ───────────────────────────────────────────────────────────
 function Scene({
-  showWireframe,
-  windows,
-  onWindowClick,
+  showWireframe, windows, onWindowClick,
 }: {
-  showWireframe: boolean
-  windows: WindowConfig[]
-  onWindowClick: (id: string) => void
+  showWireframe: boolean; windows: WindowConfig[]; onWindowClick: (id: string) => void
 }) {
   const { internal, external } = useLatestSensorData(30000)
   const [selectedSensor, setSelectedSensor] = useState<string | null>(null)
 
   const tempColor = internal ? tempToColor(internal.temperature) : new THREE.Color('#00aaff')
   const windSpeed = external?.wind_speed ?? 2
-  const extTemp = external?.temperature ?? 18
+  const extTemp   = external?.temperature ?? 18
   const extHumidity = external?.humidity ?? 60
 
   const anyOpen = windows.some((w) => w.openAngle > 5)
@@ -789,30 +647,48 @@ function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[6, 9, 6]} intensity={1.1} color="#ffffff" castShadow />
-      <directionalLight position={[-5, 5, -5]} intensity={0.35} color="#4488ff" />
-      <pointLight position={[0, 6, 0]} intensity={0.7} color="#0066aa" />
+      {/* Éclairage */}
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[6, 9, 6]} intensity={1.2} color="#ffffff" castShadow
+        shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
+      <directionalLight position={[-5, 5, -5]} intensity={0.4} color="#4488ff" />
+      <pointLight position={[0, 6, 0]} intensity={0.8} color="#0066aa" />
       <hemisphereLight args={['#0a1f4a', '#000510', 0.5]} />
 
-      {/* Ambient sparkles — very subtle */}
+      {/* Sparkles ambiants */}
       <Sparkles count={60} scale={[W, 4, L]} size={0.6} speed={0.2} color="#00aaff" opacity={0.2} />
 
-      {/* Greenhouse shell */}
-      <GreenhouseStructure
-        tempColor={tempColor}
-        showWireframe={showWireframe}
-        windows={windows}
-        onWindowClick={onWindowClick}
-      />
+      {/* ─── MODÈLE GLTF — SERRE PROFESSIONNELLE ─── */}
+      <Suspense fallback={<GreenhouseFallback />}>
+        <GreenhouseGLTFModel showWireframe={showWireframe} />
+      </Suspense>
 
-      {/* Temperature visual heatmap */}
+      {/* Sol */}
+      <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[W + 4, L + 4]} />
+        <meshStandardMaterial color="#050e1f" roughness={1} metalness={0} />
+      </mesh>
+
+      {/* Grille de sol */}
+      <gridHelper args={[Math.max(W, L) + 4, 14, '#001166', '#000d44']} position={[0, 0.005, 0]} />
+
+      {/* Heatmap température */}
       {internal && <TempHeatmap temp={internal.temperature} />}
 
-      {/* Culture gutters */}
+      {/* Gouttières de culture */}
       <GutterStructure />
 
-      {/* Airflow particles (only when windows open) */}
+      {/* Fenêtres (overlays animés) */}
+      {windows.map((win) => (
+        <GreenhouseWindow
+          key={win.id}
+          config={win}
+          openAngle={win.openAngle}
+          onClick={() => onWindowClick(win.id)}
+        />
+      ))}
+
+      {/* Flux d'air */}
       <AirflowParticles
         windSpeed={windSpeed}
         extTemp={extTemp}
@@ -821,10 +697,10 @@ function Scene({
         allClosed={allClosed}
       />
 
-      {/* Rain */}
+      {/* Pluie */}
       <RainSystem humidity={extHumidity} windSpeed={windSpeed} />
 
-      {/* Sensors — 3 internal */}
+      {/* Capteurs internes */}
       {internal && SENSOR_CONFIGS.slice(0, 3).map((cfg) => (
         <SensorNode
           key={cfg.id}
@@ -835,7 +711,7 @@ function Scene({
         />
       ))}
 
-      {/* External station */}
+      {/* Station extérieure */}
       {external && (
         <SensorNode
           config={SENSOR_CONFIGS[3]}
@@ -846,11 +722,8 @@ function Scene({
       )}
 
       <OrbitControls
-        enablePan
-        enableZoom
-        enableRotate
-        minDistance={4}
-        maxDistance={26}
+        enablePan enableZoom enableRotate
+        minDistance={4} maxDistance={28}
         maxPolarAngle={Math.PI / 1.85}
         target={[0, 1.5, 0]}
         dampingFactor={0.06}
@@ -860,7 +733,7 @@ function Scene({
   )
 }
 
-// ─── Main Page ──────────────────────────────────────────────────────────────────
+// ─── Page principale ────────────────────────────────────────────────────────────
 export default function Visualization3DPage() {
   const { internal, external } = useLatestSensorData(30000)
   const [showWireframe, setShowWireframe] = useState(false)
@@ -887,88 +760,93 @@ export default function Visualization3DPage() {
   }
 
   const anyOpen = Object.values(windowStates).some((v) => v > 5)
-  const windSpeed = external?.wind_speed ?? 0
-  const windLabel = windSpeed < 2 ? 'Calme' : windSpeed < 6 ? 'Faible' : windSpeed < 12 ? 'Modéré' : 'Fort'
-  const windColor = windSpeed < 2 ? '#8aaccc' : windSpeed < 6 ? '#00ccff' : windSpeed < 12 ? '#ffaa00' : '#ff6600'
-  const tempColor = internal ? tempToColor(internal.temperature).getStyle() : '#00aaff'
-  const isRaining = (external?.humidity ?? 0) > 70
+  const windSpeed  = external?.wind_speed ?? 0
+  const windLabel  = windSpeed < 2 ? 'Calme' : windSpeed < 6 ? 'Faible' : windSpeed < 12 ? 'Modéré' : 'Fort'
+  const windColor  = windSpeed < 2 ? '#8aaccc' : windSpeed < 6 ? '#00ccff' : windSpeed < 12 ? '#ffaa00' : '#ff6600'
+  const tempColor  = internal ? tempToColor(internal.temperature).getStyle() : '#00aaff'
+  const isRaining  = (external?.humidity ?? 0) > 70
 
   return (
     <Box sx={{ height: 'calc(100vh - 110px)', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-      {/* Cursor fix — ensure default cursor on page */}
       <style>{`* { cursor: auto !important; } canvas { cursor: grab; } canvas:active { cursor: grabbing; }`}</style>
 
-      {/* Header */}
+      {/* En-tête */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 1 }}>
         <Box>
           <Typography variant="h5" fontWeight={700} sx={{ color: '#e0e8f8' }}>
             Jumeau Numérique 3D — Serre Fraisier
           </Typography>
           <Typography variant="body2" sx={{ color: '#8aaccc', mt: 0.3 }}>
-            3 gouttières × 8.5 m · 80 plants · 6 fenêtres · Capteurs temps réel
+            3 gouttières × 8.5 m · 80 plants · 6 fenêtres · Capteurs temps réel ·{' '}
+            <span style={{ opacity: 0.55, fontSize: '0.75rem' }}>
+              Modèle : MinorEarth / Sketchfab (CC-BY-4.0)
+            </span>
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
           {internal && (
             <Chip label={`${internal.temperature?.toFixed(1)}°C intérieur`} size="small"
-              sx={{ bgcolor: `${tempColor}18`, color: tempColor, border: `1px solid ${tempColor}44`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
+              sx={{ bgcolor: `${tempColor}18`, color: tempColor, border: `1px solid ${tempColor}44`,
+                fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           )}
           <Chip label={`Vent ${windLabel} ${windSpeed.toFixed(1)} m/s`} size="small"
-            sx={{ bgcolor: `${windColor}15`, color: windColor, border: `1px solid ${windColor}33`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
+            sx={{ bgcolor: `${windColor}15`, color: windColor, border: `1px solid ${windColor}33`,
+              fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           {isRaining && (
             <Chip label="🌧 Pluie détectée" size="small"
-              sx={{ bgcolor: 'rgba(136,200,255,0.1)', color: '#88ccff', border: '1px solid rgba(136,200,255,0.3)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
+              sx={{ bgcolor: 'rgba(136,200,255,0.1)', color: '#88ccff', border: '1px solid rgba(136,200,255,0.3)',
+                fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           )}
-          <Chip label={anyOpen ? `${Object.values(windowStates).filter(v => v > 5).length} fenêtre(s) ouverte(s)` : 'Toutes fenêtres fermées'} size="small"
-            sx={{ bgcolor: anyOpen ? 'rgba(0,255,136,0.1)' : 'rgba(255,100,100,0.1)', color: anyOpen ? '#00ff88' : '#ff6666', border: `1px solid ${anyOpen ? 'rgba(0,255,136,0.3)' : 'rgba(255,100,100,0.3)'}`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
+          <Chip
+            label={anyOpen
+              ? `${Object.values(windowStates).filter(v => v > 5).length} fenêtre(s) ouverte(s)`
+              : 'Toutes fenêtres fermées'}
+            size="small"
+            sx={{ bgcolor: anyOpen ? 'rgba(0,255,136,0.1)' : 'rgba(255,100,100,0.1)',
+              color: anyOpen ? '#00ff88' : '#ff6666',
+              border: `1px solid ${anyOpen ? 'rgba(0,255,136,0.3)' : 'rgba(255,100,100,0.3)'}`,
+              fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           <FormControlLabel
-            control={<Switch size="small" checked={showWireframe} onChange={(e) => setShowWireframe(e.target.checked)} sx={{ '& .MuiSwitch-thumb': { bgcolor: '#00aaff' } }} />}
+            control={<Switch size="small" checked={showWireframe}
+              onChange={(e) => setShowWireframe(e.target.checked)}
+              sx={{ '& .MuiSwitch-thumb': { bgcolor: '#00aaff' } }} />}
             label={<Typography variant="caption" sx={{ color: '#8aaccc' }}>Wireframe</Typography>}
           />
         </Box>
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1.5, flex: 1, overflow: 'hidden' }}>
-        {/* Left panel — controls */}
+        {/* Panneau gauche */}
         <Paper sx={{
-          width: 220,
-          flexShrink: 0,
-          p: 2,
+          width: 220, flexShrink: 0, p: 2,
           border: '1px solid rgba(0,170,255,0.15)',
           background: 'rgba(6,10,22,0.95)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          overflowY: 'auto',
+          display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto',
         }}>
+          {/* Ouverture globale */}
           <Box>
-            <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1.5 }}>
+            <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1.5 }}>
               ◈ Ouverture Globale
             </Typography>
-            <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
+            <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
               Toutes les fenêtres : {globalOpenAngle}°
             </Typography>
-            <Slider
-              size="small"
-              value={globalOpenAngle}
-              min={0}
-              max={90}
-              step={5}
+            <Slider size="small" value={globalOpenAngle} min={0} max={90} step={5}
               onChange={(_, v) => handleGlobalAngle(v as number)}
-              sx={{
-                color: '#00aaff',
-                '& .MuiSlider-thumb': { width: 12, height: 12 },
-                '& .MuiSlider-rail': { bgcolor: 'rgba(0,170,255,0.2)' },
-              }}
-            />
+              sx={{ color: '#00aaff', '& .MuiSlider-thumb': { width: 12, height: 12 },
+                '& .MuiSlider-rail': { bgcolor: 'rgba(0,170,255,0.2)' } }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="caption" sx={{ color: '#8aaccc', fontSize: '0.6rem' }}>Fermé</Typography>
               <Typography variant="caption" sx={{ color: '#8aaccc', fontSize: '0.6rem' }}>Ouvert</Typography>
             </Box>
           </Box>
 
+          {/* Fenêtres individuelles */}
           <Box>
-            <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
+            <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
               ◈ Fenêtres Individuelles
             </Typography>
             {WINDOWS.map((w) => {
@@ -977,47 +855,45 @@ export default function Visualization3DPage() {
               return (
                 <Box key={w.id} sx={{ mb: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.3 }}>
-                    <Typography variant="caption" sx={{ color: isOpen ? '#00ff88' : '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
+                    <Typography variant="caption" sx={{ color: isOpen ? '#00ff88' : '#8aaccc',
+                      fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
                       {w.label}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: isOpen ? '#00ff88' : '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.6rem' }}>
+                    <Typography variant="caption" sx={{ color: isOpen ? '#00ff88' : '#8aaccc',
+                      fontFamily: '"JetBrains Mono", monospace', fontSize: '0.6rem' }}>
                       {angle}°
                     </Typography>
                   </Box>
-                  <Slider
-                    size="small"
-                    value={angle}
-                    min={0}
-                    max={90}
-                    step={5}
+                  <Slider size="small" value={angle} min={0} max={90} step={5}
                     onChange={(_, v) => setWindowStates((prev) => ({ ...prev, [w.id]: v as number }))}
-                    sx={{
-                      color: isOpen ? '#00ff88' : '#334466',
-                      py: 0.5,
+                    sx={{ color: isOpen ? '#00ff88' : '#334466', py: 0.5,
                       '& .MuiSlider-thumb': { width: 10, height: 10 },
-                      '& .MuiSlider-rail': { bgcolor: 'rgba(255,255,255,0.08)' },
-                    }}
-                  />
+                      '& .MuiSlider-rail': { bgcolor: 'rgba(255,255,255,0.08)' } }} />
                 </Box>
               )
             })}
           </Box>
 
-          {/* Live sensor summary */}
+          {/* Résumé capteurs */}
           {internal && (
             <Box sx={{ mt: 'auto' }}>
-              <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
+              <Typography variant="caption" sx={{ color: '#00aaff', fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
                 ◈ Capteurs Internes
               </Typography>
               {[
                 { label: 'Temp.', value: `${internal.temperature?.toFixed(1)} °C`, color: tempColor },
-                { label: 'CO₂', value: `${internal.co2?.toFixed(0)} ppm`, color: '#3b82f6' },
+                { label: 'CO₂',  value: `${internal.co2?.toFixed(0)} ppm`, color: '#3b82f6' },
                 { label: 'Hum.', value: `${internal.humidity?.toFixed(1)} %`, color: '#06b6d4' },
-                { label: 'VPD', value: `${internal.vpd?.toFixed(2)} kPa`, color: '#10b981' },
+                { label: 'VPD',  value: `${internal.vpd?.toFixed(2)} kPa`, color: '#10b981' },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>{item.label}</Typography>
-                  <Typography variant="caption" sx={{ color: item.color, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', fontWeight: 700 }}>{item.value}</Typography>
+                  <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
+                    {item.label}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: item.color, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', fontWeight: 700 }}>
+                    {item.value}
+                  </Typography>
                 </Box>
               ))}
             </Box>
@@ -1025,77 +901,62 @@ export default function Visualization3DPage() {
 
           {external && (
             <Box>
-              <Typography variant="caption" sx={{ color: '#ffaa00', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
+              <Typography variant="caption" sx={{ color: '#ffaa00', fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
                 ◈ Station Ext.
               </Typography>
               {[
-                { label: 'Vent', value: `${external.wind_speed?.toFixed(1)} m/s`, color: windColor },
+                { label: 'Vent',        value: `${external.wind_speed?.toFixed(1)} m/s`, color: windColor },
                 { label: 'Rayonnement', value: `${external.radiation?.toFixed(0)} W/m²`, color: '#f97316' },
-                { label: 'Temp. ext.', value: `${external.temperature?.toFixed(1)} °C`, color: '#f59e0b' },
-                { label: 'Hum. ext.', value: `${external.humidity?.toFixed(1)} %`, color: '#3b82f6' },
+                { label: 'Temp. ext.',  value: `${external.temperature?.toFixed(1)} °C`, color: '#f59e0b' },
+                { label: 'Hum. ext.',   value: `${external.humidity?.toFixed(1)} %`,     color: '#3b82f6' },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>{item.label}</Typography>
-                  <Typography variant="caption" sx={{ color: item.color, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', fontWeight: 700 }}>{item.value}</Typography>
+                  <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
+                    {item.label}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: item.color, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', fontWeight: 700 }}>
+                    {item.value}
+                  </Typography>
                 </Box>
               ))}
             </Box>
           )}
         </Paper>
 
-        {/* 3D Canvas */}
+        {/* Canvas 3D */}
         <Paper sx={{
-          flex: 1,
-          overflow: 'hidden',
-          border: '1px solid rgba(0,170,255,0.2)',
-          position: 'relative',
-          cursor: 'default',
+          flex: 1, overflow: 'hidden', border: '1px solid rgba(0,170,255,0.2)',
+          position: 'relative', cursor: 'default',
           '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
+            content: '""', position: 'absolute', inset: 0,
             background: 'radial-gradient(ellipse at 50% 0%, rgba(0,100,200,0.08) 0%, transparent 60%)',
-            zIndex: 1,
-            pointerEvents: 'none',
+            zIndex: 1, pointerEvents: 'none',
           },
         }}>
           <Canvas
-            camera={{ position: [9, 7, 15], fov: 52, near: 0.1, far: 100 }}
+            camera={{ position: [10, 7, 16], fov: 50, near: 0.1, far: 150 }}
             gl={{ antialias: true, preserveDrawingBuffer: false }}
             shadows
             style={{ background: 'radial-gradient(ellipse at center, #050f22 0%, #020508 100%)', cursor: 'grab' }}
             onPointerDown={() => { const s = document.querySelector('canvas'); if (s) (s as HTMLElement).style.cursor = 'grabbing' }}
-            onPointerUp={() => { const s = document.querySelector('canvas'); if (s) (s as HTMLElement).style.cursor = 'grab' }}
+            onPointerUp={  () => { const s = document.querySelector('canvas'); if (s) (s as HTMLElement).style.cursor = 'grab' }}
           >
             <Suspense fallback={null}>
-              <Scene
-                showWireframe={showWireframe}
-                windows={windows}
-                onWindowClick={handleWindowClick}
-              />
+              <Scene showWireframe={showWireframe} windows={windows} onWindowClick={handleWindowClick} />
             </Suspense>
           </Canvas>
 
-          {/* Airflow status overlay */}
+          {/* Overlay : fenêtres toutes fermées */}
           <AnimatePresence>
             {!anyOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
                 style={{
-                  position: 'absolute',
-                  top: 16,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: 3,
-                  background: 'rgba(4,12,30,0.88)',
-                  border: '1px solid rgba(255,100,100,0.4)',
-                  borderRadius: 8,
-                  padding: '6px 16px',
-                  pointerEvents: 'none',
-                }}
-              >
+                  position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
+                  zIndex: 3, background: 'rgba(4,12,30,0.88)',
+                  border: '1px solid rgba(255,100,100,0.4)', borderRadius: 8, padding: '6px 16px', pointerEvents: 'none',
+                }}>
                 <Typography variant="caption" sx={{ color: '#ff8888', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.68rem' }}>
                   ✕ Toutes les fenêtres sont fermées — aucun flux d'air
                 </Typography>
@@ -1103,22 +964,24 @@ export default function Visualization3DPage() {
             )}
           </AnimatePresence>
 
-          {/* Temperature legend */}
+          {/* Légende température */}
           <Box sx={{ position: 'absolute', bottom: 16, left: 16, zIndex: 2 }}>
-            <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 0.8 }}>
+            <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 0.8 }}>
               Température / Flux d'air
             </Typography>
             {[
-              { label: '< 10 °C', color: '#0033ff' },
-              { label: '10–15 °C', color: '#0066ff' },
-              { label: '15–20 °C', color: '#00aaff' },
-              { label: '20–25 °C', color: '#00ffaa' },
-              { label: '25–30 °C', color: '#ffaa00' },
-              { label: '30–35 °C', color: '#ff6600' },
-              { label: '> 35 °C', color: '#ff2200' },
+              { label: '< 10 °C',   color: '#0033ff' },
+              { label: '10–15 °C',  color: '#0066ff' },
+              { label: '15–20 °C',  color: '#00aaff' },
+              { label: '20–25 °C',  color: '#00ffaa' },
+              { label: '25–30 °C',  color: '#ffaa00' },
+              { label: '30–35 °C',  color: '#ff6600' },
+              { label: '> 35 °C',   color: '#ff2200' },
             ].map((item) => (
               <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 0.3 }}>
-                <Box sx={{ width: 10, height: 10, borderRadius: '2px', bgcolor: item.color, boxShadow: `0 0 5px ${item.color}88`, flexShrink: 0 }} />
+                <Box sx={{ width: 10, height: 10, borderRadius: '2px', bgcolor: item.color,
+                  boxShadow: `0 0 5px ${item.color}88`, flexShrink: 0 }} />
                 <Typography variant="caption" sx={{ color: '#8aaccc', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
                   {item.label}
                 </Typography>
@@ -1126,7 +989,7 @@ export default function Visualization3DPage() {
             ))}
           </Box>
 
-          {/* Wind indicator */}
+          {/* Indicateur vent */}
           {external && (
             <Box sx={{ position: 'absolute', bottom: 16, right: 16, zIndex: 2, textAlign: 'right' }}>
               <Typography variant="caption" sx={{ color: windColor, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.72rem', fontWeight: 700, display: 'block' }}>
@@ -1154,3 +1017,35 @@ export default function Visualization3DPage() {
     </Box>
   )
 }
+
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  OÙ PLACER LES FICHIERS DU ZIP                                              ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║  Extrayez le fichier ZIP et copiez les fichiers ainsi :                      ║
+║                                                                              ║
+║  votre-projet/                                                               ║
+║  └── public/                                                                 ║
+║      └── models/                                                             ║
+║          └── greenhouse/              ← créez ce dossier                    ║
+║              ├── scene.gltf           ← fichier principal                   ║
+║              ├── scene.bin            ← géométrie binaire (obligatoire)     ║
+║              └── textures/                                                   ║
+║                  ├── AppAA4_0_baseColor.jpeg                                 ║
+║                  └── AppAA4_1_baseColor.jpeg                                 ║
+║                                                                              ║
+║  IMPORTANT : scene.bin ET scene.gltf DOIVENT être dans le même dossier.    ║
+║  Le GLTF référence le .bin par chemin relatif.                              ║
+║                                                                              ║
+║  Commande rapide depuis la racine du projet (Linux/Mac) :                   ║
+║    mkdir -p public/models/greenhouse                                         ║
+║    unzip farmer_greenhouse_*.zip -d public/models/greenhouse/                ║
+║                                                                              ║
+║  LICENCE : Ce modèle est sous CC-BY-4.0.                                    ║
+║  Crédit à inclure dans votre app/documentation :                            ║
+║    "Farmer Greenhouse 3.5x6.0x2.03m 40x20/20x20" par MinorEarth            ║
+║    https://sketchfab.com/3d-models/farmer-greenhouse-35x60x203m-...         ║
+║    Licence CC-BY-4.0                                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/

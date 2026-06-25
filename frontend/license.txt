@@ -1,0 +1,11 @@
+Model Information:
+* title:	Farmer Greenhouse 3.5x6.0x2.03m 40x20/20x20
+* source:	https://sketchfab.com/3d-models/farmer-greenhouse-35x60x203m-40x2020x20-b032e046389a4194bf6a032620b977a3
+* author:	MinorEarth (https://sketchfab.com/sanx78)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Farmer Greenhouse 3.5x6.0x2.03m 40x20/20x20" (https://sketchfab.com/3d-models/farmer-greenhouse-35x60x203m-40x2020x20-b032e046389a4194bf6a032620b977a3) by MinorEarth (https://sketchfab.com/sanx78) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
