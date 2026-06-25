@@ -204,66 +204,7 @@ function AirflowParticles({
   )
 }
 
-// ─── External wind lines (wavy) ─────────────────────────────────────────────────
-function WindLines({ windSpeed }: { windSpeed: number }) {
-  const lineCount = Math.min(Math.round(windSpeed * 0.8), 6)
-  const pointsPerLine = 40
-  const color = windSpeed > 10 ? '#ff6600' : windSpeed > 5 ? '#ffaa00' : '#00ccff'
-
-  const lines = useMemo(() => {
-    return Array.from({ length: lineCount }).map((_, i) => {
-      const yOff = (i / lineCount) * H * 0.7 + 0.3
-      const phaseOff = i * 1.7
-      const amp = 0.1 + windSpeed * 0.02
-      return { yOff, phaseOff, amp }
-    })
-  }, [lineCount, windSpeed])
-
-  const meshesRef = useRef<(THREE.Line | null)[]>([])
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime()
-    meshesRef.current.forEach((child, i) => {
-      if (!child || i >= lines.length) return
-      const line = lines[i]
-      const pos = child.geometry.attributes.position.array as Float32Array
-      for (let j = 0; j <= pointsPerLine; j++) {
-        const progress = j / pointsPerLine
-        const x = (progress - 0.5) * (L + 2)
-        const zBase = -L / 2 - 0.5 + ((t * windSpeed * 0.3 + i * 1.2) % (L + 2))
-        const z = zBase + Math.sin(progress * Math.PI * 4 + t * 2.5 + line.phaseOff) * line.amp
-        const idx = j * 3
-        pos[idx] = x
-        pos[idx + 1] = line.yOff + Math.sin(progress * Math.PI * 6 + t * 2 + line.phaseOff) * line.amp * 0.5
-        pos[idx + 2] = z
-      }
-      child.geometry.attributes.position.needsUpdate = true
-    })
-  })
-
-  if (windSpeed < 0.3) return null
-
-  return (
-    <group position={[W / 2 + 0.3, 0, 0]}>
-      {lines.map((line, i) => {
-        const positions = new Float32Array((pointsPerLine + 1) * 3)
-        const geometry = new THREE.BufferGeometry()
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-        return (
-          <primitive
-            key={i}
-            object={new THREE.Line(geometry, new THREE.LineBasicMaterial({
-              color,
-              transparent: true,
-              opacity: 0.5 + windSpeed * 0.025,
-            }))}
-            ref={(ref: THREE.Line) => { meshesRef.current[i] = ref }}
-          />
-        )
-      })}
-    </group>
-  )
-}
+// ─── (WindLines removed per user request) ─────────────────────────────────────
 
 // ─── Rain System ────────────────────────────────────────────────────────────────
 function RainSystem({ humidity, windSpeed }: { humidity: number; windSpeed: number }) {
@@ -879,11 +820,6 @@ function Scene({
         windowsOpen={anyOpen}
         allClosed={allClosed}
       />
-
-      {/* Wind direction arrows (outside east wall) */}
-      {windSpeed > 0.5 && (
-        <WindLines windSpeed={windSpeed} />
-      )}
 
       {/* Rain */}
       <RainSystem humidity={extHumidity} windSpeed={windSpeed} />
