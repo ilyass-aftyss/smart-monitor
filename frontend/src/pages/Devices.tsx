@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Box, Typography, Grid, Paper, Chip, Skeleton } from '@mui/material'
+import { Box, Typography, Grid, Paper, Skeleton } from '@mui/material'
 import { motion } from 'framer-motion'
 import { devicesApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
 import type { Device, DeviceStatus } from '../types'
+import ToggleSwitch from '../components/common/toggle-switch'
 
 const STATUS_CONFIG: Record<DeviceStatus, { color: string; label: string }> = {
   ON:     { color: '#10b981', label: 'EN MARCHE' },
@@ -60,13 +61,29 @@ function DeviceCard({ device }: { device: Device }) {
 
   const status: DeviceStatus = (device.status as DeviceStatus) in STATUS_CONFIG ? (device.status as DeviceStatus) : 'OFF'
   const cfg = STATUS_CONFIG[status]
+  const isOn = status === 'ON'
+
+  const handleToggle = (value: boolean) => {
+    const newStatus: DeviceStatus = value ? 'ON' : 'OFF'
+    devicesApi.updateStatus(device.id, newStatus).catch(() => {})
+  }
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} layout>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+      layout
+    >
       <Paper sx={{
         p: 2.5, textAlign: 'center',
         border: `1px solid ${cfg.color}22`,
         position: 'relative', overflow: 'hidden',
+        transition: 'box-shadow 0.3s',
+        boxShadow: isOn ? `0 0 20px ${cfg.color}18` : 'none',
+        '&:hover': {
+          boxShadow: isOn ? `0 0 30px ${cfg.color}25` : 'none',
+        },
         '&::before': {
           content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
           background: `linear-gradient(90deg, transparent, ${cfg.color}, transparent)`,
@@ -81,11 +98,27 @@ function DeviceCard({ device }: { device: Device }) {
           {device.location === 'roof' ? 'Toiture' : 'Plafond'}
         </Typography>
 
-        <Chip label={cfg.label} size="small" sx={{
-          bgcolor: `${cfg.color}12`, color: cfg.color,
-          border: `1px solid ${cfg.color}40`,
-          fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem', height: 22, mb: 1.5,
-        }} />
+        {/* Toggle switch instead of Chip */}
+        {status !== 'Erreur' && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1.5 }}>
+            <ToggleSwitch
+              defaultChecked={isOn}
+              onChange={handleToggle}
+              label={isOn ? 'ON' : 'OFF'}
+            />
+          </Box>
+        )}
+
+        {status === 'Erreur' && (
+          <Box sx={{
+            display: 'inline-flex', px: 1.2, py: 0.4, borderRadius: '6px', mb: 1.5,
+            bgcolor: `${cfg.color}12`, color: cfg.color,
+            border: `1px solid ${cfg.color}40`,
+            fontFamily: '"JetBrains Mono", monospace', fontSize: '0.65rem',
+          }}>
+            ERREUR
+          </Box>
+        )}
 
         <Typography sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', display: 'block' }}>
           {new Date(device.last_update).toLocaleString('fr-FR')}
@@ -121,13 +154,17 @@ export default function DevicesPage() {
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" fontWeight={700}>État des Ventilateurs</Typography>
         <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-          Supervision uniquement · mise à jour automatique toutes les 30 s
+          Contrôle et supervision · mise à jour automatique toutes les 30 s
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, mt: 1.5 }}>
           {(Object.entries(counts) as [DeviceStatus, number][]).map(([k, v]) => (
-            <Chip key={k} label={`${STATUS_CONFIG[k].label}: ${v}`} size="small"
-              sx={{ bgcolor: `${STATUS_CONFIG[k].color}10`, color: STATUS_CONFIG[k].color,
-                border: `1px solid ${STATUS_CONFIG[k].color}30`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem', height: 22 }} />
+            <Box key={k} sx={{
+              px: 1.2, py: 0.4, borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: 0.5,
+              bgcolor: `${STATUS_CONFIG[k].color}10`, color: STATUS_CONFIG[k].color,
+              border: `1px solid ${STATUS_CONFIG[k].color}30`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem',
+            }}>
+              {STATUS_CONFIG[k].label}: {v}
+            </Box>
           ))}
         </Box>
       </Box>

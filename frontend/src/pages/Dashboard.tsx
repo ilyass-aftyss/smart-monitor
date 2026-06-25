@@ -43,6 +43,24 @@ function getStatus(v: number, cfg: KpiConfig): 'normal' | 'warning' | 'critical'
   return 'normal'
 }
 
+function AnimatedTitle({ text, color }: { text: string; color?: string }) {
+  return (
+    <Box sx={{ overflow: 'hidden' }}>
+      {text.split(' ').map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.5, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: 'inline-block', marginRight: '0.3em', color }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </Box>
+  )
+}
+
 function SourceBadge({ lastUpdate }: { lastUpdate: Date | null }) {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
@@ -50,10 +68,22 @@ function SourceBadge({ lastUpdate }: { lastUpdate: Date | null }) {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8,
+      <Box sx={{
+        position: 'relative',
+        display: 'flex', alignItems: 'center', gap: 0.8,
         px: 1.4, py: 0.5, borderRadius: '20px',
         bgcolor: isLive ? (dark ? 'rgba(0,232,122,0.08)' : 'rgba(16,185,129,0.08)') : 'rgba(245,158,11,0.08)',
         border: `1px solid ${isLive ? (dark ? 'rgba(0,232,122,0.25)' : 'rgba(16,185,129,0.25)') : 'rgba(245,158,11,0.25)'}`,
+        '&::before': isLive ? {
+          content: '""',
+          position: 'absolute', inset: -2,
+          borderRadius: '22px',
+          background: 'linear-gradient(135deg, #00e87a, #06b6d4, #00e87a)',
+          backgroundSize: '200% 200%',
+          animation: 'spin-slow 3s linear infinite',
+          zIndex: -1,
+          opacity: 0.4,
+        } : {},
       }}>
         <Box sx={{
           width: 7, height: 7, borderRadius: '50%',
@@ -93,12 +123,26 @@ export default function DashboardPage() {
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700}>Surveillance Temps Réel</Typography>
-          <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-            Culture hors-sol du fraisier · 3 gouttières × 8.5 m · 80 plants
+          <Typography variant="h5" fontWeight={700}>
+            <AnimatedTitle text="Surveillance Temps Réel" />
           </Typography>
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
+            <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
+              Culture hors-sol du fraisier · 3 gouttières × 8.5 m · 80 plants
+            </Typography>
+          </motion.div>
         </Box>
-        <SourceBadge lastUpdate={lastUpdate} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.3 }}
+        >
+          <SourceBadge lastUpdate={lastUpdate} />
+        </motion.div>
       </Box>
 
       {/* KPI Cards */}

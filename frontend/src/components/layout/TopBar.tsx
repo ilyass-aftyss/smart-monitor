@@ -1,6 +1,5 @@
-import { AppBar, Toolbar, IconButton, Typography, Box, Chip, Avatar, Tooltip } from '@mui/material'
+import { AppBar, Toolbar, IconButton, Typography, Box, Chip, Avatar } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import LogoutIcon from '@mui/icons-material/Logout'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 
@@ -20,13 +19,8 @@ interface Props {
 export default function TopBar({ onToggleSidebar }: Props) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { username, role, logout } = useAuthStore()
+  const { username, role } = useAuthStore()
   const now = new Date()
-
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
 
   return (
     <AppBar
@@ -76,12 +70,6 @@ export default function TopBar({ onToggleSidebar }: Props) {
             {username}
           </Typography>
         </Box>
-
-        <Tooltip title="Déconnexion">
-          <IconButton size="small" onClick={handleLogout} sx={{ color: '#8aaccc', '&:hover': { color: '#ff3366' } }}>
-            <LogoutIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
       </Toolbar>
     </AppBar>
   )
