@@ -1,21 +1,12 @@
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Box, Typography, Avatar, ClickAwayListener } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '../../store/authStore'
 import { useThemeMode } from '../../context/ThemeContext'
 import { useLatestSensorData } from '../../hooks/useSensorData'
-import { alertsApi } from '../../services/api'
 import ClickSparkWrapper from '../common/ClickSpark'
-
-const NAV_ITEMS = [
-  { label: 'Dashboard',    path: '/dashboard' },
-  { label: 'Historique',   path: '/history'   },
-  { label: 'Ext.',         path: '/external'  },
-  { label: 'Ventilateurs', path: '/devices'   },
-  { label: 'Alertes',      path: '/alerts'    },
-  { label: 'Vue 3D',       path: '/3d'        },
-]
+import NavTabs from './NavTabs'
 
 /* ── Greenhouse SVG Logo ─────────────────────────────────────────────────── */
 function GreenhouseSVG({ size = 18, color = '#fff' }: { size?: number; color?: string }) {
@@ -104,42 +95,6 @@ function Logo() {
         />
       </Box>
     </motion.div>
-  )
-}
-
-/* ── Alert Badge with pulse ring ─────────────────────────────────────────── */
-function BadgePulse({ count }: { count: number }) {
-  return (
-    <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-      {count > 0 && (
-        <Box sx={{
-          position: 'absolute',
-          width: 16, height: 16, borderRadius: '50%',
-          background: 'rgba(232,51,74,0.5)',
-          animation: 'badge-ring 1.4s ease-out infinite',
-          '@keyframes badge-ring': {
-            '0%':   { transform: 'scale(1)',   opacity: 0.8 },
-            '100%': { transform: 'scale(2.4)', opacity: 0 },
-          },
-        }} />
-      )}
-      <motion.span
-        animate={count > 0 ? {
-          scale: [1, 1.22, 1],
-          transition: { repeat: Infinity, duration: 1.6, ease: 'easeInOut' },
-        } : { scale: 1 }}
-        style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: 16, height: 16, borderRadius: '50%',
-          background: '#e8334a', color: '#fff', fontSize: '0.55rem', fontWeight: 700,
-          lineHeight: 1,
-          boxShadow: count > 0 ? '0 0 8px rgba(232,51,74,0.7)' : 'none',
-          position: 'relative', zIndex: 1,
-        }}
-      >
-        {count > 9 ? '9+' : count}
-      </motion.span>
-    </Box>
   )
 }
 
@@ -282,25 +237,11 @@ function Clock() {
 
 /* ── NavBar ──────────────────────────────────────────────────────────────── */
 export default function NavBar() {
-  const location = useLocation()
   const navigate  = useNavigate()
   const { username, role, logout } = useAuthStore()
   const { mode, toggle } = useThemeMode()
   const dark = mode === 'dark'
   const { lastUpdate } = useLatestSensorData(60000)
-  const [alertCount, setAlertCount] = useState(0)
-
-  useEffect(() => {
-    alertsApi.list().then((r) => {
-      setAlertCount(r.data.filter((a: any) => !a.acknowledged).length)
-    }).catch(() => {})
-    const t = setInterval(() => {
-      alertsApi.list().then((r) =>
-        setAlertCount(r.data.filter((a: any) => !a.acknowledged).length)
-      ).catch(() => {})
-    }, 30000)
-    return () => clearInterval(t)
-  }, [])
 
   const isLive = lastUpdate ? (Date.now() - lastUpdate.getTime()) < 90000 : false
 
@@ -309,12 +250,6 @@ export default function NavBar() {
   const textSec  = dark ? '#8aaccc' : '#5a7090'
   const navBg    = dark ? 'rgba(6,10,22,0.97)'  : 'rgba(255,255,255,0.98)'
   const border   = dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,80,160,0.1)'
-
-  const NAV_WIDTH = 612
-  const TAB_W = NAV_WIDTH / NAV_ITEMS.length
-
-  const currentIndex = NAV_ITEMS.findIndex((item) => location.pathname === item.path)
-  const activeIndex = currentIndex >= 0 ? currentIndex : 0
 
   return (
     <Box
@@ -346,78 +281,9 @@ export default function NavBar() {
         </Box>
       </Box>
 
-      {/* ── Pill Navigation ───────────────────────────────────────────── */}
-      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', flex: 1, position: 'relative', height: 40 }}>
-        <Box sx={{
-          position: 'relative', display: 'flex', alignItems: 'center',
-          background: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,80,160,0.04)',
-          borderRadius: '12px', p: 0.4,
-          border: `1px solid ${dark ? 'rgba(0,170,255,0.08)' : 'rgba(0,80,160,0.06)'}`,
-        }}>
-          {/* Sliding pill — spring animated */}
-          <motion.div
-            layout
-            animate={{
-              x: activeIndex >= 0 ? activeIndex * TAB_W : 0,
-              width: TAB_W - 6,
-            }}
-            transition={{ type: 'spring', stiffness: 420, damping: 36, mass: 0.7 }}
-            style={{
-              position: 'absolute',
-              height: 'calc(100% - 6px)',
-              borderRadius: 9,
-              background: dark
-                ? 'linear-gradient(135deg, rgba(0,170,255,0.18) 0%, rgba(0,220,170,0.12) 100%)'
-                : 'linear-gradient(135deg, rgba(0,112,212,0.12) 0%, rgba(0,180,160,0.08) 100%)',
-              boxShadow: dark
-                ? `0 0 16px rgba(0,170,255,0.2), inset 0 1px 0 rgba(255,255,255,0.1)`
-                : '0 2px 8px rgba(0,112,212,0.12)',
-              border: `1px solid ${dark ? 'rgba(0,170,255,0.25)' : 'rgba(0,112,212,0.15)'}`,
-              pointerEvents: 'none',
-              top: 3,
-            }}
-          />
-
-          {NAV_ITEMS.map((item, i) => {
-            const active = location.pathname === item.path
-            const isAlerts = item.path === '/alerts'
-            return (
-              <ClickSparkWrapper
-                key={item.path}
-                color={primary}
-                count={6}
-              >
-                <motion.div
-                  onClick={() => navigate(item.path)}
-                  style={{
-                    position: 'relative', zIndex: 1,
-                    padding: '6px 0',
-                    cursor: 'pointer',
-                    borderRadius: 8,
-                    userSelect: 'none',
-                    width: TAB_W,
-                    textAlign: 'center',
-                  }}
-                  whileHover={{ scale: active ? 1 : 1.03 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Typography sx={{
-                    fontSize: '0.78rem',
-                    fontWeight: active ? 700 : 400,
-                    color: active ? primary : textSec,
-                    transition: 'color 0.2s',
-                    whiteSpace: 'nowrap',
-                    letterSpacing: active ? '-0.01em' : '0.01em',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.6,
-                  }}>
-                    {item.label}
-                    {isAlerts && alertCount > 0 && <BadgePulse count={alertCount} />}
-                  </Typography>
-                </motion.div>
-              </ClickSparkWrapper>
-            )
-          })}
-        </Box>
+      {/* ── Fluid Tabs Navigation ──────────────────────────────────────── */}
+      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+        <NavTabs />
       </Box>
 
       {/* Mobile spacer */}

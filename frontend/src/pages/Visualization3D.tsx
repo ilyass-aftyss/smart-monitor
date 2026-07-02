@@ -768,7 +768,7 @@ export default function Visualization3DPage() {
 
   return (
     <Box sx={{ height: 'calc(100vh - 110px)', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-      <style>{`* { cursor: auto !important; } canvas { cursor: grab; } canvas:active { cursor: grabbing; }`}</style>
+      <style>{`.viz3d-canvas canvas { cursor: grab; } .viz3d-canvas canvas:active { cursor: grabbing; }`}</style>
 
       {/* En-tête */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 1 }}>
@@ -925,7 +925,7 @@ export default function Visualization3DPage() {
         </Paper>
 
         {/* Canvas 3D */}
-        <Paper sx={{
+        <Paper className="viz3d-canvas" sx={{
           flex: 1, overflow: 'hidden', border: '1px solid rgba(0,170,255,0.2)',
           position: 'relative', cursor: 'default',
           '&::before': {

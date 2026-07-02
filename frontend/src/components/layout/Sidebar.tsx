@@ -9,6 +9,8 @@ import WbSunnyIcon from '@mui/icons-material/WbSunny'
 import DevicesIcon from '@mui/icons-material/Devices'
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive'
 import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import SmartToyIcon from '@mui/icons-material/SmartToy'
+import EmailIcon from '@mui/icons-material/Email'
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
@@ -17,6 +19,8 @@ const navItems = [
   { label: 'État Ventilateurs', path: '/devices', icon: <DevicesIcon /> },
   { label: 'Alertes', path: '/alerts', icon: <NotificationsActiveIcon /> },
   { label: 'Vue 3D', path: '/3d', icon: <ViewInArIcon /> },
+  { label: 'Ask IA', path: '/ask', icon: <SmartToyIcon /> },
+  { label: 'Mail',   path: '/mail', icon: <EmailIcon /> },
 ]
 
 interface Props {

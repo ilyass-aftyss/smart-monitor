@@ -10,6 +10,8 @@ const pageTitles: Record<string, string> = {
   '/devices': 'Gestion des Ventilateurs',
   '/alerts': 'Alertes & Notifications',
   '/3d': 'Visualisation 3D',
+  '/ask': 'Assistant IA',
+  '/mail': 'Services Mail',
 }
 
 interface Props {

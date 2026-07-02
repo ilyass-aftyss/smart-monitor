@@ -1,16 +1,19 @@
 import asyncio
 import random
 import math
-import uuid
 from datetime import datetime, timedelta
-from typing import List, Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, Depends
+from typing import List
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.middleware.gzip import GZipMiddleware  # <-- AJOUT POUR LA PERFORMANCE
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 import uvicorn
 
 app = FastAPI(title="Smart Environmental Monitoring Mock API", version="1.0.0")
+
+# 1. COMPRESSION GZIP : Indispensable pour transférer rapidement les milliers de points des graphiques
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.add_middleware(
     CORSMiddleware,
@@ -111,26 +114,26 @@ time_step = 2880
 
 # Background task for live updates
 async def live_data_generator():
-    global time_step
+    global time_step, internal_history, external_history, alerts
     while True:
         try:
-            await asyncio.sleep(5)  # Generate mock data every 5 seconds for fast dev/testing instead of 60s
+            await asyncio.sleep(5)
             time_step += 1
             ts = datetime.utcnow()
             
             internal_val = generate_internal_data(time_step, ts)
             external_val = generate_external_data(time_step, ts)
             
-            # Append and trim history
+            # Append and trim history efficiently
             internal_history.append(internal_val)
             if len(internal_history) > 3000:
-                internal_history.pop(0)
+                del internal_history[0]  # Plus rapide que pop(0)
                 
-            if time_step % 3 == 0:  # Every 15 seconds in our fast-sim
+            if time_step % 3 == 0: 
                 external_history.append(external_val)
                 if len(external_history) > 500:
-                    external_history.pop(0)
-                # Broadcast External
+                    del external_history[0]
+                
                 await manager.broadcast({
                     "type": "external_update",
                     "data": {
@@ -142,7 +145,6 @@ async def live_data_generator():
                     "timestamp": ts.isoformat()
                 })
             
-            # Broadcast Internal
             await manager.broadcast({
                 "type": "internal_update",
                 "data": {
@@ -157,7 +159,7 @@ async def live_data_generator():
                 "timestamp": ts.isoformat()
             })
             
-            # Randomly trigger new alerts occasionally for visualization
+            # Randomly trigger new alerts occasionally
             if random.random() < 0.05:
                 global alert_id_counter
                 alert_id_counter += 1
@@ -181,6 +183,11 @@ async def live_data_generator():
                     "acknowledged_by": None
                 }
                 alerts.append(new_alert)
+                
+                # 2. NETTOYAGE DES ALERTES : Évite la saturation mémoire au bout de plusieurs heures
+                if len(alerts) > 500:
+                    del alerts[0]
+
                 await manager.broadcast({
                     "type": "alert",
                     "data": {
@@ -210,15 +217,12 @@ class DeviceUpdate(BaseModel):
 # ─── ROUTING ─────────────────────────────────────────────────────────────────
 @app.post("/api/auth/token", response_model=TokenResponse)
 async def login(username: str = Depends(OAuth2PasswordBearer(tokenUrl="token", auto_error=False))):
-    # Support client FormData login by custom reading or default token return
     return TokenResponse(
         access_token="mock-access-token",
         role="admin",
         username="admin"
     )
 
-# Override oauth for login route to accept form parameters
-from fastapi.security import OAuth2PasswordRequestForm
 @app.post("/api/auth/token")
 async def login_form(form_data: OAuth2PasswordRequestForm = Depends()):
     return TokenResponse(
@@ -310,6 +314,7 @@ async def get_alerts_route(limit: int = 50, unacknowledged_only: bool = False):
     filtered = alerts
     if unacknowledged_only:
         filtered = [a for a in alerts if not a["acknowledged"]]
+    # Tri décroissant avec limite stricte pour la rapidité
     return sorted(filtered, key=lambda x: x["timestamp"], reverse=True)[:limit]
 
 @app.post("/api/alerts/{alert_id}/acknowledge")
@@ -336,7 +341,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            # Keep connection alive
+            # Garde la connexion ouverte avec le client frontend
             await websocket.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(websocket)
