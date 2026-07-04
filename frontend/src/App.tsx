@@ -13,6 +13,7 @@ import AlertsPage from './pages/Alerts'
 import Visualization3DPage from './pages/Visualization3D'
 import AskIAPage from './pages/AskIA'
 import MailServicesPage from './pages/MailServices'
+import MeteoPage from './pages/Meteo'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, login } = useAuthStore()
@@ -76,8 +77,9 @@ function AppRoutes() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="history"   element={<HistoryPage />} />
-            <Route path="external"  element={<ExternalPage />} />
-            <Route path="devices"   element={<DevicesPage />} />
+            <Route path="external"      element={<ExternalPage />} />
+            <Route path="meteo" element={<MeteoPage />} />
+            <Route path="devices"       element={<DevicesPage />} />
             <Route path="alerts"    element={<AlertsPage />} />
             <Route path="3d"        element={<Visualization3DPage />} />
             <Route path="ask"      element={<AskIAPage />} />

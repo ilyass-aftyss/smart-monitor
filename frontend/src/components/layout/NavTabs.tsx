@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard',    path: '/dashboard' },
   { label: 'Historique',   path: '/history'   },
   { label: 'Ext.',         path: '/external'  },
+  { label: 'Météo',        path: '/meteo' },
   { label: 'Ventilateurs', path: '/devices'   },
   { label: 'Alertes',      path: '/alerts'    },
   { label: 'Vue 3D',       path: '/3d'        },

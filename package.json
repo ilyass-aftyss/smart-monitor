@@ -1,0 +1,27 @@
+{
+  "name": "smart-monitor",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Mon application de monitoring",
+  "author": "Votre Nom",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "axios": "^1.0.0" 
+  },
+  "devDependencies": {
+    "electron": "26.0.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.smart.monitor",
+    "win": {
+      "target": "nsis"
+    },
+    "extraFiles": [
+      "mock_backend.exe"
+    ]
+  }
+}

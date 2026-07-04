@@ -1,0 +1,11 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.smart.monitor
+win:
+  target: nsis
+extraFiles:
+  - filter:
+      - mock_backend.exe
+files: []
+electronVersion: 26.0.0
