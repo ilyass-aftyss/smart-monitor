@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenhouse Telemetry Test Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --primary: #319795;
+            --accent: #dd6b20;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .config-box {
+            background: #edf2f7;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input {
+            padding: 8px;
+            width: 320px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { opacity: 0.9; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-top: 4px solid var(--primary);
+        }
+        .card.solar { border-top-color: var(--accent); }
+        .card.internal { border-top-color: #4299e1; }
+        h2 { margin-top: 0; color: #4a5568; font-size: 1.25rem; }
+        .timestamp { font-size: 12px; color: #718096; margin-bottom: 15px; }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .metric:last-child { border-bottom: none; }
+        .value { font-weight: bold; color: #1a202c; }
+        .error-msg {
+            color: #c53030;
+            background: #fff5f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #fed7d7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1 style="margin:0; font-size: 1.8rem;">Greenhouse Monitoring Core</h1>
+            <p style="margin:5px 0 0 0; color:#718096;">Remote Telemetry API Verifier</p>
+        </div>
+        <div class="config-box">
+            <label for="apiUrl" style="font-size:14px; font-weight:bold;">Ngrok Target:</label>
+            <input type="text" id="apiUrl" placeholder="https://your-ngrok-subdomain.ngrok-free.dev">
+            <button onclick="fetchTelemetry()">Fetch Now</button>
+        </div>
+    </header>
+
+    <div id="errorBox" class="error-msg"></div>
+
+    <div class="grid">
+        <!-- CARD 1: OUTDOOR WEATHER -->
+        <div class="card">
+            <h2>Outdoor Weather Station</h2>
+            <div class="timestamp" id="weather-time">Waiting for data...</div>
+            <div class="metric"><span>Device Name:</span><span class="value" id="weather-name">-</span></div>
+            <div class="metric"><span>Temperature:</span><span class="value" id="weather-temp">-</span></div>
+            <div class="metric"><span>Humidity:</span><span class="value" id="weather-hum">-</span></div>
+            <div class="metric"><span>Wind Speed:</span><span class="value" id="weather-wind">-</span></div>
+            <div class="metric"><span>Wind Cardinal:</span><span class="value" id="weather-card">-</span></div>
+            <div class="metric"><span>Rainfall:</span><span class="value" id="weather-rain">-</span></div>
+            <div class="metric"><span>Link Quality (RSSI):</span><span class="value" id="weather-rssi">-</span></div>
+        </div>
+
+        <!-- CARD 2: SOLAR IRRADIANCE -->
+        <div class="card solar">
+            <h2>Solar Irradiance Array</h2>
+            <div class="timestamp" id="solar-time">Waiting for data...</div>
+            <div class="metric"><span>Device Name:</span><span class="value" id="solar-name">-</span></div>
+            <div class="metric"><span>Solar Radiation:</span><span class="value" id="solar-irr" style="color:var(--accent); font-size:1.1rem;">-</span></div>
+            <div class="metric"><span>Node Battery:</span><span class="value" id="solar-bat">-</span></div>
+        </div>
+
+        <!-- CARD 3: INDOOR CLIMATE (HD50) -->
+        <div class="card internal">
+            <h2>Indoor Climate (HD50)</h2>
+            <div class="timestamp" id="internal-time">Waiting for data...</div>
+            <div class="metric"><span>Temperature:</span><span class="value" id="internal-temp">-</span></div>
+            <div class="metric"><span>Relative Humidity:</span><span class="value" id="internal-hum">-</span></div>
+            <div class="metric"><span>Dew Point:</span><span class="value" id="internal-dew">-</span></div>
+            <div class="metric"><span>Partial Vapor Pres.:</span><span class="value" id="internal-pvp">-</span></div>
+            <div class="metric"><span>Illuminance:</span><span class="value" id="internal-lux">-</span></div>
+            <div class="metric"><span>CO2 Concentration:</span><span class="value" id="internal-co2">-</span></div>
+            <div class="metric"><span>Atmospheric Pres.:</span><span class="value" id="internal-pres">-</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Automatically retrieve saved setup configurations from browser local storage
+    document.getElementById('apiUrl').value = localStorage.getItem('saved_greenhouse_url') || '';
+
+    async function fetchTelemetry() {
+        const errorBox = document.getElementById('errorBox');
+        let baseUrl = document.getElementById('apiUrl').value.trim();
+        
+        if (!baseUrl) {
+            showError("Please enter your target validation address.");
+            return;
+        }
+
+        if (baseUrl.endsWith('/')) {
+            baseUrl = baseUrl.slice(0, -1);
+        }
+
+        localStorage.setItem('saved_greenhouse_url', baseUrl);
+        errorBox.style.display = 'none';
+
+        try {
+            // Fetching data over internet via Ngrok endpoint proxy matrix
+            const response = await fetch(`${baseUrl}/api/telemetry/latest`, {
+                method: 'GET',
+                headers: { 
+                    'Accept': 'application/json',
+                    // METHOD 1 IMPLEMENTATION: Skips the free-tier interstitial page block natively
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`API returned an bad HTTP status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            updateUI(data);
+
+        } catch (error) {
+            console.error(error);
+            showError(`Network Connection Failed: ${error.message}. Ensure your computing station server and Ngrok are active.`);
+        }
+    }
+
+    function updateUI(data) {
+        // 1. Update Weather Data Card
+        const out = data.outdoor_weather || {};
+        document.getElementById('weather-time').innerText = out.timestamp ? `Last updated: ${out.timestamp}` : 'No records logged';
+        document.getElementById('weather-name').innerText = out.device_name || '-';
+        document.getElementById('weather-temp').innerText = out.temperature_c ? `${out.temperature_c} °C` : '-';
+        document.getElementById('weather-hum').innerText = out.humidity_pct ? `${out.humidity_pct} %` : '-';
+        document.getElementById('weather-wind').innerText = out.wind_speed_kmh ? `${out.wind_speed_kmh} km/h` : '-';
+        document.getElementById('weather-card').innerText = out.wind_cardinal || '-';
+        document.getElementById('weather-rain').innerText = out.rain_mm ? `${out.rain_mm} mm` : '-';
+        document.getElementById('weather-rssi').innerText = out.rssi ? `${out.rssi} dBm` : '-';
+
+        // 2. Update Solar Data Card
+        const sol = data.solar_irradiance || {};
+        document.getElementById('solar-time').innerText = sol.timestamp ? `Last updated: ${sol.timestamp}` : 'No records logged';
+        document.getElementById('solar-name').innerText = sol.device_name || '-';
+        document.getElementById('solar-irr').innerText = sol.irradiance_wm2 ? `${sol.irradiance_wm2} W/m²` : '-';
+        document.getElementById('solar-bat').innerText = sol.battery_v ? `${sol.battery_v} V` : '-';
+
+        // 3. Update Internal Climate (HD50) Card
+        const ind = data.indoor_climat_hd50 || {};
+        document.getElementById('internal-time').innerText = ind.timestamp ? `Last updated: ${ind.timestamp}` : 'No records logged';
+        document.getElementById('internal-temp').innerText = ind.temperature_c ? `${ind.temperature_c} °C` : '-';
+        document.getElementById('internal-hum').innerText = ind.humidity_pct ? `${ind.humidity_pct} %` : '-';
+        document.getElementById('internal-dew').innerText = ind.dew_point_c ? `${ind.dew_point_c} °C` : '-';
+        document.getElementById('internal-pvp').innerText = ind.partial_vapor_pressure_hPa ? `${ind.partial_vapor_pressure_hPa} hPa` : '-';
+        document.getElementById('internal-lux').innerText = ind.illuminance_lux ? `${ind.illuminance_lux} Lux` : '-';
+        document.getElementById('internal-co2').innerText = ind.co2_ppm ? `${ind.co2_ppm} ppm` : '-';
+        document.getElementById('internal-pres').innerText = ind.atmospheric_pressure_hPa ? `${ind.atmospheric_pressure_hPa} hPa` : '-';
+    }
+
+    function showError(text) {
+        const errorBox = document.getElementById('errorBox');
+        errorBox.innerText = text;
+        errorBox.style.display = 'block';
+    }
+
+    // Fire auto-fetch immediately if a cached target address exists on startup
+    if(document.getElementById('apiUrl').value) {
+        fetchTelemetry();
+    }
+</script>
+
+</body>
+</html>
