@@ -21,6 +21,9 @@ class InternalDataOut(BaseModel):
     vpd: Optional[float]
     pressure: Optional[float]
     dew_point: Optional[float]
+    illuminance: Optional[float] = None
+    partial_vapor_pressure: Optional[float] = None
+    source: Optional[str] = "simulation"
 
     class Config:
         from_attributes = True
@@ -30,8 +33,18 @@ async def get_latest(db: AsyncSession = Depends(get_db), current_user=Depends(ge
     result = await db.execute(select(InternalData).order_by(desc(InternalData.timestamp)).limit(1))
     row = result.scalar_one_or_none()
     if not row:
-        return InternalDataOut(id=0, timestamp=datetime.utcnow(), temperature=22.5, co2=450.0, humidity=55.0, voc=120.0, vpd=0.8, pressure=1013.25, dew_point=12.5)
+        return InternalDataOut(
+            id=0, timestamp=datetime.utcnow(), temperature=22.5, co2=450.0, humidity=55.0,
+            voc=120.0, vpd=0.8, pressure=1013.25, dew_point=12.5,
+            illuminance=8500.0, partial_vapor_pressure=1.4, source="simulation",
+        )
     return row
+
+@router.get("/telemetry-status")
+async def get_telemetry_status(current_user=Depends(get_current_user)):
+    """État de la connexion HTTP au serveur de télémétrie distant (station réelle)."""
+    from services.telemetry_client import telemetry_client
+    return telemetry_client.status()
 
 @router.get("/history", response_model=List[InternalDataOut])
 async def get_history(

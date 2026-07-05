@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 480
     csv_data_path: str = "/app/csv_data"
     simulation_mode: bool = True
+    # URL du serveur Flask distant (via tunnel ngrok) exposant les données réelles
+    # de la serre. Ne JAMAIS exposer cette URL au frontend — uniquement utilisée
+    # côté backend pour le polling HTTP. Définie via variable d'environnement /
+    # secret, jamais en dur dans le code.
+    greenhouse_telemetry_url: str = ""
+    telemetry_poll_seconds: int = 20
 
     class Config:
         env_file = ".env"

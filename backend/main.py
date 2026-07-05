@@ -10,6 +10,7 @@ from database.db import engine, Base, AsyncSessionLocal
 from api import auth, internal, external, devices, alerts, websocket_endpoint
 from models.models import User
 from services.data_simulator import DataSimulator
+from services.telemetry_client import telemetry_client
 from csv_reader.reader import auto_sync_csv_folder
 
 simulator = DataSimulator()
@@ -68,7 +69,14 @@ async def lifespan(app: FastAPI):
     await seed_default_devices()
 
     tasks = []
-    if app_settings.simulation_mode:
+    if app_settings.greenhouse_telemetry_url:
+        print("[Mode] TÉLÉMÉTRIE RÉELLE — polling HTTP du serveur distant (station physique)")
+        tasks.append(asyncio.create_task(telemetry_client.run()))
+        # Le simulateur ne backfill/complète que l'historique s'il manque de données,
+        # il ne génère plus de nouvelles mesures tant que la station réelle répond.
+        if app_settings.simulation_mode:
+            tasks.append(asyncio.create_task(simulator._backfill_history(hours=48)))
+    elif app_settings.simulation_mode:
         print("[Mode] SIMULATION active — données générées automatiquement")
         tasks.append(asyncio.create_task(simulator.run()))
     else:
