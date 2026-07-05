@@ -50,12 +50,12 @@ async def seed_default_devices():
         if count == 0:
             await session.execute(text("""
                 INSERT INTO devices (id, name, device_type, location, status) VALUES
-                (gen_random_uuid(), 'Ventilateur Toiture 1', 'fan', 'roof', 'ON'),
-                (gen_random_uuid(), 'Ventilateur Toiture 2', 'fan', 'roof', 'OFF'),
-                (gen_random_uuid(), 'Ventilateur Toiture 3', 'fan', 'roof', 'ON'),
-                (gen_random_uuid(), 'Ventilateur Plafond 1', 'fan', 'ceiling', 'ON'),
-                (gen_random_uuid(), 'Ventilateur Plafond 2', 'fan', 'ceiling', 'OFF'),
-                (gen_random_uuid(), 'Ventilateur Plafond 3', 'fan', 'ceiling', 'Erreur')
+                (gen_random_uuid(), 'Actionneur Toiture 1', 'fan', 'roof', 'ON'),
+                (gen_random_uuid(), 'Actionneur Toiture 2', 'fan', 'roof', 'OFF'),
+                (gen_random_uuid(), 'Actionneur Toiture 3', 'fan', 'roof', 'ON'),
+                (gen_random_uuid(), 'Actionneur Plafond 1', 'fan', 'ceiling', 'ON'),
+                (gen_random_uuid(), 'Actionneur Plafond 2', 'fan', 'ceiling', 'OFF'),
+                (gen_random_uuid(), 'Actionneur Plafond 3', 'fan', 'ceiling', 'Erreur')
             """))
             await session.commit()
 

@@ -119,7 +119,7 @@ export default function DevicesPage() {
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700}>État des Ventilateurs</Typography>
+        <Typography variant="h5" fontWeight={700}>État des Actionneurs</Typography>
         <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
           Supervision uniquement · mise à jour automatique toutes les 30 s
         </Typography>
@@ -143,14 +143,14 @@ export default function DevicesPage() {
       ) : (
         <>
           <Typography sx={{ fontWeight: 600, color: textSec, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.7rem' }}>
-            Ventilateurs de Toiture
+            Actionneurs de Toiture
           </Typography>
           <Grid container spacing={2} sx={{ mb: 3 }}>
             {roof.map((d) => <Grid item xs={12} sm={6} md={4} key={d.id}><DeviceCard device={d} /></Grid>)}
           </Grid>
 
           <Typography sx={{ fontWeight: 600, color: textSec, mb: 1.5, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.7rem' }}>
-            Ventilateurs de Plafond
+            Actionneurs de Plafond
           </Typography>
           <Grid container spacing={2}>
             {ceiling.map((d) => <Grid item xs={12} sm={6} md={4} key={d.id}><DeviceCard device={d} /></Grid>)}

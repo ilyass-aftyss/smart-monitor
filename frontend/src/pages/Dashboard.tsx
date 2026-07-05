@@ -31,6 +31,8 @@ const KPI_CONFIGS: KpiConfig[] = [
   { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#10b981', min: 0,   max: 2,    warnHigh: 1.5, critHigh: 1.8 },
   { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#f59e0b', min: 980, max: 1040 },
   { key: 'dew_point',   label: 'Point de Rosée',  unit: '°C',  color: '#64748b', min: 0,   max: 30 },
+  { key: 'illuminance', label: 'Éclairement',     unit: 'lux', color: '#eab308', min: 0,   max: 30000 },
+  { key: 'partial_vapor_pressure', label: 'Pression Vap. Partielle', unit: 'hPa', color: '#22c55e', min: 0, max: 5 },
 ]
 
 const CHART_METRICS: (keyof InternalData)[] = ['temperature', 'co2', 'humidity', 'voc']
@@ -43,7 +45,7 @@ function getStatus(v: number, cfg: KpiConfig): 'normal' | 'warning' | 'critical'
   return 'normal'
 }
 
-function SourceBadge({ lastUpdate }: { lastUpdate: Date | null }) {
+function SourceBadge({ lastUpdate, source }: { lastUpdate: Date | null; source?: string }) {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
   const isLive = lastUpdate ? (Date.now() - lastUpdate.getTime()) < 90000 : false
@@ -64,7 +66,7 @@ function SourceBadge({ lastUpdate }: { lastUpdate: Date | null }) {
         }} />
         <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, fontFamily: '"JetBrains Mono", monospace',
           color: isLive ? (dark ? '#00e87a' : '#10b981') : '#f59e0b' }}>
-          {isLive ? 'Simulateur EN DIRECT' : 'En attente de données'}
+          {isLive ? (source === 'station' ? 'Station Réelle EN DIRECT (HTTP)' : 'Simulateur EN DIRECT') : 'En attente de données'}
         </Typography>
       </Box>
       {lastUpdate && (
@@ -98,7 +100,7 @@ export default function DashboardPage() {
             Culture hors-sol du fraisier · 3 gouttières × 8.5 m · 80 plants
           </Typography>
         </Box>
-        <SourceBadge lastUpdate={lastUpdate} />
+        <SourceBadge lastUpdate={lastUpdate} source={internal?.source} />
       </Box>
 
       {/* KPI Cards */}
@@ -132,8 +134,8 @@ export default function DashboardPage() {
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.2 }}>
                   {[
-                    { label: 'Radiation',  value: external.radiation,   unit: 'W/m²', color: '#f97316' },
-                    { label: 'Vent',       value: external.wind_speed,  unit: 'm/s',  color: '#06b6d4' },
+                    { label: 'Irradiance', value: external.radiation,   unit: 'W/m²', color: '#f97316' },
+                    { label: 'Vent',       value: external.wind_speed,  unit: 'km/h', color: '#06b6d4' },
                     { label: 'Hum. Ext.', value: external.humidity,    unit: '%',    color: '#3b82f6' },
                     { label: 'Temp. Ext.',value: external.temperature, unit: '°C',   color: '#f59e0b' },
                   ].map((item) => (

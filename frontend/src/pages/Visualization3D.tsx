@@ -130,11 +130,13 @@ const L = 10   // length
 const H = 3    // wall height
 
 // ─── Gouttières de culture ────────────────────────────────────────────────────
-// 3 lignes de 8.5 m, suspendues à 1.0 m de hauteur, espacées de 1.25 m en X
-// 80 plants au total (~27 par ligne)
+// 3 lignes de 8.5 m, suspendues à 0.8 m de hauteur (spec), espacées de 1.25 m en X
+// 80 plants au total (~27 par ligne) · hauteur max plante ≈ 1.15 m
 const GUTTER_LENGTH = 8.5
-const GUTTER_HEIGHT = 1.0
+const GUTTER_HEIGHT = 0.8
 const GUTTER_POSITIONS_X = [-1.25, 0, 1.25]
+const CORRIDOR_WIDTH = 1.0
+const CORRIDOR_X = W / 2 - CORRIDOR_WIDTH / 2
 const PLANTS_PER_GUTTER  = 27
 const PLANT_SPACING      = GUTTER_LENGTH / (PLANTS_PER_GUTTER - 1)
 
@@ -217,7 +219,21 @@ function GutterStructure() {
       ))}
       {/* Label 3D */}
       <Text position={[0, GUTTER_HEIGHT + 0.5, -GUTTER_LENGTH / 2 - 0.3]} fontSize={0.09} color="#00ff88" anchorX="center">
-        {`3 lignes × 8.5 m — 80 plants (Fibre de coco)`}
+        {`3 lignes × 8.5 m — 80 plants (Fibre de coco) · hauteur max 1.15 m`}
+      </Text>
+    </group>
+  )
+}
+
+function Corridor() {
+  return (
+    <group position={[CORRIDOR_X, 0, 0]}>
+      <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[CORRIDOR_WIDTH, L]} />
+        <meshStandardMaterial color="#12203a" metalness={0.1} roughness={0.9} transparent opacity={0.6} />
+      </mesh>
+      <Text position={[0, 0.3, -L / 2 + 0.6]} fontSize={0.11} color="#ffd166" anchorX="center" rotation={[-Math.PI / 2, 0, 0]}>
+        {`Corridor (1 m)`}
       </Text>
     </group>
   )
@@ -348,7 +364,7 @@ function HUD({ internal, external }: { internal: any; external: any }) {
             {'◈ CAPTEURS EXTERNES'}
           </Text>
           <Text position={[0.2, 4.7, 0]} fontSize={0.1} color="#e0e8f8" anchorX="left">
-            {`Radiation: ${external.radiation?.toFixed(0)} W/m²  |  Vent: ${external.wind_speed?.toFixed(1)} m/s`}
+            {`Radiation: ${external.radiation?.toFixed(0)} W/m²  |  Vent: ${external.wind_speed?.toFixed(1)} km/h`}
           </Text>
           <Text position={[0.2, 4.5, 0]} fontSize={0.1} color="#8aaccc" anchorX="left">
             {`Temp: ${external.temperature?.toFixed(1)}°C  |  Hum: ${external.humidity?.toFixed(1)}%`}
@@ -383,6 +399,9 @@ function Scene({ devices, showWireframe }: { devices: Device[]; showWireframe: b
 
       {/* 3 gouttières de culture fraisier — 8.5 m chacune, 80 plants, substrat fibre de coco */}
       <GutterStructure />
+
+      {/* Corridor de circulation — 1 m de large, le long du mur Est */}
+      <Corridor />
 
       {/* Internal sensor nodes — distributed inside the 5 m × 10 m space
           X stays within ±2.0 m, Z spread over the 10 m length */}
@@ -432,7 +451,7 @@ function Scene({ devices, showWireframe }: { devices: Device[]; showWireframe: b
               {`☀ ${external.radiation?.toFixed(0)}W/m²`}
             </Text>
             <Text position={[0, 0.56, 0]} fontSize={0.09} color="#00ccff" anchorX="center">
-              {`💨 ${external.wind_speed?.toFixed(1)}m/s`}
+              {`💨 ${external.wind_speed?.toFixed(1)}km/h`}
             </Text>
             <pointLight color="#ffaa00" intensity={0.4} distance={2} />
           </Float>
@@ -479,7 +498,7 @@ export default function Visualization3DPage() {
   const fanErr = devices.filter((d) => d.status === 'Erreur').length
 
   const statusChips = [
-    { label: `${fanOn} ventilateurs ON`,                                        color: dark ? '#00ff88' : '#0ea86a' },
+    { label: `${fanOn} actionneurs ON`,                                         color: dark ? '#00ff88' : '#0ea86a' },
     { label: fanErr > 0 ? `${fanErr} erreurs` : 'Aucune erreur',               color: fanErr > 0 ? '#e8334a' : (dark ? '#00ff88' : '#0ea86a') },
     { label: internal ? `${internal.temperature?.toFixed(1)}°C` : '…',         color: '#f97316' },
   ]
@@ -494,7 +513,7 @@ export default function Visualization3DPage() {
             Jumeau Numérique 3D — Serre Fraisier
           </Typography>
           <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-            3 gouttières × 8.5 m · 80 plants · Fibre de coco · 6 ventilateurs
+            10 m × 5 m (9 m + corridor 1 m) · 3 gouttières × 8.5 m · 80 plants · Fibre de coco · 6 actionneurs
           </Typography>
         </Box>
 
