@@ -1,8 +1,0 @@
-uploads = []
-generated = []
-
-[[outputs]]
-id = "TbjxNm08YBK9pDntuNyEQ"
-uri = "file://Guide_Serre_Fraisier.pdf"
-type = "pdf"
-title = "Guide Complet - Serre Fraisier (Protocole & Jury)"

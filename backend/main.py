@@ -60,11 +60,37 @@ async def seed_default_devices():
             await session.commit()
 
 
+async def apply_schema_migrations(conn):
+    """Ajoute les colonnes manquantes sur les tables existantes.
+
+    `Base.metadata.create_all` ne crée que les tables absentes : si une table
+    existe déjà (volume Docker conservé entre deux versions du modèle), les
+    nouvelles colonnes ajoutées au modèle ne sont jamais créées et provoquent
+    des `UndefinedColumnError` au runtime. On corrige donc le schéma existant
+    ici, de façon idempotente, à chaque démarrage du backend.
+    """
+    statements = [
+        "ALTER TABLE internal_data ADD COLUMN IF NOT EXISTS illuminance FLOAT",
+        "ALTER TABLE internal_data ADD COLUMN IF NOT EXISTS partial_vapor_pressure FLOAT",
+        "ALTER TABLE internal_data ADD COLUMN IF NOT EXISTS source VARCHAR(20) DEFAULT 'simulation'",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS rain FLOAT",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS wind_cardinal VARCHAR(10)",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS rssi FLOAT",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS battery_v FLOAT",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS device_name VARCHAR(100)",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS solar_device_name VARCHAR(100)",
+        "ALTER TABLE external_data ADD COLUMN IF NOT EXISTS source VARCHAR(20) DEFAULT 'simulation'",
+    ]
+    for statement in statements:
+        await conn.execute(text(statement))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from database.db import settings as app_settings
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await apply_schema_migrations(conn)
     await seed_default_users()
     await seed_default_devices()
 
