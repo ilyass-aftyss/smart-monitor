@@ -217,6 +217,13 @@ export default function MeteoPage() {
       grid: { top: 20, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          snap: true,
+          z: 100,
+          label: { show: true, backgroundColor: color, color: '#fff', fontSize: 9 },
+          lineStyle: { color, width: 1, type: 'dashed', opacity: 0.5 },
+        },
         backgroundColor: tooltipBg, borderColor: `${color}55`, borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
         formatter: (p: any) => p[0].value == null ? '' : `<b style="color:${color};font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
@@ -266,6 +273,13 @@ export default function MeteoPage() {
       grid: { top: 24, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          snap: true,
+          z: 100,
+          label: { show: true, backgroundColor: '#06b6d4', color: '#fff', fontSize: 9 },
+          lineStyle: { color: '#06b6d4', width: 1, type: 'dashed', opacity: 0.5 },
+        },
         backgroundColor: tooltipBg, borderColor: '#06b6d455', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
         formatter: (p: any) => {
