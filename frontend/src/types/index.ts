@@ -8,6 +8,9 @@ export interface InternalData {
   vpd: number
   pressure: number
   dew_point: number
+  illuminance?: number
+  partial_vapor_pressure?: number
+  source?: 'simulation' | 'station'
 }
 
 export interface ExternalData {
@@ -17,6 +20,13 @@ export interface ExternalData {
   wind_speed: number
   humidity: number
   temperature: number
+  rain?: number
+  wind_cardinal?: string
+  rssi?: number
+  battery_v?: number
+  device_name?: string
+  solar_device_name?: string
+  source?: 'simulation' | 'station'
 }
 
 export interface Device {

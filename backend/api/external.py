@@ -18,6 +18,13 @@ class ExternalDataOut(BaseModel):
     wind_speed: Optional[float]
     humidity: Optional[float]
     temperature: Optional[float]
+    rain: Optional[float] = None
+    wind_cardinal: Optional[str] = None
+    rssi: Optional[float] = None
+    battery_v: Optional[float] = None
+    device_name: Optional[str] = None
+    solar_device_name: Optional[str] = None
+    source: Optional[str] = "simulation"
 
     class Config:
         from_attributes = True
@@ -27,7 +34,12 @@ async def get_latest(db: AsyncSession = Depends(get_db), current_user=Depends(ge
     result = await db.execute(select(ExternalData).order_by(desc(ExternalData.timestamp)).limit(1))
     row = result.scalar_one_or_none()
     if not row:
-        return ExternalDataOut(id=0, timestamp=datetime.utcnow(), radiation=350.0, wind_speed=3.5, humidity=60.0, temperature=25.0)
+        return ExternalDataOut(
+            id=0, timestamp=datetime.utcnow(), radiation=350.0, wind_speed=12.5, humidity=60.0,
+            temperature=25.0, rain=0.0, wind_cardinal="N", rssi=-65.0, battery_v=3.9,
+            device_name="Station Météo (simulation)", solar_device_name="Capteur Solaire (simulation)",
+            source="simulation",
+        )
     return row
 
 @router.get("/history", response_model=List[ExternalDataOut])

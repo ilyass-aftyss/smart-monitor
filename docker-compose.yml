@@ -40,6 +40,15 @@ services:
       # En mode NAS    : /mnt/nas_data  (voir guide docs/GUIDE_PRODUCTION.md)
       CSV_DATA_PATH: /app/csv_data
       CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      # ─────────────────────────────────────────────────────────
+      # TÉLÉMÉTRIE RÉELLE — serveur Flask distant exposé via ngrok
+      # Définissez GREENHOUSE_TELEMETRY_URL dans un fichier .env
+      # (à la racine du projet, JAMAIS commité dans Git) pour activer
+      # la lecture des données réelles de la station. Laissez vide
+      # pour rester en mode simulation. Cette URL n'est utilisée que
+      # côté backend et n'est jamais transmise au frontend/navigateur.
+      GREENHOUSE_TELEMETRY_URL: ${GREENHOUSE_TELEMETRY_URL:-}
+      TELEMETRY_POLL_SECONDS: ${TELEMETRY_POLL_SECONDS:-20}
     volumes:
       - ./backend:/app
       - csv_data:/app/csv_data

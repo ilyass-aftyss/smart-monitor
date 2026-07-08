@@ -45,6 +45,8 @@ class DataSimulator:
         pressure      = 1013.25 + random.gauss(0, 0.5)
         vpd           = round(0.6108 * math.exp(17.27 * base_temp / (base_temp + 237.3)) * (1 - base_humidity / 100), 3)
         dew_point     = base_temp - (100 - base_humidity) / 5
+        illuminance   = max(0, 9000 * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 300))
+        pvp           = round(0.6108 * math.exp(17.27 * dew_point / (dew_point + 237.3)), 3)
         return {
             "temperature": round(base_temp, 2),
             "co2":         round(co2, 1),
@@ -53,19 +55,31 @@ class DataSimulator:
             "vpd":         round(vpd, 3),
             "pressure":    round(pressure, 2),
             "dew_point":   round(dew_point, 2),
+            "illuminance": round(illuminance, 0),
+            "partial_vapor_pressure": pvp,
+            "source": "simulation",
         }
 
     def _generate_external(self):
         t = self.time_step
         radiation    = max(0, 500 * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 20))
-        wind_speed   = abs(3 + 2 * math.sin(t / 30) + random.gauss(0, 0.5))
+        wind_speed   = abs(10 + 6 * math.sin(t / 30) + random.gauss(0, 1.5))  # km/h
         humidity     = 60 + 15 * math.sin(t / 120) + random.gauss(0, 2)
         temperature  = 20 + 8  * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 0.5)
+        rain         = max(0, random.gauss(0, 0.3) - 1.0)
+        cardinals    = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
         return {
-            "radiation":   round(max(0, radiation), 1),
-            "wind_speed":  round(wind_speed, 2),
-            "humidity":    round(humidity, 1),
-            "temperature": round(temperature, 2),
+            "radiation":    round(max(0, radiation), 1),
+            "wind_speed":   round(wind_speed, 2),
+            "humidity":     round(humidity, 1),
+            "temperature":  round(temperature, 2),
+            "rain":         round(rain, 2),
+            "wind_cardinal": cardinals[int(t / 20) % 8],
+            "rssi":         round(-60 + random.gauss(0, 5), 1),
+            "battery_v":    round(3.7 + random.gauss(0, 0.1), 2),
+            "device_name":  "Station Météo (simulation)",
+            "solar_device_name": "Capteur Solaire (simulation)",
+            "source": "simulation",
         }
 
     async def _check_alerts(self, session, d: dict):
@@ -156,6 +170,8 @@ class DataSimulator:
         pressure      = 1013.25 + random.gauss(0, 0.5)
         vpd           = round(0.6108 * math.exp(17.27 * base_temp / (base_temp + 237.3)) * (1 - base_humidity / 100), 3)
         dew_point     = base_temp - (100 - base_humidity) / 5
+        illuminance   = max(0, 9000 * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 300))
+        pvp           = round(0.6108 * math.exp(17.27 * dew_point / (dew_point + 237.3)), 3)
         return {
             "temperature": round(base_temp, 2),
             "co2":         round(co2, 1),
@@ -164,18 +180,30 @@ class DataSimulator:
             "vpd":         round(vpd, 3),
             "pressure":    round(pressure, 2),
             "dew_point":   round(dew_point, 2),
+            "illuminance": round(illuminance, 0),
+            "partial_vapor_pressure": pvp,
+            "source": "simulation",
         }
 
     def _generate_external_at(self, t: int) -> dict:
         radiation   = max(0, 500 * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 20))
-        wind_speed  = abs(3 + 2 * math.sin(t / 30) + random.gauss(0, 0.5))
+        wind_speed  = abs(10 + 6 * math.sin(t / 30) + random.gauss(0, 1.5))  # km/h
         humidity    = 60 + 15 * math.sin(t / 120) + random.gauss(0, 2)
         temperature = 20 + 8  * math.sin(math.pi * (t % 1440) / 1440) + random.gauss(0, 0.5)
+        rain        = max(0, random.gauss(0, 0.3) - 1.0)
+        cardinals   = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
         return {
-            "radiation":   round(max(0, radiation), 1),
-            "wind_speed":  round(wind_speed, 2),
-            "humidity":    round(humidity, 1),
-            "temperature": round(temperature, 2),
+            "radiation":    round(max(0, radiation), 1),
+            "wind_speed":   round(wind_speed, 2),
+            "humidity":     round(humidity, 1),
+            "temperature":  round(temperature, 2),
+            "rain":         round(rain, 2),
+            "wind_cardinal": cardinals[int(t / 20) % 8],
+            "rssi":         round(-60 + random.gauss(0, 5), 1),
+            "battery_v":    round(3.7 + random.gauss(0, 0.1), 2),
+            "device_name":  "Station Météo (simulation)",
+            "solar_device_name": "Capteur Solaire (simulation)",
+            "source": "simulation",
         }
 
     async def _backfill_history(self, hours: int = 48):

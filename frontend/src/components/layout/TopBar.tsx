@@ -7,7 +7,7 @@ const pageTitles: Record<string, string> = {
   '/dashboard': 'Dashboard Temps Réel',
   '/history': 'Historique des Données',
   '/external': 'Capteurs Externes',
-  '/devices': 'Gestion des Ventilateurs',
+  '/devices': 'Gestion des Actionneurs',
   '/alerts': 'Alertes & Notifications',
   '/3d': 'Visualisation 3D',
   '/ask': 'Assistant IA',

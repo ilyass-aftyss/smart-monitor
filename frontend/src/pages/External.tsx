@@ -8,10 +8,12 @@ import type { ExternalData } from '../types'
 const REFRESH_MS = 15 * 60 * 1000
 
 const METRICS = [
-  { key: 'radiation' as keyof ExternalData,   label: 'Radiation Solaire',   unit: 'W/m²', color: '#f97316', yMin: 0 },
-  { key: 'wind_speed' as keyof ExternalData,  label: 'Vitesse du Vent',     unit: 'm/s',  color: '#06b6d4', yMin: 0 },
+  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m²', color: '#f97316', yMin: 0 },
+  { key: 'wind_speed' as keyof ExternalData,  label: 'Vitesse du Vent',     unit: 'km/h', color: '#06b6d4', yMin: 0 },
   { key: 'humidity' as keyof ExternalData,    label: 'Humidité Extérieure', unit: '%',    color: '#3b82f6', yMin: 0, yMax: 100 },
   { key: 'temperature' as keyof ExternalData, label: 'Température Ext.',    unit: '°C',   color: '#f59e0b' },
+  { key: 'rain' as keyof ExternalData,        label: 'Précipitations',      unit: 'mm',   color: '#22c55e', yMin: 0 },
+  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie Capteur Solaire', unit: 'V', color: '#a855f7' },
 ]
 
 export default function ExternalPage() {
@@ -118,7 +120,9 @@ export default function ExternalPage() {
         <Box>
           <Typography variant="h5" fontWeight={700}>Données Externes</Typography>
           <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-            Capteurs météo · acquisition toutes les <b style={{ color: '#f97316' }}>15 minutes</b>
+            Station météo{latest?.device_name ? ` "${latest.device_name}"` : ''} + capteur solaire{latest?.solar_device_name ? ` "${latest.solar_device_name}"` : ''}
+            {' · '}acquisition toutes les <b style={{ color: '#f97316' }}>15 minutes</b>
+            {latest?.rssi != null && <> · RSSI {latest.rssi} dBm</>}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

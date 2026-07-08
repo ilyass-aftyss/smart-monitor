@@ -16,7 +16,7 @@ const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
   { label: 'Historique', path: '/history', icon: <TimelineIcon /> },
   { label: 'Données Externes', path: '/external', icon: <WbSunnyIcon /> },
-  { label: 'État Ventilateurs', path: '/devices', icon: <DevicesIcon /> },
+  { label: 'État Actionneurs', path: '/devices', icon: <DevicesIcon /> },
   { label: 'Alertes', path: '/alerts', icon: <NotificationsActiveIcon /> },
   { label: 'Vue 3D', path: '/3d', icon: <ViewInArIcon /> },
   { label: 'Ask IA', path: '/ask', icon: <SmartToyIcon /> },
