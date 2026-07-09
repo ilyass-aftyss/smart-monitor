@@ -6,7 +6,7 @@ import asyncio
 import uuid
 import bcrypt as _bcrypt
 
-from database.db import engine, Base, AsyncSessionLocal
+from database.db import engine, Base, AsyncSessionLocal, settings
 from api import auth, internal, external, devices, alerts, websocket_endpoint
 from models.models import User
 from services.data_simulator import DataSimulator
@@ -126,7 +126,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "*"],
+    allow_origins=settings.cors_origins.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

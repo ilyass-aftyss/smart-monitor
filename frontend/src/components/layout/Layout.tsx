@@ -7,7 +7,6 @@ import { useThemeMode } from '../../context/ThemeContext'
 /* ── Aurora / Blob background ─────────────────────────────────────────────── */
 function AuroraBackground({ dark }: { dark: boolean }) {
   if (!dark) {
-    // Light-mode: soft blobs
     return (
       <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
         <div style={{
@@ -30,7 +29,6 @@ function AuroraBackground({ dark }: { dark: boolean }) {
 
   return (
     <Box sx={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
-      {/* Large cyan blob — top left */}
       <div className="aurora-blob-a" style={{
         position: 'absolute',
         width: 700, height: 700,
@@ -40,8 +38,6 @@ function AuroraBackground({ dark }: { dark: boolean }) {
         background: 'radial-gradient(circle at center, #0066cc 0%, #00aaff 40%, transparent 70%)',
         top: '-20%', left: '-15%',
       }} />
-
-      {/* Emerald blob — bottom right */}
       <div className="aurora-blob-b" style={{
         position: 'absolute',
         width: 600, height: 600,
@@ -51,8 +47,6 @@ function AuroraBackground({ dark }: { dark: boolean }) {
         background: 'radial-gradient(circle at center, #00ddaa 0%, #00b898 50%, transparent 70%)',
         bottom: '-15%', right: '-10%',
       }} />
-
-      {/* Purple accent — center right */}
       <div className="aurora-blob-c" style={{
         position: 'absolute',
         width: 450, height: 450,
@@ -62,8 +56,6 @@ function AuroraBackground({ dark }: { dark: boolean }) {
         background: 'radial-gradient(circle at center, #a855f7 0%, #7c3aed 50%, transparent 70%)',
         top: '30%', right: '10%',
       }} />
-
-      {/* Subtle scan line — very faint */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,170,255,0.008) 3px, rgba(0,170,255,0.008) 4px)',
@@ -96,13 +88,11 @@ export default function Layout() {
   return (
     <Box sx={{
       minHeight: '100vh',
+      width: '100%',
       position: 'relative',
       overflow: 'hidden',
-      background: dark
-        ? '#060d1e'
-        : '#f0f4f8',
+      background: dark ? '#060d1e' : '#f0f4f8',
     }}>
-      {/* Aurora animated background */}
       <AuroraBackground dark={dark} />
 
       <NavBar />

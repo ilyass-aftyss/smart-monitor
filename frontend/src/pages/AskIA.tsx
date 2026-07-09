@@ -184,7 +184,6 @@ export default function AskIAPage() {
                 display: 'flex', alignItems: 'center', gap: 1,
                 transition: 'all 0.15s',
                 '&:hover': { bgcolor: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
-                group: true,
               }}
             >
               <HistoryIcon sx={{ fontSize: '0.85rem', color: textSecondary, flexShrink: 0, opacity: 0.5 }} />

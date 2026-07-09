@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from 'react'
+import { createContext, useContext, useState, useMemo, useEffect } from 'react'
 import { createTheme, Theme } from '@mui/material/styles'
 
 type ColorMode = 'dark' | 'light'
@@ -145,6 +145,14 @@ export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
     })
 
   const theme = useMemo(() => buildTheme(mode), [mode])
+
+  useEffect(() => {
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [mode])
 
   return <Ctx.Provider value={{ mode, toggle, theme }}>{children}</Ctx.Provider>
 }

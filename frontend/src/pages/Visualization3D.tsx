@@ -75,20 +75,28 @@ interface WindowConfig {
   label: string
   position: [number, number, number]
   rotation: [number, number, number]
-  side: 'south' | 'north'
-  row: 'upper' | 'lower'
+  side: 'left' | 'right'
   openAngle: number
 }
 
-// Les fenêtres sont des overlays React Three Fiber positionnés sur la structure GLTF
-// Positions ajustées pour coller aux parois du nouveau modèle
+// Les fenêtres sont des overlays React Three Fiber positionnés sur les parois latérales
+// 3 fenêtres à gauche (-X), 3 fenêtres à droite (+X), hauteur 1.0 m, espacées sur Z (-3, 0, +3)
+// Rotation Y = +π/2 côté gauche (face vers -X), -π/2 côté droit (face vers +X) → ouverture vers l'extérieur
+// Ajustement X pour coller aux parois du modèle GLTF (décalé par TUNE_X = 0.10)
+// WALL_OFFSET négatif → fenêtres vers l'intérieur (les parois réelles du modèle 3D
+// sont souvent en retrait des limites du bounding box)
+const WALL_OFFSET   = -0.30
+const WALL_LEFT_X   = -W / 2 + TUNE_X - WALL_OFFSET   // -2.10
+const WALL_RIGHT_X  =  W / 2 + TUNE_X + WALL_OFFSET   //  2.30
+const WINDOW_HEIGHT = 1.0             // 50% de 2.0m
+
 const WINDOWS: WindowConfig[] = [
-  { id: 'w-s-l-1', label: 'Fenêtre S1', position: [-1.5, 1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
-  { id: 'w-s-l-2', label: 'Fenêtre S2', position: [ 0,   1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
-  { id: 'w-s-l-3', label: 'Fenêtre S3', position: [ 1.5, 1.0, L / 2], rotation: [0, 0, 0],        side: 'south', row: 'lower', openAngle: 0 },
-  { id: 'w-n-u-1', label: 'Fenêtre N1', position: [-1.5, 2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
-  { id: 'w-n-u-2', label: 'Fenêtre N2', position: [ 0,   2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
-  { id: 'w-n-u-3', label: 'Fenêtre N3', position: [ 1.5, 2.2, -L / 2], rotation: [0, Math.PI, 0], side: 'north', row: 'upper', openAngle: 0 },
+  { id: 'w-l-1', label: 'Fenêtre G1', position: [WALL_LEFT_X,  WINDOW_HEIGHT, -3], rotation: [0,  Math.PI / 2, 0], side: 'left',  openAngle: 0 },
+  { id: 'w-l-2', label: 'Fenêtre G2', position: [WALL_LEFT_X,  WINDOW_HEIGHT,  0], rotation: [0,  Math.PI / 2, 0], side: 'left',  openAngle: 0 },
+  { id: 'w-l-3', label: 'Fenêtre G3', position: [WALL_LEFT_X,  WINDOW_HEIGHT,  3], rotation: [0,  Math.PI / 2, 0], side: 'left',  openAngle: 0 },
+  { id: 'w-r-1', label: 'Fenêtre D1', position: [WALL_RIGHT_X, WINDOW_HEIGHT, -3], rotation: [0, -Math.PI / 2, 0], side: 'right', openAngle: 0 },
+  { id: 'w-r-2', label: 'Fenêtre D2', position: [WALL_RIGHT_X, WINDOW_HEIGHT,  0], rotation: [0, -Math.PI / 2, 0], side: 'right', openAngle: 0 },
+  { id: 'w-r-3', label: 'Fenêtre D3', position: [WALL_RIGHT_X, WINDOW_HEIGHT,  3], rotation: [0, -Math.PI / 2, 0], side: 'right', openAngle: 0 },
 ]
 
 // ─── Capteurs ──────────────────────────────────────────────────────────────────
@@ -174,10 +182,10 @@ function AirflowParticles({
   const laneConfig = useMemo(() =>
     Array.from({ length: 18 }).map((_, i) => ({
       y: 0.25 + (i / 17) * (H - 0.5),
-      xOff: (Math.random() - 0.5) * (W * 0.85),
+      zOff: (Math.random() - 0.5) * (L * 0.85),
       phase: Math.random() * Math.PI * 2,
       ampY: 0.06 + Math.random() * 0.10,
-      ampX: 0.05 + Math.random() * 0.07,
+      ampZ: 0.05 + Math.random() * 0.07,
       speedMul: 0.7 + Math.random() * 0.6,
     })), [])
 
@@ -193,8 +201,9 @@ function AirflowParticles({
       const pos = lineObj.geometry.attributes.position.array as Float32Array
       for (let j = 0; j <= pointsPerLine; j++) {
         const progress = j / pointsPerLine
-        const zPos = -L / 2 + ((progress * L + t * baseSpeed * cfg.speedMul) % L)
-        const xPos = cfg.xOff + Math.sin(progress * Math.PI * 5 + t * 2.2 + cfg.phase) * cfg.ampX
+        // Flux gauche → droite sur l'axe X
+        const xPos = -W / 2 + ((progress * W + t * baseSpeed * cfg.speedMul) % W)
+        const zPos = cfg.zOff + Math.sin(progress * Math.PI * 5 + t * 2.2 + cfg.phase) * cfg.ampZ
         const yPos = cfg.y + Math.sin(progress * Math.PI * 7 + t * 1.8 + cfg.phase * 1.3) * cfg.ampY
         const idx = j * 3
         pos[idx] = xPos; pos[idx + 1] = yPos; pos[idx + 2] = zPos

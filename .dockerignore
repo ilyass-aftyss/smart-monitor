@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+
+# Documentation (optionnel)
+docs/
+
+# Fichiers temporaires
+*.txt
+Nouveau document texte.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environnement Python local
+.venv/
+venv/
+env/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+npm-debug.log
+yarn-error.log
+
+# Vite cache
+.vite/
+frontend/.vite/
+
+# Build frontend
+frontend/dist/
+frontend/build/
+
+# Rust / Tauri
+target/
+frontend/src-tauri/target/
+
+# IDE
+.vscode/
+.idea/
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Fichiers locaux
+.env
+.env.*
+*.local

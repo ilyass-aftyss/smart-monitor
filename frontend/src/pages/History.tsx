@@ -1,25 +1,34 @@
 import { useState, useEffect } from 'react'
-import { Box, Typography, Paper, ToggleButton, ToggleButtonGroup, Grid, Skeleton, TextField, Button } from '@mui/material'
+import { Box, Typography, Paper, ToggleButton, ToggleButtonGroup, Grid, Skeleton, TextField, Button, Chip } from '@mui/material'
 import ReactECharts from 'echarts-for-react'
-import { internalApi } from '../services/api'
+import { internalApi, externalApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
-import type { InternalData } from '../types'
+import type { InternalData, ExternalData } from '../types'
+
+const INTERNAL_METRICS = [
+  { key: 'temperature', label: 'Température',     unit: '°C',  color: '#3b82f6' },
+  { key: 'co2',         label: 'CO₂',             unit: 'ppm', color: '#3b82f6' },
+  { key: 'humidity',    label: 'Humidité',         unit: '%',   color: '#3b82f6' },
+  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#3b82f6' },
+  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#3b82f6' },
+  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#3b82f6' },
+  { key: 'dew_point',   label: 'Point de Rosée',  unit: '°C',  color: '#3b82f6' },
+]
+
+const EXTERNAL_METRICS = [
+  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m²', color: '#f97316' },
+  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#f97316' },
+  { key: 'humidity' as keyof ExternalData,    label: 'Humidité Ext.',       unit: '%',    color: '#f97316' },
+  { key: 'temperature' as keyof ExternalData, label: 'Température Ext.',    unit: '°C',   color: '#f97316' },
+  { key: 'rain' as keyof ExternalData,        label: 'Précipitations',      unit: 'mm',   color: '#f97316' },
+  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#f97316' },
+]
 
 const OPTIMAL: Record<string, { low?: number; high?: number }> = {
   temperature: { low: 18,  high: 23   },
   humidity:    { low: 70,  high: 75   },
   co2:         { low: 800, high: 1000 },
 }
-
-const METRICS = [
-  { key: 'temperature', label: 'Température',     unit: '°C',  color: '#f97316' },
-  { key: 'co2',         label: 'CO₂',             unit: 'ppm', color: '#3b82f6' },
-  { key: 'humidity',    label: 'Humidité',         unit: '%',   color: '#06b6d4' },
-  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#a855f7' },
-  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#10b981' },
-  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#f59e0b' },
-  { key: 'dew_point',   label: 'Point de Rosée',  unit: '°C',  color: '#64748b' },
-]
 
 const TIME_RANGES = [
   { value: 1,   label: '1h'  },
@@ -33,6 +42,89 @@ function toLocalDT(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
+function buildOption(
+  data: any[], metricKey: string, color: string, unit: string,
+  opt: { low?: number; high?: number } | undefined,
+  dark: boolean,
+  labelColor: string, axisColor: string, gridColor: string,
+  tooltipBg: string, tooltipTxt: string,
+) {
+  const ts   = data.map((d: any) => new Date(d.timestamp).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))
+  const vals = data.map((d: any) => parseFloat(((d[metricKey] as number) || 0).toFixed(2)))
+  const allVals = vals.filter(Boolean) as number[]
+  const minV = allVals.length ? Math.min(...allVals) : 0
+  const maxV = allVals.length ? Math.max(...allVals) : 100
+  const pad  = (maxV - minV) * 0.12 || 1
+
+  return {
+    backgroundColor: 'transparent',
+    animation: true,
+    grid: { top: 20, right: 16, bottom: 50, left: 56 },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: tooltipBg,
+      borderColor: `${color}55`,
+      borderWidth: 1,
+      padding: [8, 12],
+      textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
+      formatter: (p: any) => `<b style="color:${color};font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
+    },
+    dataZoom: [
+      { type: 'inside', start: 70, end: 100 },
+      { type: 'slider', start: 70, end: 100, height: 18, bottom: 4,
+        borderColor: dark ? 'rgba(0,170,255,0.15)' : 'rgba(0,80,160,0.15)',
+        fillerColor: dark ? 'rgba(0,170,255,0.07)' : 'rgba(0,80,160,0.07)',
+        handleStyle: { color }, textStyle: { color: labelColor, fontSize: 9 } },
+    ],
+    xAxis: {
+      type: 'category', data: ts, boundaryGap: false,
+      axisLine: { lineStyle: { color: axisColor } },
+      axisTick: { show: false },
+      axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace', rotate: 20, interval: Math.max(0, Math.floor(ts.length / 8) - 1) },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      min: minV - pad, max: maxV + pad,
+      axisLine: { show: false }, axisTick: { show: false },
+      axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace' },
+      splitLine: { lineStyle: { color: gridColor, type: 'dashed' } },
+    },
+    series: [{
+      type: 'line', data: vals, smooth: 0.3, symbol: 'none',
+      lineStyle: { color, width: 2, shadowColor: `${color}44`, shadowBlur: 6 },
+      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:`${color}38` }, { offset:1, color:`${color}00` }] } },
+      markArea: opt ? { silent:true, itemStyle:{ color:`${color}10` }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
+    }],
+  }
+}
+
+function downloadCSV(
+  data: any[],
+  metrics: { key: string; label: string }[],
+  filename: string,
+) {
+  if (data.length === 0) return
+  const header = ['timestamp', ...metrics.map((m) => `${m.label} (${m.key})`)]
+  const rows = data.map((d) => {
+    const ts = new Date(d.timestamp)
+    const dateStr = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,'0')}-${String(ts.getDate()).padStart(2,'0')} ${String(ts.getHours()).padStart(2,'0')}:${String(ts.getMinutes()).padStart(2,'0')}`
+    const values = metrics.map((m) => {
+      const v = (d as any)[m.key as string]
+      return v != null ? v.toFixed(2) : ''
+    })
+    return [dateStr, ...values].join(';')
+  })
+  const bom = '\uFEFF'
+  const csv = bom + header.join(';') + '\n' + rows.join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = filename
+  document.body.appendChild(a); a.click()
+  document.body.removeChild(a); URL.revokeObjectURL(url)
+}
+
 export default function HistoryPage() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
@@ -44,7 +136,8 @@ export default function HistoryPage() {
   const tooltipTxt = dark ? '#e2ecf8' : '#1a2540'
 
   const [hours,      setHours]      = useState<number | null>(24)
-  const [data,       setData]       = useState<InternalData[]>([])
+  const [internalData, setInternal] = useState<InternalData[]>([])
+  const [externalData, setExternal] = useState<ExternalData[]>([])
   const [loading,    setLoading]    = useState(true)
   const [customMode, setCustomMode] = useState(false)
   const now = new Date()
@@ -53,7 +146,14 @@ export default function HistoryPage() {
 
   const fetchByHours = (h: number) => {
     setLoading(true)
-    internalApi.history(h, 2000).then((r) => { setData(r.data); setLoading(false) }).catch(() => setLoading(false))
+    Promise.all([
+      internalApi.history(h, 2000),
+      externalApi.history(h, 2000),
+    ]).then(([i, e]) => {
+      setInternal(i.data)
+      setExternal(e.data)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }
 
   const fetchCustom = () => {
@@ -61,11 +161,14 @@ export default function HistoryPage() {
     if (isNaN(from.getTime()) || isNaN(to.getTime()) || from >= to) return
     const diffH = Math.ceil((to.getTime() - from.getTime()) / 3_600_000)
     setLoading(true)
-    internalApi.history(diffH, 2000).then((r) => {
-      setData(r.data.filter((d: InternalData) => {
-        const ts = new Date(d.timestamp).getTime()
-        return ts >= from.getTime() && ts <= to.getTime()
-      }))
+    Promise.all([
+      internalApi.history(diffH, 2000),
+      externalApi.history(diffH, 2000),
+    ]).then(([i, e]) => {
+      const fit = (d: InternalData) => { const ts = new Date(d.timestamp).getTime(); return ts >= from.getTime() && ts <= to.getTime() }
+      const fex = (d: ExternalData) => { const ts = new Date(d.timestamp).getTime(); return ts >= from.getTime() && ts <= to.getTime() }
+      setInternal(i.data.filter(fit))
+      setExternal(e.data.filter(fex))
       setLoading(false)
     }).catch(() => setLoading(false))
   }
@@ -73,58 +176,6 @@ export default function HistoryPage() {
   useEffect(() => {
     if (!customMode && hours !== null) fetchByHours(hours)
   }, [hours, customMode])
-
-  function buildOption(metricKey: string, color: string, unit: string) {
-    const opt = OPTIMAL[metricKey]
-    const ts   = data.map((d) => new Date(d.timestamp).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))
-    const vals = data.map((d) => parseFloat(((d as any)[metricKey] || 0).toFixed(2)))
-    const allVals = vals.filter(Boolean) as number[]
-    const minV = allVals.length ? Math.min(...allVals) : 0
-    const maxV = allVals.length ? Math.max(...allVals) : 100
-    const pad  = (maxV - minV) * 0.12 || 1
-
-    return {
-      backgroundColor: 'transparent',
-      animation: true,
-      grid: { top: 20, right: 16, bottom: 50, left: 56 },
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: tooltipBg,
-        borderColor: `${color}55`,
-        borderWidth: 1,
-        padding: [8, 12],
-        textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-        formatter: (p: any) => `<b style="color:${color};font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
-      },
-      dataZoom: [
-        { type: 'inside', start: 70, end: 100 },
-        { type: 'slider', start: 70, end: 100, height: 18, bottom: 4,
-          borderColor: dark ? 'rgba(0,170,255,0.15)' : 'rgba(0,80,160,0.15)',
-          fillerColor: dark ? 'rgba(0,170,255,0.07)' : 'rgba(0,80,160,0.07)',
-          handleStyle: { color }, textStyle: { color: labelColor, fontSize: 9 } },
-      ],
-      xAxis: {
-        type: 'category', data: ts, boundaryGap: false,
-        axisLine: { lineStyle: { color: axisColor } },
-        axisTick: { show: false },
-        axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace', rotate: 20, interval: Math.max(0, Math.floor(ts.length / 8) - 1) },
-        splitLine: { show: false },
-      },
-      yAxis: {
-        type: 'value',
-        min: minV - pad, max: maxV + pad,
-        axisLine: { show: false }, axisTick: { show: false },
-        axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace' },
-        splitLine: { lineStyle: { color: gridColor, type: 'dashed' } },
-      },
-      series: [{
-        type: 'line', data: vals, smooth: 0.3, symbol: 'none',
-        lineStyle: { color, width: 2, shadowColor: `${color}44`, shadowBlur: 6 },
-        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:`${color}38` }, { offset:1, color:`${color}00` }] } },
-        markArea: opt ? { silent:true, itemStyle:{ color:`${color}10` }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
-      }],
-    }
-  }
 
   const dtFieldSx = {
     '& .MuiOutlinedInput-root': {
@@ -142,7 +193,7 @@ export default function HistoryPage() {
         <Box>
           <Typography variant="h5" fontWeight={700}>Historique des Données</Typography>
           <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-            {data.length} mesures · zones colorées = plage optimale fraisier
+            {internalData.length + externalData.length} mesures · zones colorées = plage optimale fraisier
           </Typography>
         </Box>
 
@@ -172,26 +223,100 @@ export default function HistoryPage() {
         </Box>
       </Box>
 
-      <Grid container spacing={2}>
-        {METRICS.map((m) => (
-          <Grid item xs={12} md={6} key={m.key}>
-            <Paper sx={{ p: 2.5 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: m.color, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {m.label}
-                </Typography>
-                <Typography sx={{ fontSize: '0.65rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
-                  {m.unit}{OPTIMAL[m.key] ? ` · optimal ${OPTIMAL[m.key].low}–${OPTIMAL[m.key].high}` : ''}
-                </Typography>
-              </Box>
-              {loading
-                ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                : <ReactECharts option={buildOption(m.key, m.color, m.unit)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              }
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+      {/* ── Section Intérieur (bleue) ──────────────────────────────────── */}
+      <Paper sx={{ p: 2.5, mb: 3, borderLeft: '4px solid #3b82f6' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <span>🏠</span> Historique Intérieur
+          </Typography>
+          <Chip
+            label="CSV"
+            size="small"
+            onClick={() => downloadCSV(internalData, INTERNAL_METRICS, `interieur_${hours ?? 'custom'}h.csv`)}
+            sx={{
+              height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
+              bgcolor: dark ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.08)',
+              color: '#3b82f6', border: `1px solid ${dark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.2)'}`,
+              fontFamily: '"JetBrains Mono", monospace', letterSpacing: '0.04em',
+              transition: 'all 0.15s',
+              '&:hover': {
+                bgcolor: dark ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.14)',
+                borderColor: '#3b82f6',
+                boxShadow: `0 0 10px ${dark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.15)'}`,
+              },
+            }}
+          />
+        </Box>
+        <Grid container spacing={2}>
+          {INTERNAL_METRICS.map((m) => {
+            const opt = OPTIMAL[m.key]
+            return (
+              <Grid item xs={12} md={6} key={m.key}>
+                <Paper sx={{ p: 2, border: `1px solid ${m.color}20` }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: m.color, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {m.label}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.65rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
+                      {m.unit}{opt ? ` · optimal ${opt.low}–${opt.high}` : ''}
+                    </Typography>
+                  </Box>
+                  {loading
+                    ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                    : <ReactECharts option={buildOption(internalData, m.key, m.color, m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                  }
+                </Paper>
+              </Grid>
+            )
+          })}
+        </Grid>
+      </Paper>
+
+      {/* ── Section Extérieur (orange) ─────────────────────────────────── */}
+      <Paper sx={{ p: 2.5, borderLeft: '4px solid #f97316' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#f97316', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <span>🌤</span> Historique Extérieur
+          </Typography>
+          <Chip
+            label="CSV"
+            size="small"
+            onClick={() => downloadCSV(externalData, EXTERNAL_METRICS as any, `exterieur_${hours ?? 'custom'}h.csv`)}
+            sx={{
+              height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
+              bgcolor: dark ? 'rgba(249,115,22,0.12)' : 'rgba(249,115,22,0.08)',
+              color: '#f97316', border: `1px solid ${dark ? 'rgba(249,115,22,0.25)' : 'rgba(249,115,22,0.2)'}`,
+              fontFamily: '"JetBrains Mono", monospace', letterSpacing: '0.04em',
+              transition: 'all 0.15s',
+              '&:hover': {
+                bgcolor: dark ? 'rgba(249,115,22,0.2)' : 'rgba(249,115,22,0.14)',
+                borderColor: '#f97316',
+                boxShadow: `0 0 10px ${dark ? 'rgba(249,115,22,0.25)' : 'rgba(249,115,22,0.15)'}`,
+              },
+            }}
+          />
+        </Box>
+        <Grid container spacing={2}>
+          {EXTERNAL_METRICS.map((m) => (
+            <Grid item xs={12} md={6} key={m.key as string}>
+              <Paper sx={{ p: 2, border: `1px solid ${m.color}20` }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: m.color, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {m.label}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.65rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
+                    {m.unit}
+                  </Typography>
+                </Box>
+                {loading
+                  ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                  : <ReactECharts option={buildOption(externalData, m.key as string, m.color, m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                }
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Paper>
     </Box>
   )
 }

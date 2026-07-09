@@ -16,9 +16,11 @@ class Settings(BaseSettings):
     # secret, jamais en dur dans le code.
     greenhouse_telemetry_url: str = ""
     telemetry_poll_seconds: int = 20
+    cors_origins: str = "http://localhost:3000,http://localhost:5173"
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()
 

@@ -7,13 +7,11 @@ import { authApi } from './services/api'
 import Layout from './components/layout/Layout'
 import DashboardPage from './pages/Dashboard'
 import HistoryPage from './pages/History'
-import ExternalPage from './pages/External'
 import DevicesPage from './pages/Devices'
 import AlertsPage from './pages/Alerts'
-import Visualization3DPage from './pages/Visualization3D'
 import AskIAPage from './pages/AskIA'
-import MailServicesPage from './pages/MailServices'
 import MeteoPage from './pages/Meteo'
+import Visualization3DPage from './pages/Visualization3D'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, login } = useAuthStore()
@@ -77,13 +75,11 @@ function AppRoutes() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="history"   element={<HistoryPage />} />
-            <Route path="external"      element={<ExternalPage />} />
             <Route path="meteo" element={<MeteoPage />} />
             <Route path="devices"       element={<DevicesPage />} />
             <Route path="alerts"    element={<AlertsPage />} />
-            <Route path="3d"        element={<Visualization3DPage />} />
             <Route path="ask"      element={<AskIAPage />} />
-            <Route path="mail"     element={<MailServicesPage />} />
+            <Route path="3d"        element={<Visualization3DPage />} />
           </Route>
           <Route path="/login" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -100,4 +96,3 @@ export default function App() {
     </ThemeModeProvider>
   )
 }
-
