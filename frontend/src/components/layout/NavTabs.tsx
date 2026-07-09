@@ -10,10 +10,11 @@ const NAV_ITEMS = [
   { label: 'Dashboard',    path: '/dashboard' },
   { label: 'Historique',   path: '/history'   },
   { label: 'Météo',        path: '/meteo' },
-  { label: 'Ventilateurs', path: '/devices'   },
+  { label: 'Actionneurs', path: '/devices'   },
   { label: 'Alertes',      path: '/alerts'    },
   { label: 'Vue 3D',       path: '/3d'        },
   { label: 'Ask IA',       path: '/ask'       },
+  { label: 'Admin',        path: '/admin'     },
 ]
 
 const INDICATOR_SPRING = {

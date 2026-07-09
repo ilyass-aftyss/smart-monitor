@@ -40,9 +40,10 @@ const NAV_ITEMS = [
   { label: 'Dashboard',    path: '/dashboard', icon: LayoutDashboard },
   { label: 'Historique',   path: '/history',   icon: History },
   { label: 'Météo',        path: '/meteo',     icon: CloudSun },
-  { label: 'Ventilateurs', path: '/devices',   icon: Fan },
+  { label: 'Actionneurs', path: '/devices',   icon: Fan },
   { label: 'Alertes',      path: '/alerts',    icon: Bell },
   { label: 'Ask IA',       path: '/ask',       icon: Bot },
+  { label: 'Admin',        path: '/admin',     icon: Settings },
 ]
 
 export function AppSidebar() {
