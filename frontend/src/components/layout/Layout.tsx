@@ -109,7 +109,7 @@ export default function Layout() {
           zIndex: 1,
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <PageTransition key={location.pathname}>
             <Outlet />
           </PageTransition>

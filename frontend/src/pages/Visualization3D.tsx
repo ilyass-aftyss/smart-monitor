@@ -710,7 +710,7 @@ function Scene({
       <RainSystem humidity={extHumidity} windSpeed={windSpeed} />
 
       {/* Capteurs internes */}
-      {internal && SENSOR_CONFIGS.slice(0, 3).map((cfg) => (
+      {SENSOR_CONFIGS.slice(0, 3).map((cfg) => (
         <SensorNode
           key={cfg.id}
           config={cfg}
@@ -721,14 +721,12 @@ function Scene({
       ))}
 
       {/* Station extérieure */}
-      {external && (
-        <SensorNode
-          config={SENSOR_CONFIGS[3]}
-          data={external}
-          selected={selectedSensor === SENSOR_CONFIGS[3].id}
-          onSelect={() => setSelectedSensor((s) => s === SENSOR_CONFIGS[3].id ? null : SENSOR_CONFIGS[3].id)}
-        />
-      )}
+      <SensorNode
+        config={SENSOR_CONFIGS[3]}
+        data={external}
+        selected={selectedSensor === SENSOR_CONFIGS[3].id}
+        onSelect={() => setSelectedSensor((s) => s === SENSOR_CONFIGS[3].id ? null : SENSOR_CONFIGS[3].id)}
+      />
 
       <OrbitControls
         enablePan enableZoom enableRotate

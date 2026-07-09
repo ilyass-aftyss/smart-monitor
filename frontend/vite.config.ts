@@ -13,7 +13,6 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           if (req.url?.endsWith('.bin')) {
             res.setHeader('Content-Type', 'application/octet-stream')
-            res.setHeader('Content-Disposition', 'inline')
             res.setHeader('Cache-Control', 'public, max-age=31536000')
           }
           next()
