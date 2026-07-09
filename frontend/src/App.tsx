@@ -13,6 +13,7 @@ import AskIAPage from './pages/AskIA'
 import MeteoPage from './pages/Meteo'
 import Visualization3DPage from './pages/Visualization3D'
 import AdminControlPage from './pages/AdminControl'
+import CustomCursor from './components/common/CustomCursor'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, login } = useAuthStore()
@@ -63,6 +64,7 @@ function AppRoutes() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <CustomCursor />
       <BrowserRouter>
         <Routes>
           <Route
