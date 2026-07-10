@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: 'Alertes',      path: '/alerts'    },
   { label: 'Vue 3D',       path: '/3d'        },
   { label: 'Ask IA',       path: '/ask'       },
+  { label: 'Mail',         path: '/mail'      },
   { label: 'Admin',        path: '/admin'     },
 ]
 

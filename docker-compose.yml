@@ -34,7 +34,7 @@ services:
       # MODE SIMULATION  →  SIMULATION_MODE=true  (données fictives)
       # MODE PRODUCTION  →  SIMULATION_MODE=false (données CSV réels)
       # ─────────────────────────────────────────────────────────
-      SIMULATION_MODE: "true"
+      SIMULATION_MODE: "false"
       # Chemin où le backend lit les fichiers CSV.
       # En mode local  : /app/csv_data  (volume Docker ci-dessous)
       # En mode NAS    : /mnt/nas_data  (voir guide docs/GUIDE_PRODUCTION.md)
@@ -63,26 +63,7 @@ services:
       - smart_net
     restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: development
-    container_name: smart_monitor_frontend
-    environment:
-      # URL relative = le proxy Vite achemine vers le backend (réseau Docker)
-      VITE_API_URL: ""
-      VITE_WS_URL: ""
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - smart_net
-    restart: unless-stopped
+ 
 
 volumes:
   postgres_data:

@@ -13,6 +13,7 @@ import AskIAPage from './pages/AskIA'
 import MeteoPage from './pages/Meteo'
 import Visualization3DPage from './pages/Visualization3D'
 import AdminControlPage from './pages/AdminControl'
+import MailServicesPage from './pages/MailServices'
 import CustomCursor from './components/common/CustomCursor'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
@@ -83,8 +84,8 @@ function AppRoutes() {
             <Route path="alerts"    element={<AlertsPage />} />
             <Route path="ask"      element={<AskIAPage />} />
             <Route path="3d"        element={<Visualization3DPage />} />
+            <Route path="mail"      element={<MailServicesPage />} />
             <Route path="admin"     element={<AdminControlPage />} />
-            <Route path="admin"       element={<AdminControlPage />} />
           </Route>
           <Route path="/login" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

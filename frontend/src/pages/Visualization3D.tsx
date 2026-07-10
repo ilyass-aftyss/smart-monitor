@@ -7,8 +7,7 @@
 //  Licence   : CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 //
 //  PLACEMENT DES FICHIERS (voir section « Où placer le ZIP » en bas) :
-//    public/models/greenhouse/scene.gltf
-//    public/models/greenhouse/scene.bin
+//    public/models/greenhouse/scene.glb   ← fichier unique (GLTF + BIN fusionnés)
 //    public/models/greenhouse/textures/AppAA4_0_baseColor.jpeg
 //    public/models/greenhouse/textures/AppAA4_1_baseColor.jpeg
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -23,7 +22,9 @@ import { useLatestSensorData } from '../hooks/useSensorData'
 
 // ─── Chemin public vers le modèle GLTF ─────────────────────────────────────────
 // Placez les fichiers extraits du ZIP dans : public/models/greenhouse/
-const GREENHOUSE_GLTF_PATH = '/models/greenhouse/scene.gltf'
+const GREENHOUSE_GLTF_PATH = '/models/greenhouse/scene.glb'
+
+useGLTF.preload(GREENHOUSE_GLTF_PATH)
 
 // ─── Constants scène (doivent précéder les calculs d'échelle) ─────────────────
 const W = 5     // largeur  (X)  m
@@ -584,10 +585,6 @@ function TempHeatmap({ temp }: { temp: number }) {
 }
 
 // ─── MODÈLE GLTF — Serre professionnelle ────────────────────────────────────────
-// Chargement paresseux du modèle GLTF avec useGLTF (drei)
-// Le modèle est préchargé en dehors du composant pour éviter les rechargements
-useGLTF.preload(GREENHOUSE_GLTF_PATH)
-
 function GreenhouseGLTFModel({ showWireframe }: { showWireframe: boolean }) {
   const { scene } = useGLTF(GREENHOUSE_GLTF_PATH)
 
@@ -1036,14 +1033,13 @@ export default function Visualization3DPage() {
 ║  └── public/                                                                 ║
 ║      └── models/                                                             ║
 ║          └── greenhouse/              ← créez ce dossier                    ║
-║              ├── scene.gltf           ← fichier principal                   ║
-║              ├── scene.bin            ← géométrie binaire (obligatoire)     ║
+║              ├── scene.glb            ← fichier unique (GLTF+BIN fusionnés) ║
 ║              └── textures/                                                   ║
 ║                  ├── AppAA4_0_baseColor.jpeg                                 ║
 ║                  └── AppAA4_1_baseColor.jpeg                                 ║
 ║                                                                              ║
-║  IMPORTANT : scene.bin ET scene.gltf DOIVENT être dans le même dossier.    ║
-║  Le GLTF référence le .bin par chemin relatif.                              ║
+║  Conversion GLTF → GLB (nécessite gltf-pipeline) :                          ║
+║    npx gltf-pipeline -i scene.gltf -o scene.glb                             ║
 ║                                                                              ║
 ║  Commande rapide depuis la racine du projet (Linux/Mac) :                   ║
 ║    mkdir -p public/models/greenhouse                                         ║
