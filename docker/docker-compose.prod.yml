@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart_monitor_db_prod
+    environment:
+      POSTGRES_USER: ${DB_USER:-smart_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: smart_monitor
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    networks:
+      - smart_net
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: smart_monitor_backend_prod
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@postgres:5432/smart_monitor
+      DATABASE_SYNC_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/smart_monitor
+      SECRET_KEY: ${SECRET_KEY}
+      CSV_DATA_PATH: /nas_data
+    volumes:
+      - ${NAS_MOUNT_PATH}:/nas_data:ro
+    depends_on:
+      - postgres
+    networks:
+      - smart_net
+    restart: always
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: smart_monitor_frontend_prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - smart_net
+    restart: always
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  smart_net:
+    driver: bridge
