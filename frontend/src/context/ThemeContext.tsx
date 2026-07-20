@@ -16,26 +16,26 @@ function buildTheme(mode: ColorMode): Theme {
   return createTheme({
     palette: {
       mode,
-      primary:    { main: dark ? '#00aaff' : '#0060c8', light: dark ? '#33bbff' : '#3380e0', dark: dark ? '#0077cc' : '#004aa0' },
-      secondary:  { main: dark ? '#00ffcc' : '#00a88a' },
-      error:      { main: '#e8334a' },
-      warning:    { main: '#f59e0b' },
-      success:    { main: dark ? '#00e87a' : '#0ea86a' },
+      primary:    { main: '#10B981', light: '#34D399', dark: '#059669' },
+      secondary:  { main: '#10B981' },
+      error:      { main: '#EF4444' },
+      warning:    { main: '#F59E0B' },
+      success:    { main: '#10B981' },
       background: {
-        default: dark ? '#060d1e' : '#f0f4f9',
-        paper:   dark ? 'rgba(10,22,48,0.92)' : '#ffffff',
+        default: dark ? '#0F1F14' : '#F8FAF9',
+        paper:   dark ? '#1A2E1F' : '#FFFFFF',
       },
       text: {
-        primary:   dark ? '#e2ecf8' : '#111827',
-        secondary: dark ? '#8aaccc' : '#4b5e7a',
+        primary:   dark ? '#F0FDF4' : '#1A2E1A',
+        secondary: '#6B7280',
       },
-      divider: dark ? 'rgba(0,170,255,0.1)' : 'rgba(0,80,160,0.1)',
+      divider: 'rgba(16, 185, 129, 0.1)',
     },
     typography: {
       fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
-      h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+      h5: { fontWeight: 600, letterSpacing: '-0.01em' },
       h6: { fontWeight: 600, letterSpacing: '-0.01em' },
-      body1: { fontSize: '0.9rem' },
+      body1: { fontSize: '0.85rem', lineHeight: 1.5 },
       body2: { fontSize: '0.8rem' },
       caption: { fontFamily: '"JetBrains Mono", monospace', fontSize: '0.72rem' },
     },
@@ -44,16 +44,16 @@ function buildTheme(mode: ColorMode): Theme {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            backgroundColor: dark ? '#060d1e' : '#f0f4f9',
-            color:           dark ? '#e2ecf8' : '#111827',
+            backgroundColor: dark ? '#0F1F14' : '#F8FAF9',
+            color:           dark ? '#F0FDF4' : '#1A2E1A',
             scrollbarColor:  dark
-              ? 'rgba(0,170,255,0.22) transparent'
-              : 'rgba(0,100,180,0.18) transparent',
+              ? 'rgba(16,185,129,0.22) transparent'
+              : 'rgba(16,185,129,0.18) transparent',
             '&::-webkit-scrollbar':       { width: 5 },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
             '&::-webkit-scrollbar-thumb': {
               borderRadius: 3,
-              background: dark ? 'rgba(0,170,255,0.22)' : 'rgba(0,100,180,0.18)',
+              background: dark ? 'rgba(16,185,129,0.22)' : 'rgba(16,185,129,0.18)',
             },
           },
         },
@@ -62,16 +62,15 @@ function buildTheme(mode: ColorMode): Theme {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: dark ? 'rgba(10,22,48,0.88)' : '#ffffff',
-            backdropFilter:  dark ? 'blur(16px)' : 'none',
-            border: `1px solid ${dark ? 'rgba(0,170,255,0.09)' : 'rgba(0,80,160,0.09)'}`,
-            boxShadow: dark ? 'none' : '0 1px 6px rgba(0,0,0,0.07)',
+            backgroundColor: dark ? '#1A2E1F' : '#FFFFFF',
+            border: `1px solid rgba(16,185,129,0.1)`,
+            boxShadow: dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
           },
         },
       },
       MuiButton: {
         styleOverrides: {
-          root: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' },
+          root: { textTransform: 'none', fontWeight: 600 },
         },
       },
       MuiChip: {
@@ -82,33 +81,31 @@ function buildTheme(mode: ColorMode): Theme {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            borderBottom: `1px solid ${dark ? 'rgba(0,170,255,0.06)' : 'rgba(0,80,160,0.07)'}`,
+            borderBottom: `1px solid ${dark ? 'rgba(16,185,129,0.06)' : 'rgba(16,185,129,0.07)'}`,
           },
           head: {
-            color:      dark ? '#8aaccc' : '#4b5e7a',
+            color: '#6B7280',
             fontWeight: 600,
-            fontSize:   '0.72rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
+            fontSize: '0.72rem',
           },
         },
       },
       MuiSwitch: {
         styleOverrides: {
-          switchBase: { '&.Mui-checked': { color: dark ? '#00aaff' : '#0060c8' } },
-          track:      { '.Mui-checked.Mui-checked + &': { backgroundColor: dark ? '#00aaff' : '#0060c8' } },
+          switchBase: { '&.Mui-checked': { color: '#10B981' } },
+          track:      { '.Mui-checked.Mui-checked + &': { backgroundColor: '#10B981' } },
         },
       },
       MuiToggleButton: {
         styleOverrides: {
           root: {
-            color:       dark ? '#8aaccc' : '#4b5e7a',
-            borderColor: dark ? 'rgba(0,170,255,0.18)' : 'rgba(0,80,160,0.15)',
+            color:       '#6B7280',
+            borderColor: 'rgba(16,185,129,0.15)',
             '&.Mui-selected': {
-              backgroundColor: dark ? 'rgba(0,170,255,0.12)' : 'rgba(0,96,200,0.09)',
-              color:           dark ? '#00aaff' : '#0060c8',
+              backgroundColor: 'rgba(16,185,129,0.12)',
+              color: '#10B981',
               '&:hover': {
-                backgroundColor: dark ? 'rgba(0,170,255,0.18)' : 'rgba(0,96,200,0.14)',
+                backgroundColor: 'rgba(16,185,129,0.18)',
               },
             },
           },
@@ -124,7 +121,7 @@ function buildTheme(mode: ColorMode): Theme {
       MuiSkeleton: {
         styleOverrides: {
           root: {
-            backgroundColor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.06)',
+            backgroundColor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.06)',
           },
         },
       },

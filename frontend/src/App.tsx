@@ -14,7 +14,6 @@ import MeteoPage from './pages/Meteo'
 import Visualization3DPage from './pages/Visualization3D'
 import AdminControlPage from './pages/AdminControl'
 import MailServicesPage from './pages/MailServices'
-import CustomCursor from './components/common/CustomCursor'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, login } = useAuthStore()
@@ -45,11 +44,11 @@ function AutoLogin({ children }: { children: React.ReactNode }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#060d1e',
-        color: '#e2ecf8',
+        bgcolor: '#0F1F14',
+        color: '#F0FDF4',
         gap: 2
       }}>
-        <CircularProgress size={40} sx={{ color: '#00aaff' }} />
+        <CircularProgress size={40} sx={{ color: '#10B981' }} />
         <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace' }}>
           Connexion automatique...
         </Typography>
@@ -65,7 +64,6 @@ function AppRoutes() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <CustomCursor />
       <BrowserRouter>
         <Routes>
           <Route

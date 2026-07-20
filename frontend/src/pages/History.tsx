@@ -6,22 +6,22 @@ import { useThemeMode } from '../context/ThemeContext'
 import type { InternalData, ExternalData } from '../types'
 
 const INTERNAL_METRICS = [
-  { key: 'temperature', label: 'Température',     unit: '°C',  color: '#3b82f6' },
-  { key: 'co2',         label: 'CO₂',             unit: 'ppm', color: '#3b82f6' },
-  { key: 'humidity',    label: 'Humidité',         unit: '%',   color: '#3b82f6' },
-  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#3b82f6' },
-  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#3b82f6' },
-  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#3b82f6' },
-  { key: 'dew_point',   label: 'Point de Rosée',  unit: '°C',  color: '#3b82f6' },
+  { key: 'temperature', label: 'Température',     unit: '°C',  color: '#10B981' },
+  { key: 'co2',         label: 'CO₂',             unit: 'ppm', color: '#10B981' },
+  { key: 'humidity',    label: 'Humidité',         unit: '%',   color: '#10B981' },
+  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#10B981' },
+  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#059669' },
+  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#059669' },
+  { key: 'dew_point',   label: 'Point de Rosée',  unit: '°C',  color: '#059669' },
 ]
 
 const EXTERNAL_METRICS = [
-  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m²', color: '#f97316' },
-  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#f97316' },
-  { key: 'humidity' as keyof ExternalData,    label: 'Humidité Ext.',       unit: '%',    color: '#f97316' },
-  { key: 'temperature' as keyof ExternalData, label: 'Température Ext.',    unit: '°C',   color: '#f97316' },
-  { key: 'rain' as keyof ExternalData,        label: 'Précipitations',      unit: 'mm',   color: '#f97316' },
-  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#f97316' },
+  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m²', color: '#10B981' },
+  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#10B981' },
+  { key: 'humidity' as keyof ExternalData,    label: 'Humidité Ext.',       unit: '%',    color: '#10B981' },
+  { key: 'temperature' as keyof ExternalData, label: 'Température Ext.',    unit: '°C',   color: '#10B981' },
+  { key: 'rain' as keyof ExternalData,        label: 'Précipitations',      unit: 'mm',   color: '#10B981' },
+  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#10B981' },
 ]
 
 const OPTIMAL: Record<string, { low?: number; high?: number }> = {
@@ -63,18 +63,18 @@ function buildOption(
     tooltip: {
       trigger: 'axis',
       backgroundColor: tooltipBg,
-      borderColor: `${color}55`,
+      borderColor: 'rgba(16,185,129,0.3)',
       borderWidth: 1,
       padding: [8, 12],
       textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-      formatter: (p: any) => `<b style="color:${color};font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
+      formatter: (p: any) => `<b style="color:#10B981;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
     },
     dataZoom: [
       { type: 'inside', start: 70, end: 100 },
       { type: 'slider', start: 70, end: 100, height: 18, bottom: 4,
-        borderColor: dark ? 'rgba(0,170,255,0.15)' : 'rgba(0,80,160,0.15)',
-        fillerColor: dark ? 'rgba(0,170,255,0.07)' : 'rgba(0,80,160,0.07)',
-        handleStyle: { color }, textStyle: { color: labelColor, fontSize: 9 } },
+        borderColor: 'rgba(16,185,129,0.15)',
+        fillerColor: 'rgba(16,185,129,0.07)',
+        handleStyle: { color: '#10B981' }, textStyle: { color: labelColor, fontSize: 9 } },
     ],
     xAxis: {
       type: 'category', data: ts, boundaryGap: false,
@@ -92,9 +92,9 @@ function buildOption(
     },
     series: [{
       type: 'line', data: vals, smooth: 0.3, symbol: 'none',
-      lineStyle: { color, width: 2, shadowColor: `${color}44`, shadowBlur: 6 },
-      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:`${color}38` }, { offset:1, color:`${color}00` }] } },
-      markArea: opt ? { silent:true, itemStyle:{ color:`${color}10` }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
+      lineStyle: { color, width: 2 },
+      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(16,185,129,0.2)' }, { offset:1, color:'rgba(16,185,129,0)' }] } },
+      markArea: opt ? { silent:true, itemStyle:{ color:'rgba(16,185,129,0.06)' }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
     }],
   }
 }
@@ -128,12 +128,12 @@ function downloadCSV(
 export default function HistoryPage() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
-  const textSec    = dark ? '#8aaccc' : '#5a7090'
+  const textSec    = '#6B7280'
   const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
   const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
-  const labelColor = dark ? '#8aaccc' : '#5a7090'
-  const tooltipBg  = dark ? '#0a1628' : '#ffffff'
-  const tooltipTxt = dark ? '#e2ecf8' : '#1a2540'
+  const labelColor = '#6B7280'
+  const tooltipBg  = dark ? '#1A2E1F' : '#FFFFFF'
+  const tooltipTxt = dark ? '#F0FDF4' : '#1A2E1A'
 
   const [hours,      setHours]      = useState<number | null>(24)
   const [internalData, setInternal] = useState<InternalData[]>([])
@@ -179,9 +179,9 @@ export default function HistoryPage() {
 
   const dtFieldSx = {
     '& .MuiOutlinedInput-root': {
-      color: dark ? '#e2ecf8' : '#1a2540', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.78rem',
-      '& fieldset': { borderColor: dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,80,160,0.2)' },
-      '&:hover fieldset': { borderColor: dark ? '#00aaff' : '#0070d4' },
+      color: dark ? '#F0FDF4' : '#1A2E1A', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.78rem',
+      '& fieldset': { borderColor: 'rgba(16,185,129,0.2)' },
+      '&:hover fieldset': { borderColor: '#10B981' },
     },
     '& .MuiInputLabel-root': { color: textSec, fontSize: '0.78rem' },
     '& input::-webkit-calendar-picker-indicator': { filter: dark ? 'invert(0.6)' : 'none' },
@@ -200,11 +200,11 @@ export default function HistoryPage() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, alignItems: 'flex-end' }}>
           <ToggleButtonGroup value={customMode ? null : hours} exclusive size="small"
             onChange={(_, v) => { if (v !== null) { setCustomMode(false); setHours(v) } }}
-            sx={{ '& .MuiToggleButton-root': { color: textSec, borderColor: dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,80,160,0.15)', fontFamily: '"JetBrains Mono", monospace', px: 1.8, fontSize: '0.78rem',
-              '&.Mui-selected': { bgcolor: dark ? 'rgba(0,170,255,0.12)' : 'rgba(0,112,212,0.1)', color: dark ? '#00aaff' : '#0070d4' } } }}>
+            sx={{ '& .MuiToggleButton-root': { color: textSec, borderColor: 'rgba(16,185,129,0.15)', fontFamily: '"JetBrains Mono", monospace', px: 1.8, fontSize: '0.78rem',
+              '&.Mui-selected': { bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981' } } }}>
             {TIME_RANGES.map((r) => <ToggleButton key={r.value} value={r.value}>{r.label}</ToggleButton>)}
             <ToggleButton value={-1} selected={customMode} onClick={() => { setCustomMode(true); setHours(null) }}
-              sx={{ '&.Mui-selected': { bgcolor: dark ? 'rgba(245,158,11,0.1)' : 'rgba(245,158,11,0.08)', color: '#f59e0b !important' } }}>
+              sx={{ '&.Mui-selected': { bgcolor: 'rgba(245,158,11,0.1)', color: '#F59E0B !important' } }}>
               Personnalisée
             </ToggleButton>
           </ToggleButtonGroup>
@@ -215,7 +215,7 @@ export default function HistoryPage() {
               <Typography sx={{ color: textSec, fontSize: '0.8rem' }}>→</Typography>
               <TextField label="Au" type="datetime-local" size="small" value={dateTo} onChange={(e) => setDateTo(e.target.value)} InputLabelProps={{ shrink: true }} sx={dtFieldSx} />
               <Button variant="outlined" size="small" onClick={fetchCustom}
-                sx={{ borderColor: 'rgba(245,158,11,0.4)', color: '#f59e0b', textTransform: 'none', '&:hover': { borderColor: '#f59e0b', bgcolor: 'rgba(245,158,11,0.06)' } }}>
+                sx={{ borderColor: 'rgba(245,158,11,0.4)', color: '#F59E0B', textTransform: 'none', '&:hover': { borderColor: '#F59E0B', bgcolor: 'rgba(245,158,11,0.06)' } }}>
                 Chercher
               </Button>
             </Box>
@@ -223,27 +223,23 @@ export default function HistoryPage() {
         </Box>
       </Box>
 
-      {/* ── Section Intérieur (bleue) ──────────────────────────────────── */}
-      <Paper sx={{ p: 2.5, mb: 3, borderLeft: '4px solid #3b82f6' }}>
+      <Paper sx={{ p: 2.5, mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <span>🏠</span> Historique Intérieur
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#10B981' }} />
+            <Typography variant="subtitle2" fontWeight={700}>Historique Intérieur</Typography>
+          </Box>
           <Chip
             label="CSV"
             size="small"
             onClick={() => downloadCSV(internalData, INTERNAL_METRICS, `interieur_${hours ?? 'custom'}h.csv`)}
             sx={{
               height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: dark ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.08)',
-              color: '#3b82f6', border: `1px solid ${dark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.2)'}`,
-              fontFamily: '"JetBrains Mono", monospace', letterSpacing: '0.04em',
+              bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981',
+              border: '1px solid rgba(16,185,129,0.25)',
+              fontFamily: '"JetBrains Mono", monospace',
               transition: 'all 0.15s',
-              '&:hover': {
-                bgcolor: dark ? 'rgba(59,130,246,0.2)' : 'rgba(59,130,246,0.14)',
-                borderColor: '#3b82f6',
-                boxShadow: `0 0 10px ${dark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.15)'}`,
-              },
+              '&:hover': { bgcolor: 'rgba(16,185,129,0.2)', borderColor: '#10B981' },
             }}
           />
         </Box>
@@ -252,9 +248,9 @@ export default function HistoryPage() {
             const opt = OPTIMAL[m.key]
             return (
               <Grid item xs={12} md={6} key={m.key}>
-                <Paper sx={{ p: 2, border: `1px solid ${m.color}20` }}>
+                <Paper sx={{ p: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
-                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: m.color, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
                       {m.label}
                     </Typography>
                     <Typography sx={{ fontSize: '0.65rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
@@ -262,8 +258,8 @@ export default function HistoryPage() {
                     </Typography>
                   </Box>
                   {loading
-                    ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                    : <ReactECharts option={buildOption(internalData, m.key, m.color, m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                    ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                    : <ReactECharts option={buildOption(internalData, m.key, '#10B981', m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
                   }
                 </Paper>
               </Grid>
@@ -272,36 +268,32 @@ export default function HistoryPage() {
         </Grid>
       </Paper>
 
-      {/* ── Section Extérieur (orange) ─────────────────────────────────── */}
-      <Paper sx={{ p: 2.5, borderLeft: '4px solid #f97316' }}>
+      <Paper sx={{ p: 2.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="subtitle2" fontWeight={700} sx={{ color: '#f97316', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <span>🌤</span> Historique Extérieur
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#059669' }} />
+            <Typography variant="subtitle2" fontWeight={700}>Historique Extérieur</Typography>
+          </Box>
           <Chip
             label="CSV"
             size="small"
             onClick={() => downloadCSV(externalData, EXTERNAL_METRICS as any, `exterieur_${hours ?? 'custom'}h.csv`)}
             sx={{
               height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: dark ? 'rgba(249,115,22,0.12)' : 'rgba(249,115,22,0.08)',
-              color: '#f97316', border: `1px solid ${dark ? 'rgba(249,115,22,0.25)' : 'rgba(249,115,22,0.2)'}`,
-              fontFamily: '"JetBrains Mono", monospace', letterSpacing: '0.04em',
+              bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981',
+              border: '1px solid rgba(16,185,129,0.25)',
+              fontFamily: '"JetBrains Mono", monospace',
               transition: 'all 0.15s',
-              '&:hover': {
-                bgcolor: dark ? 'rgba(249,115,22,0.2)' : 'rgba(249,115,22,0.14)',
-                borderColor: '#f97316',
-                boxShadow: `0 0 10px ${dark ? 'rgba(249,115,22,0.25)' : 'rgba(249,115,22,0.15)'}`,
-              },
+              '&:hover': { bgcolor: 'rgba(16,185,129,0.2)', borderColor: '#10B981' },
             }}
           />
         </Box>
         <Grid container spacing={2}>
           {EXTERNAL_METRICS.map((m) => (
             <Grid item xs={12} md={6} key={m.key as string}>
-              <Paper sx={{ p: 2, border: `1px solid ${m.color}20` }}>
+              <Paper sx={{ p: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.8 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: m.color, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
                     {m.label}
                   </Typography>
                   <Typography sx={{ fontSize: '0.65rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
@@ -309,8 +301,8 @@ export default function HistoryPage() {
                   </Typography>
                 </Box>
                 {loading
-                  ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                  : <ReactECharts option={buildOption(externalData, m.key as string, m.color, m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                  ? <Skeleton variant="rounded" height={220} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                  : <ReactECharts option={buildOption(externalData, m.key as string, '#10B981', m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
                 }
               </Paper>
             </Grid>

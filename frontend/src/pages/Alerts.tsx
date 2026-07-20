@@ -3,15 +3,14 @@ import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableHead,
   TableRow, Chip, Switch, FormControlLabel, Skeleton,
 } from '@mui/material'
-import { motion } from 'framer-motion'
 import { alertsApi } from '../services/api'
 import { useThemeMode } from '../context/ThemeContext'
 import type { Alert } from '../types'
 
 const SEVERITY_CONFIG = {
-  critical: { color: '#e8334a', bg: 'rgba(232,51,74,0.1)',  label: 'CRITIQUE'  },
-  warning:  { color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', label: 'ATTENTION' },
-  info:     { color: '#3b82f6', bg: 'rgba(59,130,246,0.08)', label: 'INFO'      },
+  critical: { color: '#EF4444', bg: 'rgba(239,68,68,0.1)',  label: 'CRITIQUE'  },
+  warning:  { color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', label: 'ATTENTION' },
+  info:     { color: '#3B82F6', bg: 'rgba(59,130,246,0.08)', label: 'INFO'      },
 }
 
 const TYPE_META: Record<string, { label: string }> = {
@@ -36,8 +35,8 @@ function getTypeMeta(type: string) {
 export default function AlertsPage() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
-  const textPri = dark ? '#e2ecf8' : '#1a2540'
-  const textSec = dark ? '#8aaccc' : '#5a7090'
+  const textPri = dark ? '#F0FDF4' : '#1A2E1A'
+  const textSec = '#6B7280'
 
   const [alerts,   setAlerts]   = useState<Alert[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -69,9 +68,9 @@ export default function AlertsPage() {
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
             {[
-              { label: `${stats.unacknowledged} Non acquittées`, color: '#e8334a' },
-              { label: `${stats.critical} Critiques`,           color: '#e8334a' },
-              { label: `${stats.warning} Attention`,            color: '#f59e0b' },
+              { label: `${stats.unacknowledged} Non acquittées`, color: '#EF4444' },
+              { label: `${stats.critical} Critiques`,           color: '#EF4444' },
+              { label: `${stats.warning} Attention`,            color: '#F59E0B' },
             ].map((s) => (
               <Chip key={s.label} label={s.label} size="small"
                 sx={{ bgcolor: `${s.color}12`, color: s.color, border: `1px solid ${s.color}30`,
@@ -83,17 +82,16 @@ export default function AlertsPage() {
           control={
             <Switch checked={onlyUnack} onChange={(e) => setOnlyUnack(e.target.checked)}
               sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': { color: dark ? '#00aaff' : '#0070d4' },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: dark ? '#00aaff' : '#0070d4' },
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' },
               }} />
           }
           label={<Typography variant="body2" sx={{ color: textSec }}>Non acquittées seulement</Typography>}
         />
       </Box>
 
-      {/* Seuils de référence */}
-      <Paper sx={{ p: 2, mb: 2.5, border: `1px solid ${dark ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.15)'}`, bgcolor: dark ? 'rgba(16,185,129,0.03)' : 'rgba(16,185,129,0.03)' }}>
-        <Typography sx={{ fontSize: '0.67rem', color: dark ? '#10b981' : '#059669', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em', mb: 1 }}>
+      <Paper sx={{ p: 2, mb: 2.5 }}>
+        <Typography sx={{ fontSize: '0.67rem', color: '#10B981', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
           Seuils optimaux fraisier (microclimat froid)
         </Typography>
         <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
@@ -112,18 +110,17 @@ export default function AlertsPage() {
         </Box>
       </Paper>
 
-      {/* Table */}
       <Paper sx={{ overflow: 'hidden' }}>
         {loading ? (
           <Box sx={{ p: 2 }}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} height={48} sx={{ bgcolor: dark ? 'rgba(0,170,255,0.04)' : 'rgba(0,0,0,0.04)', mb: 0.5 }} />
+              <Skeleton key={i} height={48} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)', mb: 0.5 }} />
             ))}
           </Box>
         ) : alerts.length === 0 ? (
           <Box sx={{ py: 8, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '2.5rem', mb: 1 }}>✅</Typography>
-            <Typography variant="h6" sx={{ color: dark ? '#00e87a' : '#10b981', mb: 0.5 }}>Aucune alerte active</Typography>
+            <Typography variant="h6" sx={{ color: '#10B981', mb: 0.5 }}>Aucune alerte active</Typography>
             <Typography variant="body2" sx={{ color: textSec }}>Tous les paramètres dans les normes agronomiques</Typography>
           </Box>
         ) : (
@@ -131,28 +128,27 @@ export default function AlertsPage() {
             <TableHead>
               <TableRow>
                 {['Type', 'Message', 'Sévérité', 'Valeur', 'Seuil', 'Horodatage', 'Statut', 'Action'].map((h) => (
-                  <TableCell key={h} sx={{ fontSize: '0.68rem', fontWeight: 700, color: dark ? '#00aaff' : '#0070d4',
-                    bgcolor: dark ? 'rgba(0,170,255,0.06)' : 'rgba(0,112,212,0.05)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <TableCell key={h} sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#10B981',
+                    bgcolor: dark ? 'rgba(16,185,129,0.06)' : 'rgba(16,185,129,0.05)' }}>
                     {h}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {alerts.map((alert, i) => {
+              {alerts.map((alert) => {
                 const sev  = SEVERITY_CONFIG[alert.severity as keyof typeof SEVERITY_CONFIG] ?? SEVERITY_CONFIG.info
                 const meta = getTypeMeta(alert.alert_type)
                 return (
-                  <motion.tr key={alert.id}
-                    initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.025 }}
-                    style={{ background: alert.acknowledged ? 'transparent' : `${sev.color}08` }}>
+                  <TableRow key={alert.id}
+                    sx={{ background: alert.acknowledged ? 'transparent' : `${sev.color}08` }}>
                     <TableCell>
-                      <Typography variant="caption" sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', fontSize: '0.67rem' }}>
+                      <Typography sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}>
                         {meta.label}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" sx={{ color: alert.acknowledged ? textSec : textPri, fontSize: '0.8rem' }}>
+                      <Typography sx={{ color: alert.acknowledged ? textSec : textPri, fontSize: '0.8rem' }}>
                         {alert.message}
                       </Typography>
                     </TableCell>
@@ -177,10 +173,10 @@ export default function AlertsPage() {
                     </TableCell>
                     <TableCell>
                       {alert.acknowledged ? (
-                        <Chip label="Acquitté" size="small" sx={{ bgcolor: dark ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.08)', color: dark ? '#00e87a' : '#10b981',
-                          border: `1px solid ${dark ? 'rgba(0,232,122,0.25)' : 'rgba(16,185,129,0.25)'}`, fontSize: '0.62rem', height: 20 }} />
+                        <Chip label="Acquitté" size="small" sx={{ bgcolor: 'rgba(16,185,129,0.08)', color: '#10B981',
+                          border: '1px solid rgba(16,185,129,0.25)', fontSize: '0.62rem', height: 20 }} />
                       ) : (
-                        <Chip label="En attente" size="small" sx={{ bgcolor: 'rgba(245,158,11,0.08)', color: '#f59e0b',
+                        <Chip label="En attente" size="small" sx={{ bgcolor: 'rgba(245,158,11,0.08)', color: '#F59E0B',
                           border: '1px solid rgba(245,158,11,0.25)', fontSize: '0.62rem', height: 20 }} />
                       )}
                     </TableCell>
@@ -191,19 +187,19 @@ export default function AlertsPage() {
                           sx={{
                             display: 'inline-flex', alignItems: 'center', gap: 0.4,
                             px: 1, py: 0.3, borderRadius: '6px', cursor: 'pointer', userSelect: 'none',
-                            color: dark ? '#00e87a' : '#10b981', fontSize: '0.68rem', fontWeight: 600,
+                            color: '#10B981', fontSize: '0.68rem', fontWeight: 600,
                             fontFamily: '"JetBrains Mono", monospace',
-                            border: `1px solid ${dark ? 'rgba(0,232,122,0.25)' : 'rgba(16,185,129,0.25)'}`,
-                            bgcolor: dark ? 'rgba(0,232,122,0.05)' : 'rgba(16,185,129,0.05)',
+                            border: '1px solid rgba(16,185,129,0.25)',
+                            bgcolor: 'rgba(16,185,129,0.05)',
                             transition: 'all 0.15s',
-                            '&:hover': { bgcolor: dark ? 'rgba(0,232,122,0.1)' : 'rgba(16,185,129,0.1)' },
+                            '&:hover': { bgcolor: 'rgba(16,185,129,0.1)' },
                           }}
                         >
                           ✓ Acquitter
                         </Box>
                       )}
                     </TableCell>
-                  </motion.tr>
+                  </TableRow>
                 )
               })}
             </TableBody>

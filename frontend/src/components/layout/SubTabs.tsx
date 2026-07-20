@@ -28,10 +28,10 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
     <Box
       sx={{
         display: 'inline-flex',
-        background: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,80,160,0.04)',
+        background: dark ? '#1A2E1F' : '#F0FDF4',
         borderRadius: '12px',
         p: '3px',
-        border: `1px solid ${dark ? 'rgba(0,170,255,0.08)' : 'rgba(0,80,160,0.06)'}`,
+        border: '1px solid rgba(16,185,129,0.08)',
         gap: '2px',
       }}
     >
@@ -59,13 +59,7 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 8,
-                  background: dark
-                    ? 'linear-gradient(135deg, rgba(0,170,255,0.18) 0%, rgba(0,220,170,0.12) 100%)'
-                    : 'linear-gradient(135deg, rgba(0,112,212,0.12) 0%, rgba(0,180,160,0.08) 100%)',
-                  boxShadow: dark
-                    ? '0 0 12px rgba(0,170,255,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
-                    : '0 2px 6px rgba(0,112,212,0.1)',
-                  border: `1px solid ${dark ? 'rgba(0,170,255,0.2)' : 'rgba(0,112,212,0.12)'}`,
+                  background: 'rgba(16,185,129,0.12)',
                 }}
               />
             )}
@@ -74,12 +68,9 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
                 position: 'relative',
                 zIndex: 1,
                 fontSize: '0.78rem',
-                fontWeight: isActive ? 700 : 400,
-                color: isActive
-                  ? (dark ? '#00aaff' : '#0070d4')
-                  : (dark ? '#8aaccc' : '#5a7090'),
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? '#10B981' : '#6B7280',
                 whiteSpace: 'nowrap',
-                letterSpacing: isActive ? '-0.01em' : '0.01em',
                 transition: 'color 0.2s',
               }}
             >

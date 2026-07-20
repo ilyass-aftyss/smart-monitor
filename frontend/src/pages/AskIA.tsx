@@ -125,29 +125,27 @@ export default function AskIAPage() {
     }
   }
 
-  const bg = dark ? '#0a0e1a' : '#f0f2f5'
-  const surface = dark ? '#12182b' : '#ffffff'
-  const border = dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'
-  const chatBg = dark ? '#0a0e1a' : '#f7f8fa'
-  const userBubble = dark ? '#1a2a4a' : '#e8f0fe'
-  const assistantBubble = dark ? '#12182b' : '#ffffff'
-  const textPrimary = dark ? '#e2ecf8' : '#1a1a2e'
-  const textSecondary = dark ? '#6b7e9e' : '#6b7280'
-  const accent = '#10a37f'
+  const surface = dark ? '#1A2E1F' : '#FFFFFF'
+  const border = 'rgba(16,185,129,0.1)'
+  const chatBg = dark ? '#0F1F14' : '#F8FAF9'
+  const userBubble = dark ? '#1A2E1F' : '#F0FDF4'
+  const assistantBubble = dark ? '#1A2E1F' : '#FFFFFF'
+  const textPrimary = dark ? '#F0FDF4' : '#1A2E1A'
+  const textSecondary = '#6B7280'
+  const accent = '#10B981'
 
   return (
     <Box sx={{ height: 'calc(100vh - 110px)', display: 'flex', gap: 1.5 }}>
-      {/* ─── Sidebar historique ─── */}
       <Paper sx={{
         width: 260, flexShrink: 0, borderRadius: '12px',
         bgcolor: surface, border: `1px solid ${border}`,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <Box sx={{ p: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: textSecondary }}>
             Historique
           </Typography>
-          <IconButton size="small" onClick={deleteAllSessions} sx={{ color: textSecondary, opacity: 0.5, '&:hover': { opacity: 1, color: '#e8334a' } }}>
+          <IconButton size="small" onClick={deleteAllSessions} sx={{ color: textSecondary, opacity: 0.5, '&:hover': { opacity: 1, color: '#EF4444' } }}>
             <DeleteSweepIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -161,7 +159,7 @@ export default function AskIAPage() {
             display: 'flex', alignItems: 'center', gap: 1,
             color: accent, fontWeight: 600, fontSize: '0.82rem',
             transition: 'all 0.15s',
-            '&:hover': { bgcolor: dark ? 'rgba(16,163,127,0.08)' : 'rgba(16,163,127,0.06)' },
+            '&:hover': { bgcolor: dark ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.06)' },
           }}
         >
           <Box component="span" sx={{ fontSize: '1.1rem' }}>+</Box>
@@ -180,7 +178,7 @@ export default function AskIAPage() {
               onClick={() => setActiveSessionId(session.id)}
               sx={{
                 py: 1, px: 1.2, mb: 0.3, borderRadius: '8px', cursor: 'pointer',
-                bgcolor: activeSessionId === session.id ? (dark ? 'rgba(16,163,127,0.1)' : 'rgba(16,163,127,0.06)') : 'transparent',
+                bgcolor: activeSessionId === session.id ? 'rgba(16,185,129,0.1)' : 'transparent',
                 display: 'flex', alignItems: 'center', gap: 1,
                 transition: 'all 0.15s',
                 '&:hover': { bgcolor: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
@@ -201,7 +199,7 @@ export default function AskIAPage() {
               <IconButton
                 size="small"
                 onClick={(e) => { e.stopPropagation(); deleteSession(session.id) }}
-                sx={{ opacity: 0, color: textSecondary, '&:hover': { color: '#e8334a' } }}
+                sx={{ opacity: 0, color: textSecondary, '&:hover': { color: '#EF4444' } }}
                 className="delete-btn"
               />
             </Box>
@@ -209,13 +207,11 @@ export default function AskIAPage() {
         </Box>
       </Paper>
 
-      {/* ─── Zone de chat principale ─── */}
       <Paper sx={{
         flex: 1, borderRadius: '12px',
         bgcolor: surface, border: `1px solid ${border}`,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
-        {/* Header */}
         <Box sx={{
           px: 2.5, py: 1.5,
           borderBottom: `1px solid ${border}`,
@@ -234,7 +230,6 @@ export default function AskIAPage() {
           </Box>
         </Box>
 
-        {/* Messages */}
         <Box sx={{
           flex: 1, overflowY: 'auto', px: 2, py: 2,
           bgcolor: chatBg,
@@ -262,11 +257,7 @@ export default function AskIAPage() {
               flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
               alignItems: 'flex-start',
             }}>
-              <Avatar sx={{
-                width: 30, height: 30,
-                bgcolor: msg.role === 'user' ? '#555' : accent,
-                flexShrink: 0,
-              }}>
+              <Avatar sx={{ width: 30, height: 30, bgcolor: msg.role === 'user' ? '#6B7280' : accent, flexShrink: 0 }}>
                 {msg.role === 'user' ? <PersonIcon sx={{ fontSize: '0.75rem', color: '#fff' }} /> : <SmartToyIcon sx={{ fontSize: '0.75rem', color: '#fff' }} />}
               </Avatar>
               <Box sx={{
@@ -275,7 +266,6 @@ export default function AskIAPage() {
                 borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                 bgcolor: msg.role === 'user' ? userBubble : assistantBubble,
                 border: msg.role === 'assistant' ? `1px solid ${border}` : 'none',
-                boxShadow: msg.role === 'assistant' ? (dark ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 4px rgba(0,0,0,0.04)') : 'none',
               }}>
                 <Typography sx={{
                   fontSize: '0.82rem', color: textPrimary, lineHeight: 1.55,
@@ -289,14 +279,10 @@ export default function AskIAPage() {
           <div ref={messagesEndRef} />
         </Box>
 
-        {/* Input */}
-        <Box sx={{
-          p: 2, borderTop: `1px solid ${border}`,
-          bgcolor: surface,
-        }}>
+        <Box sx={{ p: 2, borderTop: `1px solid ${border}`, bgcolor: surface }}>
           <Box sx={{
             display: 'flex', gap: 1, alignItems: 'flex-end',
-            bgcolor: dark ? '#1a2040' : '#f7f8fa',
+            bgcolor: dark ? '#0F1F14' : '#F8FAF9',
             borderRadius: '12px', px: 1.5, py: 0.5,
             border: `1px solid ${border}`,
             transition: 'border-color 0.15s',
@@ -328,7 +314,7 @@ export default function AskIAPage() {
                 color: input.trim() ? '#fff' : textSecondary,
                 width: 34, height: 34, borderRadius: '8px',
                 transition: 'all 0.15s',
-                '&:hover': { bgcolor: input.trim() ? '#0d8c6f' : 'rgba(255,255,255,0.05)' },
+                '&:hover': { bgcolor: input.trim() ? '#059669' : 'rgba(255,255,255,0.05)' },
                 '&.Mui-disabled': { bgcolor: 'transparent', color: textSecondary, opacity: 0.3 },
               }}
             >
