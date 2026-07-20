@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Box, Typography, Drawer, IconButton, Collapse, Avatar, ClickAwayListener,
@@ -9,11 +9,13 @@ import { useLatestSensorData } from '../../hooks/useSensorData'
 import { alertsApi } from '../../services/api'
 import {
   LayoutDashboard, History, CloudSun, Fan, Bell, Brain, Boxes,
-  Mail, Shield, ChevronRight, PanelLeftClose, PanelLeftOpen,
+  Mail, Shield, PanelLeftClose, PanelLeftOpen,
   User, Settings, LockKeyhole, LogOut, ChevronDown,
 } from 'lucide-react'
 
-export const SIDEBAR_WIDTH = 260
+export const SIDEBAR_MIN = 180
+export const SIDEBAR_MAX = 400
+export const SIDEBAR_DEFAULT = 260
 export const SIDEBAR_COLLAPSED = 68
 
 function GreenhouseSVG({ size = 20, color = '#fff' }: { size?: number; color?: string }) {
@@ -78,9 +80,10 @@ function NavItemRow({
   item: NavItem; collapsed: boolean; active: boolean; alertCount: number; onNavigate: () => void
 }) {
   const Icon = item.icon
+  const nav = useNavigate()
   return (
     <Box
-      onClick={onNavigate}
+      onClick={(e) => { e.stopPropagation(); nav(item.path) }}
       sx={{
         display: 'flex', alignItems: 'center', gap: 2,
         px: collapsed ? 0 : 2, py: 1.6,
@@ -136,17 +139,22 @@ function NavItemRow({
 interface SidebarProps {
   collapsed: boolean
   mobileOpen: boolean
+  sidebarWidth: number
   onToggleCollapse: () => void
   onCloseMobile: () => void
+  onResize: (width: number) => void
 }
 
-export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onCloseMobile }: SidebarProps) {
+export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleCollapse, onCloseMobile, onResize }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { mode, toggle } = useThemeMode()
   const { username, role, logout } = useAuthStore()
   const { lastUpdate } = useLatestSensorData(60000)
   const dark = mode === 'dark'
+  const resizingRef = useRef(false)
+  const startXRef = useRef(0)
+  const startWRef = useRef(0)
 
   const [userOpen, setUserOpen] = useState(false)
   const [alertCount, setAlertCount] = useState(0)
@@ -165,6 +173,36 @@ export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onClo
     return () => clearInterval(t)
   }, [])
 
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    resizingRef.current = true
+    startXRef.current = e.clientX
+    startWRef.current = sidebarWidth
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [sidebarWidth])
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!resizingRef.current) return
+    const delta = e.clientX - startXRef.current
+    const newWidth = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWRef.current + delta))
+    onResize(newWidth)
+  }, [onResize])
+
+  const handleMouseUp = useCallback(() => {
+    resizingRef.current = false
+    document.body.style.cursor = ''
+    document.body.style.userSelect = ''
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }, [])
+
+  useEffect(() => {
+    setUserOpen(false)
+  }, [location.pathname])
+
   const activePath = location.pathname
   const bg     = dark ? '#0F1F14' : '#FFFFFF'
   const border = '1px solid rgba(16,185,129,0.08)'
@@ -182,9 +220,34 @@ export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onClo
       display: 'flex',
       flexDirection: 'column',
       bgcolor: bg,
-      borderRight: border,
-      overflow: 'hidden',
+      position: 'relative',
     }}>
+      {/* Resize handle */}
+      {!collapsed && (
+        <Box
+          onMouseDown={handleMouseDown}
+          sx={{
+            position: 'absolute', top: 0, right: 0, bottom: 0, zIndex: 10,
+            width: 8, cursor: 'col-resize',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'opacity 0.15s',
+            opacity: 0,
+            '&:hover': { opacity: 1 },
+            '&::before': {
+              content: '""',
+              width: 3, height: 40,
+              borderRadius: 2,
+              bgcolor: 'rgba(16,185,129,0.25)',
+              transition: 'background 0.15s, height 0.15s',
+            },
+            '&:hover::before': {
+              bgcolor: '#10B981',
+              height: 60,
+            },
+          }}
+        />
+      )}
+
       {/* Logo + collapse */}
       <Box sx={{
         display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between',
@@ -402,6 +465,8 @@ export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onClo
     </Box>
   )
 
+  const currentWidth = collapsed ? SIDEBAR_COLLAPSED : sidebarWidth
+
   return (
     <>
       <Drawer
@@ -411,7 +476,7 @@ export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onClo
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { width: SIDEBAR_WIDTH, border: 'none' },
+          '& .MuiDrawer-paper': { width: SIDEBAR_DEFAULT, border: 'none' },
         }}
       >
         {sidebarContent}
@@ -422,11 +487,11 @@ export default function Sidebar({ collapsed, mobileOpen, onToggleCollapse, onClo
         sx={{
           display: { xs: 'none', md: 'block' },
           flexShrink: 0,
-          width: collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_WIDTH,
-          transition: 'width 0.25s ease',
+          width: currentWidth,
+          transition: collapsed ? 'width 0.25s ease' : 'none',
           '& .MuiDrawer-paper': {
-            width: collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_WIDTH,
-            transition: 'width 0.25s ease',
+            width: currentWidth,
+            transition: collapsed ? 'width 0.25s ease' : 'none',
             overflow: 'hidden',
             border: 'none',
             boxSizing: 'border-box',

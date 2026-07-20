@@ -1,23 +1,9 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Box, IconButton } from '@mui/material'
-import { motion, AnimatePresence } from 'framer-motion'
-import Sidebar, { SIDEBAR_WIDTH, SIDEBAR_COLLAPSED } from './Sidebar'
+import Sidebar, { SIDEBAR_DEFAULT } from './Sidebar'
 import { useThemeMode } from '../../context/ThemeContext'
 import { Menu } from 'lucide-react'
-
-function PageTransition({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 export default function Layout() {
   const { mode } = useThemeMode()
@@ -25,6 +11,12 @@ export default function Layout() {
   const location = useLocation()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem('sidebar-collapsed') === 'true'
+  )
+  const [sidebarWidth, setSidebarWidth] = useState(
+    () => {
+      const stored = localStorage.getItem('sidebar-width')
+      return stored ? Math.min(400, Math.max(180, parseInt(stored, 10))) : SIDEBAR_DEFAULT
+    }
   )
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -36,7 +28,10 @@ export default function Layout() {
     })
   }
 
-  const sidebarWidth = sidebarCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_WIDTH
+  const handleResize = useCallback((w: number) => {
+    setSidebarWidth(w)
+    localStorage.setItem('sidebar-width', String(w))
+  }, [])
 
   return (
     <Box sx={{
@@ -49,8 +44,10 @@ export default function Layout() {
       <Sidebar
         collapsed={sidebarCollapsed}
         mobileOpen={mobileSidebarOpen}
+        sidebarWidth={sidebarWidth}
         onToggleCollapse={toggleCollapse}
         onCloseMobile={() => setMobileSidebarOpen(false)}
+        onResize={handleResize}
       />
 
       <Box
@@ -118,11 +115,9 @@ export default function Layout() {
           width: '100%',
           mx: 'auto',
         }}>
-          <AnimatePresence mode="popLayout">
-            <PageTransition key={location.pathname}>
-              <Outlet />
-            </PageTransition>
-          </AnimatePresence>
+          <Box key={location.pathname}>
+            <Outlet />
+          </Box>
         </Box>
       </Box>
     </Box>
