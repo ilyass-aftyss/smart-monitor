@@ -19,8 +19,8 @@ export default function LiveChart({ data, metric, color, unit, optLow, optHigh }
   const axisColor   = dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
   const labelColor  = '#6B7280'
   const gridColor   = dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)'
-  const tooltipBg   = dark ? '#1A2E1F' : '#FFFFFF'
-  const tooltipText = dark ? '#F0FDF4' : '#1A2E1A'
+  const tooltipBg   = dark ? '#102A33' : '#FFFFFF'
+  const tooltipText = dark ? '#C4F9FF' : '#0D3040'
 
   const timestamps = data.map((d) =>
     new Date(d.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -46,14 +46,14 @@ export default function LiveChart({ data, metric, color, unit, optLow, optHigh }
     tooltip: {
       trigger: 'axis',
       backgroundColor: tooltipBg,
-      borderColor: 'rgba(16,185,129,0.3)',
+      borderColor: 'rgba(13,152,186,0.3)',
       borderWidth: 1,
       padding: [9, 14],
       textStyle: { color: tooltipText, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
       formatter: (params: any) => {
         const p = params[0]
         if (p.value === null || p.value === undefined) return ''
-        return `<span style="color:#10B981;font-weight:700;font-size:14px">${p.value} <span style="font-size:11px;opacity:0.7">${unit}</span></span><br/><span style="opacity:0.45;font-size:10px">${p.axisValue}</span>`
+        return `<span style="color:#0D98BA;font-weight:700;font-size:14px">${p.value} <span style="font-size:11px;opacity:0.7">${unit}</span></span><br/><span style="opacity:0.45;font-size:10px">${p.axisValue}</span>`
       },
     },
     xAxis: {
@@ -84,20 +84,20 @@ export default function LiveChart({ data, metric, color, unit, optLow, optHigh }
       symbol: 'circle',
       symbolSize: (v: number | null) => (v !== null && timestamps.length <= 40) ? 4 : 0,
       showSymbol: timestamps.length <= 40,
-      lineStyle: { color: '#10B981', width: 2 },
-      itemStyle: { color: '#10B981' },
+      lineStyle: { color: '#0D98BA', width: 2 },
+      itemStyle: { color: '#0D98BA' },
       areaStyle: {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(16,185,129,0.2)' },
-            { offset: 1, color: 'rgba(16,185,129,0)' },
+            { offset: 0, color: 'rgba(13,152,186,0.2)' },
+            { offset: 1, color: 'rgba(13,152,186,0)' },
           ],
         },
       },
       markArea: (optLow !== undefined && optHigh !== undefined) ? {
         silent: true,
-        itemStyle: { color: 'rgba(16,185,129,0.06)', borderWidth: 0 },
+        itemStyle: { color: 'rgba(13,152,186,0.06)', borderWidth: 0 },
         data: [[
           { yAxis: optLow, label: { show: false } },
           { yAxis: optHigh },
@@ -106,7 +106,7 @@ export default function LiveChart({ data, metric, color, unit, optLow, optHigh }
       markLine: allVals.length ? {
         silent: true,
         symbol: ['none', 'none'],
-        lineStyle: { color: 'rgba(16,185,129,0.3)', type: 'dashed', width: 1 },
+        lineStyle: { color: 'rgba(13,152,186,0.3)', type: 'dashed', width: 1 },
         label: { show: false },
         data: [{ type: 'average' }],
       } : undefined,

@@ -20,8 +20,8 @@ export default function ExternalSection() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
   const textSec    = '#6B7280'
-  const tooltipBg  = dark ? '#1A2E1F' : '#FFFFFF'
-  const tooltipTxt = dark ? '#F0FDF4' : '#1A2E1A'
+  const tooltipBg  = dark ? '#102A33' : '#FFFFFF'
+  const tooltipTxt = dark ? '#C4F9FF' : '#0D3040'
   const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
   const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
   const labelColor = '#6B7280'
@@ -75,9 +75,9 @@ export default function ExternalSection() {
       grid: { top: 20, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
-        backgroundColor: tooltipBg, borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, padding: [8, 12],
+        backgroundColor: tooltipBg, borderColor: 'rgba(13,152,186,0.3)', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:#10B981;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
+        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:#0D98BA;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
       },
       xAxis: {
         type: 'category', data: labels, boundaryGap: false,
@@ -97,14 +97,14 @@ export default function ExternalSection() {
         type: 'line', data: vals, smooth: 0.3,
         symbol: 'circle', symbolSize: (v: number|null) => v != null && labels.length <= 24 ? 4 : 0,
         showSymbol: labels.length <= 24,
-        lineStyle: { color: '#10B981', width: 2 },
-        itemStyle: { color: '#10B981', borderColor: dark ? '#1A2E1F' : '#fff', borderWidth: 1 },
-        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(16,185,129,0.2)' },{ offset:1, color:'rgba(16,185,129,0)' }] } },
+        lineStyle: { color: '#0D98BA', width: 2 },
+        itemStyle: { color: '#0D98BA', borderColor: dark ? '#102A33' : '#fff', borderWidth: 1 },
+        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' },{ offset:1, color:'rgba(13,152,186,0)' }] } },
         markPoint: {
           symbol: 'pin', symbolSize: 28,
           data: [
-            { type: 'max', itemStyle: { color: '#10B981' }, label: { color: '#fff', fontSize: 9, fontFamily: 'monospace', formatter: (p: any) => `${p.value}` } },
-            { type: 'min', itemStyle: { color: '#059669' }, label: { color: '#fff', fontSize: 9, fontFamily: 'monospace', formatter: (p: any) => `${p.value}` } },
+            { type: 'max', itemStyle: { color: '#0D98BA' }, label: { color: '#fff', fontSize: 9, fontFamily: 'monospace', formatter: (p: any) => `${p.value}` } },
+            { type: 'min', itemStyle: { color: '#097782' }, label: { color: '#fff', fontSize: 9, fontFamily: 'monospace', formatter: (p: any) => `${p.value}` } },
           ],
         },
       }],
@@ -118,7 +118,7 @@ export default function ExternalSection() {
           <Typography sx={{ fontSize: '0.67rem', color: textSec, fontFamily: '"JetBrains Mono", monospace' }}>
             Prochaine acquisition dans :
           </Typography>
-          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
+          <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
             {minLeft} min
           </Typography>
         </Box>
@@ -138,9 +138,9 @@ export default function ExternalSection() {
                     {m.label}
                   </Typography>
                   {loading || value === null
-                    ? <Skeleton height={30} width={80} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
+                    ? <Skeleton height={30} width={80} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
                     : <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.4 }}>
-                        <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.6rem', lineHeight: 1 }}>
+                        <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.6rem', lineHeight: 1 }}>
                           {value.toFixed(1)}
                         </Typography>
                         <Typography sx={{ fontSize: '0.72rem', color: textSec }}>{m.unit}</Typography>
@@ -158,11 +158,11 @@ export default function ExternalSection() {
           <Grid item xs={12} md={6} key={m.key}>
             <Paper sx={{ p: 2.5 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                   {m.label}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 0.6 }}>
-                  <Chip label={`${history.length} pts`} size="small" sx={{ height: 17, fontSize: '0.58rem', bgcolor: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }} />
+                  <Chip label={`${history.length} pts`} size="small" sx={{ height: 17, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                   <Chip label="1/15 min" size="small" sx={{ height: 17, fontSize: '0.58rem', bgcolor: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', color: textSec }} />
                 </Box>
               </Box>
@@ -170,7 +170,7 @@ export default function ExternalSection() {
                 {loading || !latest
                   ? <Skeleton width={90} height={32} sx={{ bgcolor: dark ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)' }} />
                   : <>
-                      <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.7rem', lineHeight: 1 }}>
+                      <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.7rem', lineHeight: 1 }}>
                         {(((latest as any)[m.key] as number) ?? 0).toFixed(1)}
                       </Typography>
                       <Typography sx={{ fontSize: '0.72rem', color: textSec }}>{m.unit}</Typography>
@@ -179,7 +179,7 @@ export default function ExternalSection() {
                 }
               </Box>
               {loading
-                ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
                 : history.length === 0
                   ? <Box sx={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Typography sx={{ color: textSec, fontSize: '0.8rem' }}>Aucune donnée</Typography></Box>
                   : <ReactECharts option={buildChart(m)} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />

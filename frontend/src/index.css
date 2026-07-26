@@ -58,8 +58,8 @@ html, body {
 
 body {
   font-family: 'Inter', sans-serif;
-  background: #0F1F14;
-  color: #F0FDF4;
+  background: #091E24;
+  color: #C4F9FF;
   -webkit-font-smoothing: antialiased;
   cursor: auto;
 }
@@ -72,12 +72,12 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(16,185,129,0.18);
+  background: rgba(13,152,186,0.18);
   border-radius: 4px;
   transition: background 0.3s;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16,185,129,0.5);
+  background: rgba(13,152,186,0.5);
 }
 
 .sr-only {

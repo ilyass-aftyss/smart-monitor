@@ -36,11 +36,11 @@ const PLANTS_PER_GUTTER = 27
 const PLANT_SPACING = GUTTER_LENGTH / (PLANTS_PER_GUTTER - 1)
 
 function tempToColor(temp: number): THREE.Color {
-  if (temp < 10) return new THREE.Color('#064E3B')
+  if (temp < 10) return new THREE.Color('#083C45')
   if (temp < 15) return new THREE.Color('#065F46')
-  if (temp < 20) return new THREE.Color('#059669')
-  if (temp < 25) return new THREE.Color('#10B981')
-  if (temp < 30) return new THREE.Color('#34D399')
+  if (temp < 20) return new THREE.Color('#097782')
+  if (temp < 25) return new THREE.Color('#0D98BA')
+  if (temp < 30) return new THREE.Color('#88F4FF')
   if (temp < 35) return new THREE.Color('#6EE7B7')
   return new THREE.Color('#A7F3D0')
 }
@@ -82,7 +82,7 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     id: 'sensor-north',
     label: 'Capteur Nord',
     position: [-1.5, 1.6, -3.5],
-    color: '#10B981',
+    color: '#0D98BA',
     zone: 'Zone Nord',
     getValue: (d) => [
       { label: 'Temperature', value: `${d.temperature?.toFixed(1)} °C` },
@@ -95,7 +95,7 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     id: 'sensor-center',
     label: 'Capteur Centre',
     position: [0, 1.6, 0],
-    color: '#34D399',
+    color: '#88F4FF',
     zone: 'Zone Centre',
     getValue: (d) => [
       { label: 'Temperature', value: `${d.temperature?.toFixed(1)} °C` },
@@ -121,7 +121,7 @@ const SENSOR_CONFIGS: SensorConfig[] = [
     id: 'sensor-ext',
     label: 'Station Ext.',
     position: [W / 2 + 1.2, 1.5, 0],
-    color: '#059669',
+    color: '#097782',
     zone: 'Exterieur',
     getValue: (d) => [
       { label: 'Temp. Ext',  value: `${d.temperature?.toFixed(1)} °C` },
@@ -236,7 +236,7 @@ function RainSystem({ humidity, windSpeed }: { humidity: number; windSpeed: numb
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, 300]}>
       <cylinderGeometry args={[1, 1, 1, 4]} />
-      <meshStandardMaterial color="#10B981" transparent opacity={0.3} />
+      <meshStandardMaterial color="#0D98BA" transparent opacity={0.3} />
     </instancedMesh>
   )
 }
@@ -256,8 +256,8 @@ function GreenhouseWindow({
   })
 
   const isOpen = openAngle > 5
-  const frameColor = isOpen ? '#10B981' : '#1A2E1F'
-  const glassColor = isOpen ? '#34D399' : '#0F1F14'
+  const frameColor = isOpen ? '#0D98BA' : '#102A33'
+  const glassColor = isOpen ? '#88F4FF' : '#091E24'
 
   return (
     <group position={config.position} rotation={config.rotation}>
@@ -285,8 +285,8 @@ function GreenhouseWindow({
           <meshStandardMaterial color={frameColor} metalness={0.7} roughness={0.2} />
         </mesh>
       ))}
-      {isOpen && <pointLight color="#10B981" intensity={0.2} distance={1.5} />}
-      <Text position={[0, -0.5, 0.05]} fontSize={0.07} color={isOpen ? '#10B981' : '#6B7280'} anchorX="center">
+      {isOpen && <pointLight color="#0D98BA" intensity={0.2} distance={1.5} />}
+      <Text position={[0, -0.5, 0.05]} fontSize={0.07} color={isOpen ? '#0D98BA' : '#6B7280'} anchorX="center">
         {config.label} {isOpen ? `${openAngle}°` : 'fermee'}
       </Text>
     </group>
@@ -337,18 +337,18 @@ function SensorNode({
         <>
           <mesh position={[0, -config.position[1] / 2 - 0.05, 0]}>
             <cylinderGeometry args={[0.012, 0.012, config.position[1] + 0.1, 8]} />
-            <meshStandardMaterial color="#1A2E1F" metalness={0.7} roughness={0.3} />
+            <meshStandardMaterial color="#102A33" metalness={0.7} roughness={0.3} />
           </mesh>
           <mesh position={[0, -config.position[1] + 0.02, 0]}>
             <cylinderGeometry args={[0.055, 0.07, 0.04, 12]} />
-            <meshStandardMaterial color="#0F1F14" metalness={0.6} roughness={0.4} />
+            <meshStandardMaterial color="#091E24" metalness={0.6} roughness={0.4} />
           </mesh>
         </>
       )}
       <mesh ref={bodyRef} castShadow>
         <boxGeometry args={[0.18, 0.24, 0.12]} />
         <meshStandardMaterial
-          color={selected ? config.color : '#1A2E1F'}
+          color={selected ? config.color : '#102A33'}
           emissive={config.color}
           emissiveIntensity={selected ? 0.25 : 0.05}
           metalness={0.5} roughness={0.4}
@@ -356,7 +356,7 @@ function SensorNode({
       </mesh>
       <mesh position={[0, 0, 0.063]}>
         <boxGeometry args={[0.155, 0.21, 0.008]} />
-        <meshStandardMaterial color="#0F1F14" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#091E24" metalness={0.3} roughness={0.6} />
       </mesh>
       <mesh position={[0, 0.03, 0.069]}>
         <boxGeometry args={[0.12, 0.11, 0.003]} />
@@ -366,7 +366,7 @@ function SensorNode({
       {[-0.04, 0, 0.04].map((x, i) => (
         <mesh key={i} position={[x, -0.075, 0.068]}>
           <cylinderGeometry args={[0.008, 0.008, 0.006, 8]} />
-          <meshStandardMaterial color="#1A2E1F" metalness={0.6} roughness={0.3} />
+          <meshStandardMaterial color="#102A33" metalness={0.6} roughness={0.3} />
         </mesh>
       ))}
       <mesh ref={ledRef} position={[0.06, 0.085, 0.069]}>
@@ -376,7 +376,7 @@ function SensorNode({
       {[0.04, 0.02, 0, -0.02, -0.04].map((y, i) => (
         <mesh key={i} position={[0.092, y, 0]}>
           <boxGeometry args={[0.003, 0.012, 0.08]} />
-          <meshStandardMaterial color="#0F1F14" metalness={0.4} roughness={0.5} />
+          <meshStandardMaterial color="#091E24" metalness={0.4} roughness={0.5} />
         </mesh>
       ))}
       <mesh position={[0.055, 0.19, 0]}>
@@ -412,7 +412,7 @@ function SensorNode({
               <span style={{ marginLeft: 'auto', color: 'rgba(0,0,0,0.6)', fontSize: 9 }}>{config.label}</span>
             </div>
             <div style={{
-              background: '#0F1F14', border: `1px solid ${config.color}44`,
+              background: '#091E24', border: `1px solid ${config.color}44`,
               borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '10px 14px 10px',
             }}>
               {readings.map((r, idx) => (
@@ -451,7 +451,7 @@ function StrawberryPlant({ position }: { position: [number, number, number] }) {
     <group position={position}>
       <mesh ref={meshRef}>
         <sphereGeometry args={[0.055, 6, 4]} />
-        <meshStandardMaterial color="#059669" emissive="#064E3B" emissiveIntensity={0.2} roughness={0.8} />
+        <meshStandardMaterial color="#097782" emissive="#083C45" emissiveIntensity={0.2} roughness={0.8} />
       </mesh>
       {Math.abs(position[2] % 0.9) < 0.3 && (
         <mesh position={[0.04, -0.05, 0.04]}>
@@ -468,7 +468,7 @@ function CultureGutter({ posX }: { posX: number }) {
     <group position={[posX, GUTTER_HEIGHT, 0]}>
       <mesh>
         <boxGeometry args={[0.08, 0.06, GUTTER_LENGTH]} />
-        <meshStandardMaterial color="#1A2E1F" metalness={0.1} roughness={0.7} />
+        <meshStandardMaterial color="#102A33" metalness={0.1} roughness={0.7} />
       </mesh>
       <mesh position={[0, 0.02, 0]}>
         <boxGeometry args={[0.06, 0.02, GUTTER_LENGTH - 0.1]} />
@@ -495,11 +495,11 @@ function GutterStructure() {
             <group key={z} position={[x, 0, z]}>
               <mesh position={[0, GUTTER_HEIGHT / 2, 0]}>
                 <cylinderGeometry args={[0.018, 0.018, GUTTER_HEIGHT, 8]} />
-                <meshStandardMaterial color="#1A2E1F" metalness={0.6} roughness={0.3} />
+                <meshStandardMaterial color="#102A33" metalness={0.6} roughness={0.3} />
               </mesh>
               <mesh position={[0, 0.02, 0]}>
                 <cylinderGeometry args={[0.045, 0.045, 0.04, 8]} />
-                <meshStandardMaterial color="#0F1F14" metalness={0.5} roughness={0.4} />
+                <meshStandardMaterial color="#091E24" metalness={0.5} roughness={0.4} />
               </mesh>
             </group>
           ))}
@@ -538,7 +538,7 @@ function GreenhouseGLTFModel({ showWireframe }: { showWireframe: boolean }) {
         if (showWireframe) {
           const mat = (mesh.material as THREE.MeshStandardMaterial).clone()
           mat.wireframe = true
-          mat.color = new THREE.Color('#10B981')
+          mat.color = new THREE.Color('#0D98BA')
           mesh.material = mat
         }
       }
@@ -560,7 +560,7 @@ function GreenhouseFallback() {
   return (
     <mesh position={[0, H / 2, 0]}>
       <boxGeometry args={[W, H, L]} />
-      <meshStandardMaterial color="#1A2E1F" transparent opacity={0.2} wireframe />
+      <meshStandardMaterial color="#102A33" transparent opacity={0.2} wireframe />
     </mesh>
   )
 }
@@ -573,7 +573,7 @@ function Scene({
   const { internal, external } = useLatestSensorData(30000)
   const [selectedSensor, setSelectedSensor] = useState<string | null>(null)
 
-  const tempColor = internal ? tempToColor(internal.temperature) : new THREE.Color('#10B981')
+  const tempColor = internal ? tempToColor(internal.temperature) : new THREE.Color('#0D98BA')
   const windSpeed = external?.wind_speed ?? 2
   const extTemp   = external?.temperature ?? 18
   const extHumidity = external?.humidity ?? 60
@@ -586,9 +586,9 @@ function Scene({
       <ambientLight intensity={0.6} />
       <directionalLight position={[6, 9, 6]} intensity={1.2} color="#ffffff" castShadow
         shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
-      <directionalLight position={[-5, 5, -5]} intensity={0.4} color="#34D399" />
-      <pointLight position={[0, 6, 0]} intensity={0.6} color="#10B981" />
-      <hemisphereLight args={['#064E3B', '#0F1F14', 0.5]} />
+      <directionalLight position={[-5, 5, -5]} intensity={0.4} color="#88F4FF" />
+      <pointLight position={[0, 6, 0]} intensity={0.6} color="#0D98BA" />
+      <hemisphereLight args={['#083C45', '#091E24', 0.5]} />
 
       <Suspense fallback={<GreenhouseFallback />}>
         <GreenhouseGLTFModel showWireframe={showWireframe} />
@@ -599,7 +599,7 @@ function Scene({
         <meshStandardMaterial color="#0A1A10" roughness={1} metalness={0} />
       </mesh>
 
-      <gridHelper args={[Math.max(W, L) + 4, 14, '#10B981', '#064E3B']} position={[0, 0.005, 0]} />
+      <gridHelper args={[Math.max(W, L) + 4, 14, '#0D98BA', '#083C45']} position={[0, 0.005, 0]} />
 
       {internal && <TempHeatmap temp={internal.temperature} />}
 
@@ -681,8 +681,8 @@ export default function Visualization3DPage() {
   const anyOpen = Object.values(windowStates).some((v) => v > 5)
   const windSpeed  = external?.wind_speed ?? 0
   const windLabel  = windSpeed < 2 ? 'Calme' : windSpeed < 6 ? 'Faible' : windSpeed < 12 ? 'Modere' : 'Fort'
-  const windColor  = windSpeed < 2 ? '#6B7280' : windSpeed < 6 ? '#10B981' : windSpeed < 12 ? '#34D399' : '#059669'
-  const tempColor  = internal ? tempToColor(internal.temperature).getStyle() : '#10B981'
+  const windColor  = windSpeed < 2 ? '#6B7280' : windSpeed < 6 ? '#0D98BA' : windSpeed < 12 ? '#88F4FF' : '#097782'
+  const tempColor  = internal ? tempToColor(internal.temperature).getStyle() : '#0D98BA'
   const isRaining  = (external?.humidity ?? 0) > 70
 
   return (
@@ -691,7 +691,7 @@ export default function Visualization3DPage() {
 
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 1 }}>
         <Box>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#059669' }}>
+          <Typography variant="h5" fontWeight={700} sx={{ color: '#097782' }}>
             Jumeau Numerique 3D - Serre Fraisier
           </Typography>
           <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.3 }}>
@@ -701,15 +701,15 @@ export default function Visualization3DPage() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
           {internal && (
             <Chip label={`${internal.temperature?.toFixed(1)}°C interieur`} size="small"
-              sx={{ bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)',
+              sx={{ bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.3)',
                 fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           )}
           <Chip label={`Vent ${windLabel} ${windSpeed.toFixed(1)} m/s`} size="small"
-            sx={{ bgcolor: 'rgba(16,185,129,0.08)', color: '#6B7280', border: '1px solid rgba(16,185,129,0.15)',
+            sx={{ bgcolor: 'rgba(13,152,186,0.08)', color: '#6B7280', border: '1px solid rgba(13,152,186,0.15)',
               fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           {isRaining && (
             <Chip label="Pluie detectee" size="small"
-              sx={{ bgcolor: 'rgba(16,185,129,0.08)', color: '#6B7280', border: '1px solid rgba(16,185,129,0.15)',
+              sx={{ bgcolor: 'rgba(13,152,186,0.08)', color: '#6B7280', border: '1px solid rgba(13,152,186,0.15)',
                 fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           )}
           <Chip
@@ -717,14 +717,14 @@ export default function Visualization3DPage() {
               ? `${Object.values(windowStates).filter(v => v > 5).length} fenetre(s) ouverte(s)`
               : 'Toutes fenetres fermees'}
             size="small"
-            sx={{ bgcolor: anyOpen ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.08)',
-              color: anyOpen ? '#10B981' : '#EF4444',
-              border: `1px solid ${anyOpen ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.2)'}`,
+            sx={{ bgcolor: anyOpen ? 'rgba(13,152,186,0.12)' : 'rgba(239,68,68,0.08)',
+              color: anyOpen ? '#0D98BA' : '#EF4444',
+              border: `1px solid ${anyOpen ? 'rgba(13,152,186,0.3)' : 'rgba(239,68,68,0.2)'}`,
               fontFamily: '"JetBrains Mono", monospace', fontSize: '0.7rem' }} />
           <FormControlLabel
             control={<Switch size="small" checked={showWireframe}
               onChange={(e) => setShowWireframe(e.target.checked)}
-              sx={{ '& .MuiSwitch-thumb': { bgcolor: '#10B981' } }} />}
+              sx={{ '& .MuiSwitch-thumb': { bgcolor: '#0D98BA' } }} />}
             label={<Typography variant="caption" sx={{ color: '#6B7280' }}>Wireframe</Typography>}
           />
         </Box>
@@ -733,12 +733,12 @@ export default function Visualization3DPage() {
       <Box sx={{ display: 'flex', gap: 1.5, flex: 1, overflow: 'hidden' }}>
         <Paper sx={{
           width: 220, flexShrink: 0, p: 2,
-          border: '1px solid rgba(16,185,129,0.15)',
-          background: '#0F1F14',
+          border: '1px solid rgba(13,152,186,0.15)',
+          background: '#091E24',
           display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto',
         }}>
           <Box>
-            <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace',
+            <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace',
               fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1.5 }}>
               Ouverture Globale
             </Typography>
@@ -748,8 +748,8 @@ export default function Visualization3DPage() {
             </Typography>
             <Slider size="small" value={globalOpenAngle} min={0} max={90} step={5}
               onChange={(_, v) => handleGlobalAngle(v as number)}
-              sx={{ color: '#10B981', '& .MuiSlider-thumb': { width: 12, height: 12 },
-                '& .MuiSlider-rail': { bgcolor: 'rgba(16,185,129,0.2)' } }} />
+              sx={{ color: '#0D98BA', '& .MuiSlider-thumb': { width: 12, height: 12 },
+                '& .MuiSlider-rail': { bgcolor: 'rgba(13,152,186,0.2)' } }} />
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.6rem' }}>Ferme</Typography>
               <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.6rem' }}>Ouvert</Typography>
@@ -757,7 +757,7 @@ export default function Visualization3DPage() {
           </Box>
 
           <Box>
-            <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace',
+            <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace',
               fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
               Fenetres Individuelles
             </Typography>
@@ -767,20 +767,20 @@ export default function Visualization3DPage() {
               return (
                 <Box key={w.id} sx={{ mb: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.3 }}>
-                    <Typography variant="caption" sx={{ color: isOpen ? '#10B981' : '#6B7280',
+                    <Typography variant="caption" sx={{ color: isOpen ? '#0D98BA' : '#6B7280',
                       fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
                       {w.label}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: isOpen ? '#10B981' : '#6B7280',
+                    <Typography variant="caption" sx={{ color: isOpen ? '#0D98BA' : '#6B7280',
                       fontFamily: '"JetBrains Mono", monospace', fontSize: '0.6rem' }}>
                       {angle}°
                     </Typography>
                   </Box>
                   <Slider size="small" value={angle} min={0} max={90} step={5}
                     onChange={(_, v) => setWindowStates((prev) => ({ ...prev, [w.id]: v as number }))}
-                    sx={{ color: isOpen ? '#10B981' : '#1A2E1F', py: 0.5,
+                    sx={{ color: isOpen ? '#0D98BA' : '#102A33', py: 0.5,
                       '& .MuiSlider-thumb': { width: 10, height: 10 },
-                      '& .MuiSlider-rail': { bgcolor: 'rgba(16,185,129,0.1)' } }} />
+                      '& .MuiSlider-rail': { bgcolor: 'rgba(13,152,186,0.1)' } }} />
                 </Box>
               )
             })}
@@ -788,15 +788,15 @@ export default function Visualization3DPage() {
 
           {internal && (
             <Box sx={{ mt: 'auto' }}>
-              <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace',
+              <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
                 Capteurs Internes
               </Typography>
               {[
-                { label: 'Temp.', value: `${internal.temperature?.toFixed(1)} °C`, color: '#10B981' },
-                { label: 'CO2',  value: `${internal.co2?.toFixed(0)} ppm`, color: '#34D399' },
+                { label: 'Temp.', value: `${internal.temperature?.toFixed(1)} °C`, color: '#0D98BA' },
+                { label: 'CO2',  value: `${internal.co2?.toFixed(0)} ppm`, color: '#88F4FF' },
                 { label: 'Hum.', value: `${internal.humidity?.toFixed(1)} %`, color: '#6EE7B7' },
-                { label: 'VPD',  value: `${internal.vpd?.toFixed(2)} kPa`, color: '#059669' },
+                { label: 'VPD',  value: `${internal.vpd?.toFixed(2)} kPa`, color: '#097782' },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                   <Typography variant="caption" sx={{ color: '#6B7280', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
@@ -812,15 +812,15 @@ export default function Visualization3DPage() {
 
           {external && (
             <Box>
-              <Typography variant="caption" sx={{ color: '#059669', fontFamily: '"JetBrains Mono", monospace',
+              <Typography variant="caption" sx={{ color: '#097782', fontFamily: '"JetBrains Mono", monospace',
                 fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
                 Station Ext.
               </Typography>
               {[
-                { label: 'Vent',        value: `${external.wind_speed?.toFixed(1)} m/s`, color: '#10B981' },
-                { label: 'Rayonnement', value: `${external.radiation?.toFixed(0)} W/m2`, color: '#34D399' },
+                { label: 'Vent',        value: `${external.wind_speed?.toFixed(1)} m/s`, color: '#0D98BA' },
+                { label: 'Rayonnement', value: `${external.radiation?.toFixed(0)} W/m2`, color: '#88F4FF' },
                 { label: 'Temp. ext.',  value: `${external.temperature?.toFixed(1)} °C`, color: '#6EE7B7' },
-                { label: 'Hum. ext.',   value: `${external.humidity?.toFixed(1)} %`,     color: '#059669' },
+                { label: 'Hum. ext.',   value: `${external.humidity?.toFixed(1)} %`,     color: '#097782' },
               ].map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                   <Typography variant="caption" sx={{ color: '#6B7280', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem' }}>
@@ -836,14 +836,14 @@ export default function Visualization3DPage() {
         </Paper>
 
         <Paper className="viz3d-canvas" sx={{
-          flex: 1, overflow: 'hidden', border: '1px solid rgba(16,185,129,0.2)',
+          flex: 1, overflow: 'hidden', border: '1px solid rgba(13,152,186,0.2)',
           position: 'relative', cursor: 'default',
         }}>
           <Canvas
             camera={{ position: [10, 7, 16], fov: 50, near: 0.1, far: 150 }}
             gl={{ antialias: true, preserveDrawingBuffer: false }}
             shadows
-            style={{ background: '#0F1F14', cursor: 'grab' }}
+            style={{ background: '#091E24', cursor: 'grab' }}
             onPointerDown={() => { const s = document.querySelector('canvas'); if (s) (s as HTMLElement).style.cursor = 'grabbing' }}
             onPointerUp={  () => { const s = document.querySelector('canvas'); if (s) (s as HTMLElement).style.cursor = 'grab' }}
           >
@@ -855,7 +855,7 @@ export default function Visualization3DPage() {
           {!anyOpen && (
             <Box sx={{
               position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)',
-              zIndex: 3, bgcolor: '#0F1F14',
+              zIndex: 3, bgcolor: '#091E24',
               border: '1px solid rgba(239,68,68,0.3)', borderRadius: 1.5, px: 2, py: 0.75, pointerEvents: 'none',
             }}>
               <Typography variant="caption" sx={{ color: '#EF4444', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.68rem' }}>
@@ -865,16 +865,16 @@ export default function Visualization3DPage() {
           )}
 
           <Box sx={{ position: 'absolute', bottom: 16, left: 16, zIndex: 2 }}>
-            <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace',
+            <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace',
               fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 0.8 }}>
               Temperature / Flux d'air
             </Typography>
             {[
-              { label: '< 10 C',   color: '#064E3B' },
+              { label: '< 10 C',   color: '#083C45' },
               { label: '10-15 C',  color: '#065F46' },
-              { label: '15-20 C',  color: '#059669' },
-              { label: '20-25 C',  color: '#10B981' },
-              { label: '25-30 C',  color: '#34D399' },
+              { label: '15-20 C',  color: '#097782' },
+              { label: '20-25 C',  color: '#0D98BA' },
+              { label: '25-30 C',  color: '#88F4FF' },
               { label: '30-35 C',  color: '#6EE7B7' },
               { label: '> 35 C',   color: '#A7F3D0' },
             ].map((item) => (
@@ -889,7 +889,7 @@ export default function Visualization3DPage() {
 
           {external && (
             <Box sx={{ position: 'absolute', bottom: 16, right: 16, zIndex: 2, textAlign: 'right' }}>
-              <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.72rem', fontWeight: 700, display: 'block' }}>
+              <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.72rem', fontWeight: 700, display: 'block' }}>
                 {external.wind_speed?.toFixed(1)} m/s
               </Typography>
               <Typography variant="caption" sx={{ color: '#6B7280', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.62rem', display: 'block' }}>

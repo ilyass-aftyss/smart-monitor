@@ -44,11 +44,11 @@ function AutoLogin({ children }: { children: React.ReactNode }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#0F1F14',
-        color: '#F0FDF4',
+        bgcolor: '#091E24',
+        color: '#C4F9FF',
         gap: 2
       }}>
-        <CircularProgress size={40} sx={{ color: '#10B981' }} />
+        <CircularProgress size={40} sx={{ color: '#0D98BA' }} />
         <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace' }}>
           Connexion automatique...
         </Typography>

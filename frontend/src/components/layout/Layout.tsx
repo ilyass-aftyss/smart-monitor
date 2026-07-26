@@ -38,7 +38,7 @@ export default function Layout() {
       minHeight: '100vh',
       width: '100%',
       position: 'relative',
-      background: dark ? '#0F1F14' : '#F8FAF9',
+      background: dark ? '#091E24' : '#F8FAF9',
       display: 'flex',
     }}>
       <Sidebar
@@ -65,8 +65,8 @@ export default function Layout() {
           display: { xs: 'flex', md: 'none' },
           alignItems: 'center',
           px: 2, py: 1.5,
-          borderBottom: '1px solid rgba(16,185,129,0.08)',
-          bgcolor: dark ? '#0F1F14' : '#FFFFFF',
+          borderBottom: '1px solid rgba(13,152,186,0.08)',
+          bgcolor: dark ? '#091E24' : '#FFFFFF',
           position: 'sticky',
           top: 0,
           zIndex: 1100,
@@ -74,7 +74,7 @@ export default function Layout() {
           <IconButton
             onClick={() => setMobileSidebarOpen(true)}
             size="small"
-            sx={{ color: '#6B7280', '&:hover': { color: '#10B981' } }}
+            sx={{ color: '#6B7280', '&:hover': { color: '#0D98BA' } }}
           >
             <Menu size={20} />
           </IconButton>
@@ -84,7 +84,7 @@ export default function Layout() {
           }}>
             <Box sx={{
               width: 28, height: 28, borderRadius: '8px',
-              bgcolor: '#10B981',
+              bgcolor: '#0D98BA',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,7 +95,7 @@ export default function Layout() {
               </svg>
             </Box>
             <Box>
-              <Box sx={{ fontWeight: 700, fontSize: '0.85rem', color: dark ? '#F0FDF4' : '#1A2E1A', lineHeight: 1.1 }}>
+              <Box sx={{ fontWeight: 700, fontSize: '0.85rem', color: dark ? '#C4F9FF' : '#0D3040', lineHeight: 1.1 }}>
                 Serre Fraisier
               </Box>
               <Box sx={{ fontSize: '0.57rem', color: '#6B7280', fontFamily: '"JetBrains Mono", monospace', lineHeight: 1 }}>

@@ -45,7 +45,7 @@ export default function NavTabs() {
     return () => clearInterval(t)
   }, [])
 
-  const primary  = '#10B981'
+  const primary  = '#0D98BA'
   const textSec  = '#6B7280'
 
   return (
@@ -53,10 +53,10 @@ export default function NavTabs() {
       sx={{
         display: 'flex',
         alignItems: 'center',
-        background: dark ? '#1A2E1F' : '#F0FDF4',
+        background: dark ? '#102A33' : '#C4F9FF',
         borderRadius: '12px',
         p: '4px',
-        border: `1px solid rgba(16,185,129,0.08)`,
+        border: `1px solid rgba(13,152,186,0.08)`,
         gap: '4px',
       }}
     >
@@ -89,7 +89,7 @@ export default function NavTabs() {
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 10,
-                  background: 'rgba(16,185,129,0.12)',
+                  background: 'rgba(13,152,186,0.12)',
                 }}
               />
             )}

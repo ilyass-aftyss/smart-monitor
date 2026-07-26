@@ -125,14 +125,14 @@ export default function AskIAPage() {
     }
   }
 
-  const surface = dark ? '#1A2E1F' : '#FFFFFF'
-  const border = 'rgba(16,185,129,0.1)'
-  const chatBg = dark ? '#0F1F14' : '#F8FAF9'
-  const userBubble = dark ? '#1A2E1F' : '#F0FDF4'
-  const assistantBubble = dark ? '#1A2E1F' : '#FFFFFF'
-  const textPrimary = dark ? '#F0FDF4' : '#1A2E1A'
+  const surface = dark ? '#102A33' : '#FFFFFF'
+  const border = 'rgba(13,152,186,0.1)'
+  const chatBg = dark ? '#091E24' : '#F8FAF9'
+  const userBubble = dark ? '#102A33' : '#C4F9FF'
+  const assistantBubble = dark ? '#102A33' : '#FFFFFF'
+  const textPrimary = dark ? '#C4F9FF' : '#0D3040'
   const textSecondary = '#6B7280'
-  const accent = '#10B981'
+  const accent = '#0D98BA'
 
   return (
     <Box sx={{ height: 'calc(100vh - 110px)', display: 'flex', gap: 1.5 }}>
@@ -159,7 +159,7 @@ export default function AskIAPage() {
             display: 'flex', alignItems: 'center', gap: 1,
             color: accent, fontWeight: 600, fontSize: '0.82rem',
             transition: 'all 0.15s',
-            '&:hover': { bgcolor: dark ? 'rgba(16,185,129,0.08)' : 'rgba(16,185,129,0.06)' },
+            '&:hover': { bgcolor: dark ? 'rgba(13,152,186,0.08)' : 'rgba(13,152,186,0.06)' },
           }}
         >
           <Box component="span" sx={{ fontSize: '1.1rem' }}>+</Box>
@@ -178,7 +178,7 @@ export default function AskIAPage() {
               onClick={() => setActiveSessionId(session.id)}
               sx={{
                 py: 1, px: 1.2, mb: 0.3, borderRadius: '8px', cursor: 'pointer',
-                bgcolor: activeSessionId === session.id ? 'rgba(16,185,129,0.1)' : 'transparent',
+                bgcolor: activeSessionId === session.id ? 'rgba(13,152,186,0.1)' : 'transparent',
                 display: 'flex', alignItems: 'center', gap: 1,
                 transition: 'all 0.15s',
                 '&:hover': { bgcolor: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)' },
@@ -282,7 +282,7 @@ export default function AskIAPage() {
         <Box sx={{ p: 2, borderTop: `1px solid ${border}`, bgcolor: surface }}>
           <Box sx={{
             display: 'flex', gap: 1, alignItems: 'flex-end',
-            bgcolor: dark ? '#0F1F14' : '#F8FAF9',
+            bgcolor: dark ? '#091E24' : '#F8FAF9',
             borderRadius: '12px', px: 1.5, py: 0.5,
             border: `1px solid ${border}`,
             transition: 'border-color 0.15s',
@@ -314,7 +314,7 @@ export default function AskIAPage() {
                 color: input.trim() ? '#fff' : textSecondary,
                 width: 34, height: 34, borderRadius: '8px',
                 transition: 'all 0.15s',
-                '&:hover': { bgcolor: input.trim() ? '#059669' : 'rgba(255,255,255,0.05)' },
+                '&:hover': { bgcolor: input.trim() ? '#097782' : 'rgba(255,255,255,0.05)' },
                 '&.Mui-disabled': { bgcolor: 'transparent', color: textSecondary, opacity: 0.3 },
               }}
             >

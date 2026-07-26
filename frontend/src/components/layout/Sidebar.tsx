@@ -92,13 +92,13 @@ function NavItemRow({
         borderRadius: 2,
         cursor: 'pointer',
         userSelect: 'none',
-        bgcolor: active ? 'rgba(16,185,129,0.1)' : 'transparent',
-        color: active ? '#10B981' : '#6B7280',
+        bgcolor: active ? 'rgba(13,152,186,0.1)' : 'transparent',
+        color: active ? '#0D98BA' : '#6B7280',
         transition: 'all 0.15s',
         position: 'relative',
         '&:hover': {
-          bgcolor: active ? 'rgba(16,185,129,0.14)' : 'rgba(16,185,129,0.06)',
-          color: active ? '#10B981' : '#F0FDF4',
+          bgcolor: active ? 'rgba(13,152,186,0.14)' : 'rgba(13,152,186,0.06)',
+          color: active ? '#0D98BA' : '#C4F9FF',
         },
       }}
     >
@@ -129,7 +129,7 @@ function NavItemRow({
         <Box sx={{
           position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
           width: 3, height: 20, borderRadius: '0 3px 3px 0',
-          bgcolor: '#10B981',
+          bgcolor: '#0D98BA',
         }} />
       )}
     </Box>
@@ -204,9 +204,9 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
   }, [location.pathname])
 
   const activePath = location.pathname
-  const bg     = dark ? '#0F1F14' : '#FFFFFF'
-  const border = '1px solid rgba(16,185,129,0.08)'
-  const textPri = dark ? '#F0FDF4' : '#1A2E1A'
+  const bg     = dark ? '#091E24' : '#FFFFFF'
+  const border = '1px solid rgba(13,152,186,0.08)'
+  const textPri = dark ? '#C4F9FF' : '#0D3040'
 
   const handleNavigate = (path: string) => {
     navigate(path)
@@ -237,11 +237,11 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
               content: '""',
               width: 3, height: 40,
               borderRadius: 2,
-              bgcolor: 'rgba(16,185,129,0.25)',
+              bgcolor: 'rgba(13,152,186,0.25)',
               transition: 'background 0.15s, height 0.15s',
             },
             '&:hover::before': {
-              bgcolor: '#10B981',
+              bgcolor: '#0D98BA',
               height: 60,
             },
           }}
@@ -262,7 +262,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
           >
             <Box sx={{
               width: 32, height: 32, borderRadius: '9px',
-              bgcolor: '#10B981',
+              bgcolor: '#0D98BA',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
               <GreenhouseSVG size={18} color="#ffffff" />
@@ -281,7 +281,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
           <Box onClick={() => handleNavigate('/dashboard')} sx={{ cursor: 'pointer' }}>
             <Box sx={{
               width: 32, height: 32, borderRadius: '9px',
-              bgcolor: '#10B981',
+              bgcolor: '#0D98BA',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <GreenhouseSVG size={18} color="#ffffff" />
@@ -294,7 +294,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
           sx={{
             color: '#6B7280',
             display: collapsed ? 'flex' : { xs: 'none', md: 'flex' },
-            '&:hover': { color: '#10B981', bgcolor: 'rgba(16,185,129,0.1)' },
+            '&:hover': { color: '#0D98BA', bgcolor: 'rgba(13,152,186,0.1)' },
           }}
         >
           {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
@@ -305,7 +305,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
       <Box sx={{
         mx: collapsed ? 0.75 : 1.5, my: 1.5, p: collapsed ? 1 : 1.8,
         borderRadius: 2, border, cursor: 'pointer',
-        bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(16,185,129,0.03)',
+        bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(13,152,186,0.03)',
       }}>
         <ClickAwayListener onClickAway={() => setUserOpen(false)}>
           <Box>
@@ -316,8 +316,8 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
               <Avatar sx={{
                 width: collapsed ? 28 : 34, height: collapsed ? 28 : 34,
                 fontSize: '0.7rem', fontWeight: 700,
-                bgcolor: 'rgba(16,185,129,0.15)', color: '#10B981',
-                border: '2px solid rgba(16,185,129,0.3)', flexShrink: 0,
+                bgcolor: 'rgba(13,152,186,0.15)', color: '#0D98BA',
+                border: '2px solid rgba(13,152,186,0.3)', flexShrink: 0,
               }}>
                 {username?.charAt(0).toUpperCase()}
               </Avatar>
@@ -360,8 +360,8 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
                         '&:hover': {
                           bgcolor: item.label === 'Deconnexion'
                             ? 'rgba(239,68,68,0.08)'
-                            : 'rgba(16,185,129,0.06)',
-                          color: item.label === 'Deconnexion' ? '#EF4444' : '#10B981',
+                            : 'rgba(13,152,186,0.06)',
+                          color: item.label === 'Deconnexion' ? '#EF4444' : '#0D98BA',
                         },
                       }}
                     >
@@ -381,7 +381,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mx: 2, mb: 1 }}>
           <Box sx={{
             width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-            bgcolor: isLive ? '#10B981' : '#F59E0B',
+            bgcolor: isLive ? '#0D98BA' : '#F59E0B',
             animation: isLive ? 'sidebarPulse 2s infinite' : 'none',
             '@keyframes sidebarPulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.4 } },
           }} />
@@ -428,7 +428,7 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
             gap: 1.5, px: collapsed ? 0 : 1.5, py: 1.2, borderRadius: 2,
             cursor: 'pointer', color: '#6B7280',
             transition: 'all 0.15s',
-            '&:hover': { bgcolor: 'rgba(16,185,129,0.06)', color: '#10B981' },
+            '&:hover': { bgcolor: 'rgba(13,152,186,0.06)', color: '#0D98BA' },
           }}
         >
           {dark ? (
@@ -450,8 +450,8 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
         {!collapsed && (
           <Box sx={{
             mx: 1.5, my: 1, p: 1.5, borderRadius: 2, textAlign: 'center',
-            bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(16,185,129,0.04)',
-            border: '1px dashed rgba(16,185,129,0.15)',
+            bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(13,152,186,0.04)',
+            border: '1px dashed rgba(13,152,186,0.15)',
           }}>
             <Typography sx={{ fontSize: '0.65rem', color: '#6B7280', mb: 0.5 }}>
               Smart Monitor v1.0

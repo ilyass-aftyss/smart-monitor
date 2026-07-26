@@ -38,9 +38,9 @@ function AvatarMenu() {
           onClick={(e) => { setOpen(!open) }}
           sx={{
             width: 28, height: 28, fontSize: '0.65rem', fontWeight: 700, cursor: 'pointer',
-            bgcolor: 'rgba(16,185,129,0.15)',
-            color: '#10B981',
-            border: '2px solid rgba(16,185,129,0.3)',
+            bgcolor: 'rgba(13,152,186,0.15)',
+            color: '#0D98BA',
+            border: '2px solid rgba(13,152,186,0.3)',
           }}
         >
           {username?.charAt(0).toUpperCase()}
@@ -56,13 +56,13 @@ function AvatarMenu() {
               style={{
                 position: 'absolute', top: 'calc(100% + 8px)', right: 0,
                 minWidth: 170, zIndex: 9999,
-                background: dark ? '#1A2E1F' : '#FFFFFF',
-                border: '1px solid rgba(16,185,129,0.15)',
+                background: dark ? '#102A33' : '#FFFFFF',
+                border: '1px solid rgba(13,152,186,0.15)',
                 borderRadius: 12, padding: '12px',
                 boxShadow: dark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 32px rgba(0,0,0,0.12)',
               }}
             >
-              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, mb: 0.3, color: dark ? '#F0FDF4' : '#1A2E1A' }}>
+              <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, mb: 0.3, color: dark ? '#C4F9FF' : '#0D3040' }}>
                 {username}
               </Typography>
               <Typography sx={{ fontSize: '0.68rem', opacity: 0.55, mb: 1.5, fontFamily: '"JetBrains Mono", monospace', color: '#6B7280' }}>
@@ -96,10 +96,10 @@ export default function NavBar() {
 
   const isLive = lastUpdate ? (Date.now() - lastUpdate.getTime()) < 90000 : false
 
-  const textPri  = dark ? '#F0FDF4' : '#1A2E1A'
+  const textPri  = dark ? '#C4F9FF' : '#0D3040'
   const textSec  = '#6B7280'
-  const navBg    = dark ? '#0F1F14' : '#FFFFFF'
-  const border   = 'rgba(16,185,129,0.1)'
+  const navBg    = dark ? '#091E24' : '#FFFFFF'
+  const border   = 'rgba(13,152,186,0.1)'
 
   return (
     <Box
@@ -120,7 +120,7 @@ export default function NavBar() {
         <Box sx={{
           width: 30, height: 30, borderRadius: '9px',
           flexShrink: 0,
-          bgcolor: '#10B981',
+          bgcolor: '#0D98BA',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <GreenhouseSVG size={17} color="#ffffff" />
@@ -145,7 +145,7 @@ export default function NavBar() {
         <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 0.7 }}>
           <Box sx={{
             width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
-            bgcolor: isLive ? '#10B981' : '#F59E0B',
+            bgcolor: isLive ? '#0D98BA' : '#F59E0B',
             animation: isLive ? 'navPulse 2s infinite' : 'none',
             '@keyframes navPulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.4 } },
           }} />
@@ -163,16 +163,16 @@ export default function NavBar() {
             display: 'flex', alignItems: 'center', gap: 0.6,
             px: 1.2, py: 0.5, borderRadius: '20px', cursor: 'pointer', userSelect: 'none',
             border: `1px solid ${border}`,
-            background: dark ? 'rgba(16,185,129,0.07)' : 'rgba(16,185,129,0.05)',
+            background: dark ? 'rgba(13,152,186,0.07)' : 'rgba(13,152,186,0.05)',
             transition: 'all 0.2s',
             '&:hover': {
-              borderColor: '#10B981',
-              background: dark ? 'rgba(16,185,129,0.14)' : 'rgba(16,185,129,0.1)',
+              borderColor: '#0D98BA',
+              background: dark ? 'rgba(13,152,186,0.14)' : 'rgba(13,152,186,0.1)',
             },
           }}
         >
           <Typography sx={{
-            fontSize: '0.7rem', fontWeight: 600, color: '#10B981',
+            fontSize: '0.7rem', fontWeight: 600, color: '#0D98BA',
             fontFamily: '"JetBrains Mono", monospace', whiteSpace: 'nowrap',
           }}>
             {dark ? '☀ Clair' : '◑ Sombre'}
@@ -182,14 +182,14 @@ export default function NavBar() {
         <Box sx={{
           px: 0.9, py: 0.3, borderRadius: '6px',
           bgcolor: role === 'admin'
-            ? 'rgba(16,185,129,0.1)'
-            : 'rgba(16,185,129,0.08)',
-          border: '1px solid rgba(16,185,129,0.25)',
+            ? 'rgba(13,152,186,0.1)'
+            : 'rgba(13,152,186,0.08)',
+          border: '1px solid rgba(13,152,186,0.25)',
           display: { xs: 'none', sm: 'flex' }, alignItems: 'center',
         }}>
           <Typography sx={{
             fontSize: '0.62rem', fontWeight: 700,
-            color: '#10B981',
+            color: '#0D98BA',
             fontFamily: '"JetBrains Mono", monospace',
           }}>
             {role === 'admin' ? 'Admin' : 'Viewer'}

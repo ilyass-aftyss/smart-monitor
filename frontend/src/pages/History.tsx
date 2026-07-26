@@ -6,22 +6,22 @@ import { useThemeMode } from '../context/ThemeContext'
 import type { InternalData, ExternalData } from '../types'
 
 const INTERNAL_METRICS = [
-  { key: 'temperature', label: 'Temperature',     unit: 'C',  color: '#10B981' },
-  { key: 'co2',         label: 'CO2',             unit: 'ppm', color: '#10B981' },
-  { key: 'humidity',    label: 'Humidite',         unit: '%',   color: '#10B981' },
-  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#10B981' },
-  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#059669' },
-  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#059669' },
-  { key: 'dew_point',   label: 'Pt. de Rosee',    unit: 'C',   color: '#059669' },
+  { key: 'temperature', label: 'Temperature',     unit: 'C',  color: '#0D98BA' },
+  { key: 'co2',         label: 'CO2',             unit: 'ppm', color: '#0D98BA' },
+  { key: 'humidity',    label: 'Humidite',         unit: '%',   color: '#0D98BA' },
+  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#0D98BA' },
+  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#097782' },
+  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#097782' },
+  { key: 'dew_point',   label: 'Pt. de Rosee',    unit: 'C',   color: '#097782' },
 ]
 
 const EXTERNAL_METRICS = [
-  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m2', color: '#10B981' },
-  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#10B981' },
-  { key: 'humidity' as keyof ExternalData,    label: 'Humidite Ext.',       unit: '%',    color: '#10B981' },
-  { key: 'temperature' as keyof ExternalData, label: 'Temp. Ext.',          unit: 'C',    color: '#10B981' },
-  { key: 'rain' as keyof ExternalData,        label: 'Precipitations',      unit: 'mm',   color: '#10B981' },
-  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#10B981' },
+  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m2', color: '#0D98BA' },
+  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#0D98BA' },
+  { key: 'humidity' as keyof ExternalData,    label: 'Humidite Ext.',       unit: '%',    color: '#0D98BA' },
+  { key: 'temperature' as keyof ExternalData, label: 'Temp. Ext.',          unit: 'C',    color: '#0D98BA' },
+  { key: 'rain' as keyof ExternalData,        label: 'Precipitations',      unit: 'mm',   color: '#0D98BA' },
+  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#0D98BA' },
 ]
 
 const OPTIMAL: Record<string, { low?: number; high?: number }> = {
@@ -64,11 +64,11 @@ function buildOption(
     tooltip: {
       trigger: 'axis',
       backgroundColor: tooltipBg,
-      borderColor: 'rgba(16,185,129,0.3)',
+      borderColor: 'rgba(13,152,186,0.3)',
       borderWidth: 1,
       padding: [8, 12],
       textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-      formatter: (p: any) => `<b style="color:#10B981;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
+      formatter: (p: any) => `<b style="color:#0D98BA;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
     },
     dataZoom: [
       { type: 'inside', start: zoomStart, end: zoomEnd },
@@ -90,8 +90,8 @@ function buildOption(
     series: [{
       type: 'line', data: vals, smooth: 0.3, symbol: 'none',
       lineStyle: { color, width: 2 },
-      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(16,185,129,0.2)' }, { offset:1, color:'rgba(16,185,129,0)' }] } },
-      markArea: opt ? { silent:true, itemStyle:{ color:'rgba(16,185,129,0.06)' }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
+      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' }, { offset:1, color:'rgba(13,152,186,0)' }] } },
+      markArea: opt ? { silent:true, itemStyle:{ color:'rgba(13,152,186,0.06)' }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
     }],
   }
 }
@@ -133,12 +133,12 @@ function ChartCard({
     <Paper sx={{ p: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
+          <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
             {title}
           </Typography>
           {optimal && (
             <Chip label={`optimal ${optimal.low} - ${optimal.high}`} size="small"
-              sx={{ height: 18, fontSize: '0.55rem', bgcolor: 'rgba(16,185,129,0.08)', color: '#6B7280',
+              sx={{ height: 18, fontSize: '0.55rem', bgcolor: 'rgba(13,152,186,0.08)', color: '#6B7280',
                 fontFamily: '"JetBrains Mono", monospace' }} />
           )}
         </Box>
@@ -162,10 +162,10 @@ function ChartCard({
           min={0} max={100} step={1}
           size="small"
           sx={{
-            color: '#10B981',
+            color: '#0D98BA',
             py: 0,
             '& .MuiSlider-thumb': { width: 12, height: 12 },
-            '& .MuiSlider-rail': { bgcolor: 'rgba(16,185,129,0.15)' },
+            '& .MuiSlider-rail': { bgcolor: 'rgba(13,152,186,0.15)' },
           }}
         />
       </Box>
@@ -180,8 +180,8 @@ export default function HistoryPage() {
   const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
   const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
   const labelColor = '#6B7280'
-  const tooltipBg  = dark ? '#1A2E1F' : '#FFFFFF'
-  const tooltipTxt = dark ? '#F0FDF4' : '#1A2E1A'
+  const tooltipBg  = dark ? '#102A33' : '#FFFFFF'
+  const tooltipTxt = dark ? '#C4F9FF' : '#0D3040'
 
   const [hours,      setHours]      = useState<number | null>(24)
   const [internalData, setInternal] = useState<InternalData[]>([])
@@ -232,9 +232,9 @@ export default function HistoryPage() {
 
   const dtFieldSx = {
     '& .MuiOutlinedInput-root': {
-      color: dark ? '#F0FDF4' : '#1A2E1A', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.78rem',
-      '& fieldset': { borderColor: 'rgba(16,185,129,0.2)' },
-      '&:hover fieldset': { borderColor: '#10B981' },
+      color: dark ? '#C4F9FF' : '#0D3040', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.78rem',
+      '& fieldset': { borderColor: 'rgba(13,152,186,0.2)' },
+      '&:hover fieldset': { borderColor: '#0D98BA' },
     },
     '& .MuiInputLabel-root': { color: textSec, fontSize: '0.78rem' },
     '& input::-webkit-calendar-picker-indicator': { filter: dark ? 'invert(0.6)' : 'none' },
@@ -253,8 +253,8 @@ export default function HistoryPage() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, alignItems: 'flex-end' }}>
           <ToggleButtonGroup value={customMode ? null : hours} exclusive size="small"
             onChange={(_, v) => { if (v !== null) { setCustomMode(false); setHours(v) } }}
-            sx={{ '& .MuiToggleButton-root': { color: textSec, borderColor: 'rgba(16,185,129,0.15)', fontFamily: '"JetBrains Mono", monospace', px: 1.8, fontSize: '0.78rem',
-              '&.Mui-selected': { bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981' } } }}>
+            sx={{ '& .MuiToggleButton-root': { color: textSec, borderColor: 'rgba(13,152,186,0.15)', fontFamily: '"JetBrains Mono", monospace', px: 1.8, fontSize: '0.78rem',
+              '&.Mui-selected': { bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA' } } }}>
             {TIME_RANGES.map((r) => <ToggleButton key={r.value} value={r.value}>{r.label}</ToggleButton>)}
             <ToggleButton value={-1} selected={customMode} onClick={() => { setCustomMode(true); setHours(null) }}
               sx={{ '&.Mui-selected': { bgcolor: 'rgba(245,158,11,0.1)', color: '#F59E0B !important' } }}>
@@ -279,7 +279,7 @@ export default function HistoryPage() {
       <Paper sx={{ p: 2.5, mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#10B981' }} />
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#0D98BA' }} />
             <Typography variant="subtitle2" fontWeight={700}>Historique Interieur</Typography>
           </Box>
           <Chip
@@ -288,11 +288,11 @@ export default function HistoryPage() {
             onClick={() => downloadCSV(internalData, INTERNAL_METRICS, `interieur_${hours ?? 'custom'}h.csv`)}
             sx={{
               height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981',
-              border: '1px solid rgba(16,185,129,0.25)',
+              bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA',
+              border: '1px solid rgba(13,152,186,0.25)',
               fontFamily: '"JetBrains Mono", monospace',
               transition: 'all 0.15s',
-              '&:hover': { bgcolor: 'rgba(16,185,129,0.2)', borderColor: '#10B981' },
+              '&:hover': { bgcolor: 'rgba(13,152,186,0.2)', borderColor: '#0D98BA' },
             }}
           />
         </Box>
@@ -310,8 +310,8 @@ export default function HistoryPage() {
                   onZoomChange={(r) => setZoom(zoomKey, r)}
                 >
                   {loading
-                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                    : <ReactECharts option={buildOption(internalData, m.key, '#10B981', m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
+                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                    : <ReactECharts option={buildOption(internalData, m.key, '#0D98BA', m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
                   }
                 </ChartCard>
               </Grid>
@@ -323,7 +323,7 @@ export default function HistoryPage() {
       <Paper sx={{ p: 2.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#059669' }} />
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#097782' }} />
             <Typography variant="subtitle2" fontWeight={700}>Historique Exterieur</Typography>
           </Box>
           <Chip
@@ -332,11 +332,11 @@ export default function HistoryPage() {
             onClick={() => downloadCSV(externalData, EXTERNAL_METRICS as any, `exterieur_${hours ?? 'custom'}h.csv`)}
             sx={{
               height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981',
-              border: '1px solid rgba(16,185,129,0.25)',
+              bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA',
+              border: '1px solid rgba(13,152,186,0.25)',
               fontFamily: '"JetBrains Mono", monospace',
               transition: 'all 0.15s',
-              '&:hover': { bgcolor: 'rgba(16,185,129,0.2)', borderColor: '#10B981' },
+              '&:hover': { bgcolor: 'rgba(13,152,186,0.2)', borderColor: '#0D98BA' },
             }}
           />
         </Box>
@@ -353,8 +353,8 @@ export default function HistoryPage() {
                   onZoomChange={(r) => setZoom(zoomKey, r)}
                 >
                   {loading
-                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                    : <ReactECharts option={buildOption(externalData, m.key as string, '#10B981', m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
+                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
+                    : <ReactECharts option={buildOption(externalData, m.key as string, '#0D98BA', m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
                   }
                 </ChartCard>
               </Grid>

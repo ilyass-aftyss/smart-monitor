@@ -22,7 +22,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const STATUS_CONFIG: Record<string, { bg: string; text: string }> = {
-  normal:   { bg: 'rgba(16,185,129,0.12)',  text: '#10B981' },
+  normal:   { bg: 'rgba(13,152,186,0.12)',  text: '#0D98BA' },
   warning:  { bg: 'rgba(245,158,11,0.12)',  text: '#F59E0B' },
   critical: { bg: 'rgba(239,68,68,0.12)',   text: '#EF4444' },
 }
@@ -35,7 +35,7 @@ export default function KpiCard({
   const dark = mode === 'dark'
 
   const statusCfg = STATUS_CONFIG[status]
-  const textPri = dark ? '#F0FDF4' : '#1A2E1A'
+  const textPri = dark ? '#C4F9FF' : '#0D3040'
   const textSec = '#6B7280'
 
   const progress = (min !== undefined && max !== undefined && current !== undefined)
@@ -54,8 +54,8 @@ export default function KpiCard({
     >
       <Box sx={{
         height: '100%',
-        background: dark ? '#1A2E1F' : '#FFFFFF',
-        border: `1px solid ${status === 'normal' ? 'rgba(16,185,129,0.15)' : `${statusCfg.text}40`}`,
+        background: dark ? '#102A33' : '#FFFFFF',
+        border: `1px solid ${status === 'normal' ? 'rgba(13,152,186,0.15)' : `${statusCfg.text}40`}`,
         borderRadius: '12px',
         p: 2.5,
         position: 'relative',
@@ -83,7 +83,7 @@ export default function KpiCard({
 
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mb: progress !== undefined ? 2 : 0 }}>
           <Typography sx={{
-            color: '#10B981',
+            color: '#0D98BA',
             fontFamily: '"JetBrains Mono", monospace',
             fontWeight: 700,
             fontSize: '2.5rem',
@@ -109,7 +109,7 @@ export default function KpiCard({
             }}>
               <Box sx={{
                 height: '100%', borderRadius: 3,
-                bgcolor: '#10B981',
+                bgcolor: '#0D98BA',
                 width: `${progress}%`,
                 transition: 'width 0.5s ease',
               }} />
@@ -132,7 +132,7 @@ export default function KpiCard({
           }}>
             <Typography sx={{
               fontSize: '0.6rem', fontFamily: '"JetBrains Mono", monospace',
-              color: status === 'normal' ? '#10B981' : textSec,
+              color: status === 'normal' ? '#0D98BA' : textSec,
             }}>
               optimal {optLow}–{optHigh} {unit}
             </Typography>

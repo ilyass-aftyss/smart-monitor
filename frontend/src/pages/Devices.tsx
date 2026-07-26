@@ -6,7 +6,7 @@ import { useThemeMode } from '../context/ThemeContext'
 import type { DeviceStatus } from '../types'
 
 const STATUS_CONFIG: Record<DeviceStatus, { color: string; label: string }> = {
-  ON:     { color: '#10B981', label: 'EN MARCHE' },
+  ON:     { color: '#0D98BA', label: 'EN MARCHE' },
   OFF:    { color: '#6B7280', label: 'ARRÊTÉ'    },
   Erreur: { color: '#EF4444', label: 'ERREUR'    },
 }
@@ -36,16 +36,16 @@ const WINDOWS: WindowData[] = [
 function WindowGraphic({ opening, dark }: { opening: 0 | 50 | 100; dark: boolean }) {
   const isOpen = opening > 0
   const glassOpacity = opening === 0 ? 0.15 : opening === 50 ? 0.35 : 0.6
-  const glassColor = `rgba(16,185,129,${glassOpacity})`
-  const frameColor = 'rgba(16,185,129,0.6)'
-  const handleColor = '#10B981'
+  const glassColor = `rgba(13,152,186,${glassOpacity})`
+  const frameColor = 'rgba(13,152,186,0.6)'
+  const handleColor = '#0D98BA'
   const sashLeft = opening === 0 ? '4px' : opening === 50 ? '35%' : 'calc(70% - 4px)'
 
   return (
     <Box sx={{
       width: '100%', height: 120, position: 'relative',
       border: `2px solid ${frameColor}`, borderRadius: 8,
-      background: dark ? '#0F1F14' : '#F0FDF4',
+      background: dark ? '#091E24' : '#C4F9FF',
       overflow: 'hidden', transition: 'all 0.3s ease',
     }}>
       <Box sx={{
@@ -83,7 +83,7 @@ function WindowGraphic({ opening, dark }: { opening: 0 | 50 | 100; dark: boolean
         position: 'absolute', bottom: 6, right: 6,
         px: 1.2, py: 0.3, borderRadius: 4, fontSize: '0.62rem',
         fontFamily: '"JetBrains Mono", monospace', fontWeight: 700,
-        background: isOpen ? 'rgba(16,185,129,0.12)' : 'transparent',
+        background: isOpen ? 'rgba(13,152,186,0.12)' : 'transparent',
         color: isOpen ? handleColor : '#6B7280',
         border: `1px solid ${isOpen ? handleColor : 'transparent'}`,
       }}>
@@ -96,9 +96,9 @@ function WindowGraphic({ opening, dark }: { opening: 0 | 50 | 100; dark: boolean
 function WindowCard({ window: win, onOpeningChange }: { window: WindowData; onOpeningChange: (id: string, opening: 0 | 50 | 100) => void }) {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
-  const textPri = dark ? '#F0FDF4' : '#1A2E1A'
+  const textPri = dark ? '#C4F9FF' : '#0D3040'
   const textSec = '#6B7280'
-  const positionColor = win.position === 'sud-haut' ? '#10B981' : '#059669'
+  const positionColor = win.position === 'sud-haut' ? '#0D98BA' : '#097782'
   const positionLabel = win.position === 'sud-haut' ? 'SUD - HAUT' : 'NORD - BAS'
 
   const handleOpeningClick = (newOpening: 0 | 50 | 100) => {
@@ -140,12 +140,12 @@ function WindowCard({ window: win, onOpeningChange }: { window: WindowData; onOp
                 px: 1, py: 0.3, fontSize: '0.62rem', fontWeight: 700,
                 fontFamily: '"JetBrains Mono", monospace', textTransform: 'none',
                 borderRadius: 6,
-                background: win.opening === val ? '#10B981' : undefined,
-                color: win.opening === val ? '#fff' : '#10B981',
-                borderColor: win.opening === val ? 'transparent' : 'rgba(16,185,129,0.4)',
+                background: win.opening === val ? '#0D98BA' : undefined,
+                color: win.opening === val ? '#fff' : '#0D98BA',
+                borderColor: win.opening === val ? 'transparent' : 'rgba(13,152,186,0.4)',
                 '&:hover': {
-                  borderColor: win.opening === val ? 'transparent' : '#10B981',
-                  background: win.opening === val ? '#059669' : 'rgba(16,185,129,0.08)',
+                  borderColor: win.opening === val ? 'transparent' : '#0D98BA',
+                  background: win.opening === val ? '#097782' : 'rgba(13,152,186,0.08)',
                 },
                 minWidth: 50,
               }}
@@ -158,10 +158,10 @@ function WindowCard({ window: win, onOpeningChange }: { window: WindowData; onOp
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 1 }}>
           <Box sx={{
             width: 8, height: 8, borderRadius: '50%',
-            bgcolor: win.opening > 0 ? '#10B981' : '#6B7280',
+            bgcolor: win.opening > 0 ? '#0D98BA' : '#6B7280',
           }} />
           <Typography sx={{ fontSize: '0.65rem', fontWeight: 600, fontFamily: '"JetBrains Mono", monospace',
-            color: win.opening > 0 ? '#10B981' : textSec }}>
+            color: win.opening > 0 ? '#0D98BA' : textSec }}>
             {win.opening > 0 ? 'OUVERT' : 'FERMÉ'}
           </Typography>
         </Box>
@@ -238,8 +238,8 @@ export default function DevicesPage() {
           ))}
           <Box sx={{
             px: 1.2, py: 0.4, borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: 0.5,
-            bgcolor: 'rgba(16,185,129,0.1)', color: '#10B981',
-            border: '1px solid rgba(16,185,129,0.3)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem',
+            bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA',
+            border: '1px solid rgba(13,152,186,0.3)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem',
           }}>
             Ouvert 100%: {fullyOpen}
           </Box>
@@ -264,14 +264,14 @@ export default function DevicesPage() {
         <Grid container spacing={2}>
           {Array.from({ length: 6 }).map((_, i) => (
             <Grid item xs={12} sm={6} md={4} key={i}>
-              <Skeleton variant="rounded" height={300} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)' }} />
+              <Skeleton variant="rounded" height={300} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
             </Grid>
           ))}
         </Grid>
       ) : (
         <>
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: '#10B981', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#10B981' }} />
+          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: '#0D98BA', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#0D98BA' }} />
             Sud - Haut (Côté Sud)
           </Typography>
           <Grid container spacing={2} sx={{ mb: 4 }}>
@@ -282,8 +282,8 @@ export default function DevicesPage() {
             ))}
           </Grid>
 
-          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: '#059669', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#059669' }} />
+          <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2, color: '#097782', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#097782' }} />
             Nord - Bas (Côté Nord)
           </Typography>
           <Grid container spacing={2}>

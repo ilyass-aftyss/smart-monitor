@@ -91,8 +91,8 @@ export default function MeteoPage() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
   const textSec    = '#6B7280'
-  const tooltipBg  = dark ? '#1A2E1F' : '#FFFFFF'
-  const tooltipTxt = dark ? '#F0FDF4' : '#1A2E1A'
+  const tooltipBg  = dark ? '#102A33' : '#FFFFFF'
+  const tooltipTxt = dark ? '#C4F9FF' : '#0D3040'
   const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
   const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
   const labelColor = '#6B7280'
@@ -214,9 +214,9 @@ export default function MeteoPage() {
       grid: { top: 20, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
-        backgroundColor: tooltipBg, borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, padding: [8, 12],
+        backgroundColor: tooltipBg, borderColor: 'rgba(13,152,186,0.3)', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:#10B981;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
+        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:#0D98BA;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
       },
       xAxis: {
         type: 'category', data: labels, boundaryGap: false,
@@ -237,8 +237,8 @@ export default function MeteoPage() {
         symbol: 'circle', symbolSize: 3,
         showSymbol: false,
         lineStyle: { color, width: 2 },
-        itemStyle: { color, borderColor: dark ? '#1A2E1F' : '#fff', borderWidth: 1 },
-        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(16,185,129,0.2)' },{ offset:1, color:'rgba(16,185,129,0)' }] } },
+        itemStyle: { color, borderColor: dark ? '#102A33' : '#fff', borderWidth: 1 },
+        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' },{ offset:1, color:'rgba(13,152,186,0)' }] } },
       }],
     }
   }
@@ -259,7 +259,7 @@ export default function MeteoPage() {
       grid: { top: 24, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
-        backgroundColor: tooltipBg, borderColor: 'rgba(16,185,129,0.3)', borderWidth: 1, padding: [8, 12],
+        backgroundColor: tooltipBg, borderColor: 'rgba(13,152,186,0.3)', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
         formatter: (p: any) => {
           let html = ''
@@ -287,15 +287,15 @@ export default function MeteoPage() {
         {
           name: 'Vent', type: 'line', data: speed, smooth: 0.3,
           symbol: 'none',
-          lineStyle: { color: '#10B981', width: 2 },
-          itemStyle: { color: '#10B981' },
-          areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(16,185,129,0.2)' },{ offset:1, color:'rgba(16,185,129,0)' }] } },
+          lineStyle: { color: '#0D98BA', width: 2 },
+          itemStyle: { color: '#0D98BA' },
+          areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' },{ offset:1, color:'rgba(13,152,186,0)' }] } },
         },
         {
           name: 'Rafales', type: 'line', data: gusts, smooth: 0.3,
           symbol: 'none',
-          lineStyle: { color: '#059669', width: 1.5, type: 'dashed' },
-          itemStyle: { color: '#059669' },
+          lineStyle: { color: '#097782', width: 1.5, type: 'dashed' },
+          itemStyle: { color: '#097782' },
         },
       ],
     }
@@ -317,9 +317,9 @@ export default function MeteoPage() {
             width: 12,
             color: [
               [0.3, '#F59E0B'],
-              [0.6, '#34D399'],
-              [0.8, '#10B981'],
-              [1, '#059669'],
+              [0.6, '#88F4FF'],
+              [0.8, '#0D98BA'],
+              [1, '#097782'],
             ],
           },
         },
@@ -337,7 +337,7 @@ export default function MeteoPage() {
           top: '32%',
           style: {
             text: `${v.toFixed(0)}%`,
-            fill: dark ? '#F0FDF4' : '#1A2E1A',
+            fill: dark ? '#C4F9FF' : '#0D3040',
             font: 'bold 28px "JetBrains Mono", monospace',
             textAlign: 'center',
           },
@@ -377,12 +377,12 @@ export default function MeteoPage() {
             <Chip
               label={`Dernière mise à jour : ${lastUpdate.toLocaleTimeString('fr-FR')}`}
               size="small"
-              sx={{ bgcolor: 'rgba(16,185,129,0.07)', color: textSec,
-                border: '1px solid rgba(16,185,129,0.15)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
+              sx={{ bgcolor: 'rgba(13,152,186,0.07)', color: textSec,
+                border: '1px solid rgba(13,152,186,0.15)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
             />
           )}
           <Tooltip title="Rafraîchir">
-            <IconButton onClick={fetchData} size="small" sx={{ color: textSec, '&:hover': { color: '#10B981' } }}>
+            <IconButton onClick={fetchData} size="small" sx={{ color: textSec, '&:hover': { color: '#0D98BA' } }}>
               <RefreshCw size={16} />
             </IconButton>
           </Tooltip>
@@ -400,30 +400,30 @@ export default function MeteoPage() {
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Thermometer size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Thermometer size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Température</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.temperature_2m.toFixed(1)}°C
                 </Typography>}
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Droplets size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Humidité</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.relative_humidity_2m.toFixed(0)}%
                 </Typography>}
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Wind size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Wind size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Vent</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.wind_speed_10m.toFixed(1)}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>km/h · {now ? degToCompass(now.wind_direction_10m) : '—'}</Typography>
@@ -431,29 +431,29 @@ export default function MeteoPage() {
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Cloud size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Cloud size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>État</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ fontSize: '1.6rem', lineHeight: 1.2 }}>{curWeather?.icon}</Typography>}
             {curWeather && <Typography sx={{ fontSize: '0.6rem', color: textSec, mt: 0.2 }}>{curWeather.label}</Typography>}
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Droplets size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Risque pluie</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {data?.hourly.precipitation_probability[0]?.toFixed(0) ?? '0'}%
                 </Typography>}
           </Paper>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
           <Paper sx={{ p: 1.5, textAlign: 'center' }}>
-            <Sun size={16} style={{ color: '#10B981', marginBottom: 4 }} />
+            <Sun size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Rayonnement</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {data?.hourly.shortwave_radiation[0]?.toFixed(0) ?? '0'}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>W/m²</Typography>
@@ -473,23 +473,23 @@ export default function MeteoPage() {
             <Grid item xs={12} md={6}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Thermometer size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Température (24h)
                   </Typography>
-                  <Chip label={`${now?.temperature_2m.toFixed(1)}°C actuel`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }} />
+                  <Chip label={`${now?.temperature_2m.toFixed(1)}°C actuel`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildLineChart('temperature_2m', '#10B981', '°C')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                <ReactECharts option={buildLineChart('temperature_2m', '#0D98BA', '°C')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
               </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Probabilité de pluie
                   </Typography>
-                  <Chip label="24h" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#059669', border: '1px solid rgba(5,150,105,0.2)' }} />
+                  <Chip label="24h" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildLineChart('precipitation_probability', '#059669', '%', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                <ReactECharts option={buildLineChart('precipitation_probability', '#097782', '%', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
               </Paper>
             </Grid>
           </Grid>
@@ -498,10 +498,10 @@ export default function MeteoPage() {
             <Grid item xs={12} md={6}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Wind size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Vent & Rafales
                   </Typography>
-                  <Chip label={`${now?.wind_speed_10m.toFixed(1)} km/h`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }} />
+                  <Chip label={`${now?.wind_speed_10m.toFixed(1)} km/h`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildWindChart()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
               </Paper>
@@ -509,12 +509,12 @@ export default function MeteoPage() {
             <Grid item xs={12} md={6}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Rayonnement Solaire
                   </Typography>
-                  <Chip label="W/m²" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#059669', border: '1px solid rgba(5,150,105,0.2)' }} />
+                  <Chip label="W/m²" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildLineChart('shortwave_radiation', '#059669', 'W/m²', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                <ReactECharts option={buildLineChart('shortwave_radiation', '#097782', 'W/m²', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
               </Paper>
             </Grid>
           </Grid>
@@ -522,7 +522,7 @@ export default function MeteoPage() {
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6} md={4}>
               <Paper sx={paperSx}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
                   <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Humidité
                 </Typography>
                 <ReactECharts option={buildHumidityGauge()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
@@ -531,35 +531,35 @@ export default function MeteoPage() {
             <Grid item xs={12} sm={6} md={4}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Cloud size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Couverture Nuageuse
                   </Typography>
-                  <Chip label={`${now?.cloud_cover.toFixed(0) ?? '—'}%`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#059669', border: '1px solid rgba(5,150,105,0.2)' }} />
+                  <Chip label={`${now?.cloud_cover.toFixed(0) ?? '—'}%`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildLineChart('cloud_cover', '#059669', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+                <ReactECharts option={buildLineChart('cloud_cover', '#097782', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
               </Paper>
             </Grid>
             <Grid item xs={12} md={4}>
               <Paper sx={paperSx}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#34D399', fontFamily: '"JetBrains Mono", monospace' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#88F4FF', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Gauge size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Pression Atm.
                   </Typography>
-                  <Chip label="hPa" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(52,211,153,0.1)', color: '#34D399', border: '1px solid rgba(52,211,153,0.2)' }} />
+                  <Chip label="hPa" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(52,211,153,0.1)', color: '#88F4FF', border: '1px solid rgba(52,211,153,0.2)' }} />
                 </Box>
                 <Box sx={{ textAlign: 'center', py: 1 }}>
-                  <Typography sx={{ color: '#34D399', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '2rem', lineHeight: 1 }}>
+                  <Typography sx={{ color: '#88F4FF', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '2rem', lineHeight: 1 }}>
                     {now?.pressure_msl.toFixed(1)}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: textSec, mb: 1 }}>hPa</Typography>
-                  <ReactECharts option={buildLineChart('pressure_msl', '#34D399', 'hPa')} style={{ height: 120 }} opts={{ renderer: 'canvas' }} />
+                  <ReactECharts option={buildLineChart('pressure_msl', '#88F4FF', 'hPa')} style={{ height: 120 }} opts={{ renderer: 'canvas' }} />
                 </Box>
               </Paper>
             </Grid>
           </Grid>
 
           <Paper sx={{ p: 2.5, mb: 2 }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', fontFamily: '"JetBrains Mono", monospace', mb: 2 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 2 }}>
               <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Prévisions 7 Jours
             </Typography>
             <Grid container spacing={1}>
@@ -574,18 +574,18 @@ export default function MeteoPage() {
                   <Grid item xs={6} sm={3} md={12/7} key={i} sx={{ minWidth: 0 }}>
                     <Paper sx={{
                       p: 1.5, textAlign: 'center',
-                      border: i === 0 ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(16,185,129,0.06)',
-                      bgcolor: i === 0 ? 'rgba(16,185,129,0.04)' : 'transparent',
+                      border: i === 0 ? '1px solid rgba(13,152,186,0.3)' : '1px solid rgba(13,152,186,0.06)',
+                      bgcolor: i === 0 ? 'rgba(13,152,186,0.04)' : 'transparent',
                     }}>
-                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: i === 0 ? '#10B981' : textSec, mb: 0.5 }}>
+                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: i === 0 ? '#0D98BA' : textSec, mb: 0.5 }}>
                         {i === 0 ? "Aujourd'hui" : formatDay(d)}
                       </Typography>
                       <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.2 }}>{wi.icon}</Typography>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: dark ? '#F0FDF4' : '#1A2E1A', fontFamily: '"JetBrains Mono", monospace', mt: 0.3 }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: dark ? '#C4F9FF' : '#0D3040', fontFamily: '"JetBrains Mono", monospace', mt: 0.3 }}>
                         {tMax?.toFixed(0) ?? '—'}° / {tMin?.toFixed(0) ?? '—'}°
                       </Typography>
                       {prec != null && prec > 0 && (
-                        <Typography sx={{ fontSize: '0.55rem', color: '#059669', fontFamily: '"JetBrains Mono", monospace', mt: 0.2 }}>
+                        <Typography sx={{ fontSize: '0.55rem', color: '#097782', fontFamily: '"JetBrains Mono", monospace', mt: 0.2 }}>
                           💧 {prec.toFixed(1)}mm
                         </Typography>
                       )}

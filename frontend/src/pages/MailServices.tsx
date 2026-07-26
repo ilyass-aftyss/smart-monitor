@@ -99,11 +99,11 @@ export default function MailServicesPage() {
     }, 1200)
   }
 
-  const surface = dark ? '#1A2E1F' : '#FFFFFF'
-  const border = 'rgba(16,185,129,0.1)'
-  const textPrimary = dark ? '#F0FDF4' : '#1A2E1A'
+  const surface = dark ? '#102A33' : '#FFFFFF'
+  const border = 'rgba(13,152,186,0.1)'
+  const textPrimary = dark ? '#C4F9FF' : '#0D3040'
   const textSecondary = '#6B7280'
-  const accent = '#10B981'
+  const accent = '#0D98BA'
   const danger = '#EF4444'
 
   return (
@@ -139,7 +139,7 @@ export default function MailServicesPage() {
             startIcon={saved ? <CheckCircleIcon fontSize="small" /> : <SaveIcon fontSize="small" />}
             sx={{
               bgcolor: accent, color: '#fff', fontSize: '0.72rem',
-              '&:hover': { bgcolor: '#059669' },
+              '&:hover': { bgcolor: '#097782' },
               transition: 'all 0.2s',
             }}
           >
@@ -178,7 +178,7 @@ export default function MailServicesPage() {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   fontSize: '0.75rem', borderRadius: '8px',
-                  bgcolor: dark ? '#0F1F14' : '#F8FAF9',
+                  bgcolor: dark ? '#091E24' : '#F8FAF9',
                   '& fieldset': { borderColor: border },
                   '&:hover fieldset': { borderColor: accent + '44' },
                   '&.Mui-focused fieldset': { borderColor: accent + '88' },
@@ -188,7 +188,7 @@ export default function MailServicesPage() {
             />
             <IconButton onClick={addEmail} sx={{
               bgcolor: accent, color: '#fff', borderRadius: '8px', width: 36, height: 36,
-              '&:hover': { bgcolor: '#059669' },
+              '&:hover': { bgcolor: '#097782' },
             }}>
               <AddIcon fontSize="small" />
             </IconButton>
@@ -203,7 +203,7 @@ export default function MailServicesPage() {
               <Paper key={entry.address} sx={{
                 px: 1.5, py: 1, borderRadius: '8px',
                 display: 'flex', alignItems: 'center', gap: 1,
-                bgcolor: dark ? '#0F1F14' : '#F8FAF9',
+                bgcolor: dark ? '#091E24' : '#F8FAF9',
                 border: `1px solid ${border}`,
               }}>
                 <Box sx={{
@@ -288,7 +288,7 @@ export default function MailServicesPage() {
                           '& .MuiOutlinedInput-root': {
                             fontSize: '0.75rem', borderRadius: '8px',
                             fontFamily: '"JetBrains Mono", monospace',
-                            bgcolor: dark ? '#0F1F14' : '#F8FAF9',
+                            bgcolor: dark ? '#091E24' : '#F8FAF9',
                             '& fieldset': { borderColor: border },
                             '&:hover fieldset': { borderColor: accent + '44' },
                             '&.Mui-focused fieldset': { borderColor: accent + '88' },
@@ -308,7 +308,7 @@ export default function MailServicesPage() {
                           '& .MuiOutlinedInput-root': {
                             fontSize: '0.75rem', borderRadius: '8px',
                             fontFamily: '"JetBrains Mono", monospace',
-                            bgcolor: dark ? '#0F1F14' : '#F8FAF9',
+                            bgcolor: dark ? '#091E24' : '#F8FAF9',
                             '& fieldset': { borderColor: border },
                             '&:hover fieldset': { borderColor: accent + '44' },
                             '&.Mui-focused fieldset': { borderColor: accent + '88' },
@@ -345,7 +345,7 @@ export default function MailServicesPage() {
               startIcon={saved ? <CheckCircleIcon /> : <SaveIcon />}
               sx={{
                 bgcolor: accent, color: '#fff', fontSize: '0.72rem', px: 2.5,
-                '&:hover': { bgcolor: '#059669' },
+                '&:hover': { bgcolor: '#097782' },
                 whiteSpace: 'nowrap',
               }}
             >

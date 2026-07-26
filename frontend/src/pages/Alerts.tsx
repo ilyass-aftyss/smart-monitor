@@ -35,7 +35,7 @@ function getTypeMeta(type: string) {
 export default function AlertsPage() {
   const { mode } = useThemeMode()
   const dark = mode === 'dark'
-  const textPri = dark ? '#F0FDF4' : '#1A2E1A'
+  const textPri = dark ? '#C4F9FF' : '#0D3040'
   const textSec = '#6B7280'
 
   const [alerts,   setAlerts]   = useState<Alert[]>([])
@@ -82,8 +82,8 @@ export default function AlertsPage() {
           control={
             <Switch checked={onlyUnack} onChange={(e) => setOnlyUnack(e.target.checked)}
               sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' },
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#0D98BA' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#0D98BA' },
               }} />
           }
           label={<Typography variant="body2" sx={{ color: textSec }}>Non acquittées seulement</Typography>}
@@ -91,7 +91,7 @@ export default function AlertsPage() {
       </Box>
 
       <Paper sx={{ p: 2, mb: 2.5 }}>
-        <Typography sx={{ fontSize: '0.67rem', color: '#10B981', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
+        <Typography sx={{ fontSize: '0.67rem', color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
           Seuils optimaux fraisier (microclimat froid)
         </Typography>
         <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
@@ -114,13 +114,13 @@ export default function AlertsPage() {
         {loading ? (
           <Box sx={{ p: 2 }}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} height={48} sx={{ bgcolor: dark ? 'rgba(16,185,129,0.04)' : 'rgba(0,0,0,0.04)', mb: 0.5 }} />
+              <Skeleton key={i} height={48} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)', mb: 0.5 }} />
             ))}
           </Box>
         ) : alerts.length === 0 ? (
           <Box sx={{ py: 8, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '2.5rem', mb: 1 }}>✅</Typography>
-            <Typography variant="h6" sx={{ color: '#10B981', mb: 0.5 }}>Aucune alerte active</Typography>
+            <Typography variant="h6" sx={{ color: '#0D98BA', mb: 0.5 }}>Aucune alerte active</Typography>
             <Typography variant="body2" sx={{ color: textSec }}>Tous les paramètres dans les normes agronomiques</Typography>
           </Box>
         ) : (
@@ -128,8 +128,8 @@ export default function AlertsPage() {
             <TableHead>
               <TableRow>
                 {['Type', 'Message', 'Sévérité', 'Valeur', 'Seuil', 'Horodatage', 'Statut', 'Action'].map((h) => (
-                  <TableCell key={h} sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#10B981',
-                    bgcolor: dark ? 'rgba(16,185,129,0.06)' : 'rgba(16,185,129,0.05)' }}>
+                  <TableCell key={h} sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#0D98BA',
+                    bgcolor: dark ? 'rgba(13,152,186,0.06)' : 'rgba(13,152,186,0.05)' }}>
                     {h}
                   </TableCell>
                 ))}
@@ -173,8 +173,8 @@ export default function AlertsPage() {
                     </TableCell>
                     <TableCell>
                       {alert.acknowledged ? (
-                        <Chip label="Acquitté" size="small" sx={{ bgcolor: 'rgba(16,185,129,0.08)', color: '#10B981',
-                          border: '1px solid rgba(16,185,129,0.25)', fontSize: '0.62rem', height: 20 }} />
+                        <Chip label="Acquitté" size="small" sx={{ bgcolor: 'rgba(13,152,186,0.08)', color: '#0D98BA',
+                          border: '1px solid rgba(13,152,186,0.25)', fontSize: '0.62rem', height: 20 }} />
                       ) : (
                         <Chip label="En attente" size="small" sx={{ bgcolor: 'rgba(245,158,11,0.08)', color: '#F59E0B',
                           border: '1px solid rgba(245,158,11,0.25)', fontSize: '0.62rem', height: 20 }} />
@@ -187,12 +187,12 @@ export default function AlertsPage() {
                           sx={{
                             display: 'inline-flex', alignItems: 'center', gap: 0.4,
                             px: 1, py: 0.3, borderRadius: '6px', cursor: 'pointer', userSelect: 'none',
-                            color: '#10B981', fontSize: '0.68rem', fontWeight: 600,
+                            color: '#0D98BA', fontSize: '0.68rem', fontWeight: 600,
                             fontFamily: '"JetBrains Mono", monospace',
-                            border: '1px solid rgba(16,185,129,0.25)',
-                            bgcolor: 'rgba(16,185,129,0.05)',
+                            border: '1px solid rgba(13,152,186,0.25)',
+                            bgcolor: 'rgba(13,152,186,0.05)',
                             transition: 'all 0.15s',
-                            '&:hover': { bgcolor: 'rgba(16,185,129,0.1)' },
+                            '&:hover': { bgcolor: 'rgba(13,152,186,0.1)' },
                           }}
                         >
                           ✓ Acquitter

@@ -22,17 +22,17 @@ function SourceBadge({ lastUpdate }: { lastUpdate: Date | null }) {
       <Box sx={{
         display: 'flex', alignItems: 'center', gap: 0.8,
         px: 1.4, py: 0.5, borderRadius: '20px',
-        bgcolor: isLive ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
-        border: `1px solid ${isLive ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
+        bgcolor: isLive ? 'rgba(13,152,186,0.08)' : 'rgba(245,158,11,0.08)',
+        border: `1px solid ${isLive ? 'rgba(13,152,186,0.25)' : 'rgba(245,158,11,0.25)'}`,
       }}>
         <Box sx={{
           width: 7, height: 7, borderRadius: '50%',
-          bgcolor: isLive ? '#10B981' : '#F59E0B',
+          bgcolor: isLive ? '#0D98BA' : '#F59E0B',
           animation: isLive ? 'pulse 2s infinite' : 'none',
           '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.5 } },
         }} />
         <Typography sx={{ fontSize: '0.68rem', fontWeight: 600, fontFamily: '"JetBrains Mono", monospace',
-          color: isLive ? '#10B981' : '#F59E0B' }}>
+          color: isLive ? '#0D98BA' : '#F59E0B' }}>
           {isLive ? 'Simulateur EN DIRECT' : 'En attente de données'}
         </Typography>
       </Box>

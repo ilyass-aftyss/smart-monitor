@@ -16,20 +16,20 @@ function buildTheme(mode: ColorMode): Theme {
   return createTheme({
     palette: {
       mode,
-      primary:    { main: '#10B981', light: '#34D399', dark: '#059669' },
-      secondary:  { main: '#10B981' },
+      primary:    { main: '#0D98BA', light: '#88F4FF', dark: '#097782' },
+      secondary:  { main: '#0DAABA' },
       error:      { main: '#EF4444' },
       warning:    { main: '#F59E0B' },
-      success:    { main: '#10B981' },
+      success:    { main: '#80EA9E' },
       background: {
-        default: dark ? '#0F1F14' : '#F8FAF9',
-        paper:   dark ? '#1A2E1F' : '#FFFFFF',
+        default: dark ? '#091E24' : '#F0F9FC',
+        paper:   dark ? '#102A33' : '#FFFFFF',
       },
       text: {
-        primary:   dark ? '#F0FDF4' : '#1A2E1A',
+        primary:   dark ? '#C4F9FF' : '#0D3040',
         secondary: '#6B7280',
       },
-      divider: 'rgba(16, 185, 129, 0.1)',
+      divider: 'rgba(13, 152, 186, 0.1)',
     },
     typography: {
       fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
@@ -44,16 +44,16 @@ function buildTheme(mode: ColorMode): Theme {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            backgroundColor: dark ? '#0F1F14' : '#F8FAF9',
-            color:           dark ? '#F0FDF4' : '#1A2E1A',
+            backgroundColor: dark ? '#091E24' : '#F0F9FC',
+            color:           dark ? '#C4F9FF' : '#0D3040',
             scrollbarColor:  dark
-              ? 'rgba(16,185,129,0.22) transparent'
-              : 'rgba(16,185,129,0.18) transparent',
+              ? 'rgba(13,152,186,0.22) transparent'
+              : 'rgba(13,152,186,0.18) transparent',
             '&::-webkit-scrollbar':       { width: 5 },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
             '&::-webkit-scrollbar-thumb': {
               borderRadius: 3,
-              background: dark ? 'rgba(16,185,129,0.22)' : 'rgba(16,185,129,0.18)',
+              background: dark ? 'rgba(13,152,186,0.22)' : 'rgba(13,152,186,0.18)',
             },
           },
         },
@@ -62,8 +62,8 @@ function buildTheme(mode: ColorMode): Theme {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: dark ? '#1A2E1F' : '#FFFFFF',
-            border: `1px solid rgba(16,185,129,0.1)`,
+            backgroundColor: dark ? '#102A33' : '#FFFFFF',
+            border: `1px solid rgba(13,152,186,0.1)`,
             boxShadow: dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
           },
         },
@@ -81,7 +81,7 @@ function buildTheme(mode: ColorMode): Theme {
       MuiTableCell: {
         styleOverrides: {
           root: {
-            borderBottom: `1px solid ${dark ? 'rgba(16,185,129,0.06)' : 'rgba(16,185,129,0.07)'}`,
+            borderBottom: `1px solid ${dark ? 'rgba(13,152,186,0.06)' : 'rgba(13,152,186,0.07)'}`,
           },
           head: {
             color: '#6B7280',
@@ -92,20 +92,20 @@ function buildTheme(mode: ColorMode): Theme {
       },
       MuiSwitch: {
         styleOverrides: {
-          switchBase: { '&.Mui-checked': { color: '#10B981' } },
-          track:      { '.Mui-checked.Mui-checked + &': { backgroundColor: '#10B981' } },
+          switchBase: { '&.Mui-checked': { color: '#0D98BA' } },
+          track:      { '.Mui-checked.Mui-checked + &': { backgroundColor: '#0D98BA' } },
         },
       },
       MuiToggleButton: {
         styleOverrides: {
           root: {
             color:       '#6B7280',
-            borderColor: 'rgba(16,185,129,0.15)',
+            borderColor: 'rgba(13,152,186,0.15)',
             '&.Mui-selected': {
-              backgroundColor: 'rgba(16,185,129,0.12)',
-              color: '#10B981',
+              backgroundColor: 'rgba(13,152,186,0.12)',
+              color: '#0D98BA',
               '&:hover': {
-                backgroundColor: 'rgba(16,185,129,0.18)',
+                backgroundColor: 'rgba(13,152,186,0.18)',
               },
             },
           },
@@ -121,7 +121,7 @@ function buildTheme(mode: ColorMode): Theme {
       MuiSkeleton: {
         styleOverrides: {
           root: {
-            backgroundColor: dark ? 'rgba(16,185,129,0.05)' : 'rgba(0,0,0,0.06)',
+            backgroundColor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.06)',
           },
         },
       },

@@ -28,10 +28,10 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
     <Box
       sx={{
         display: 'inline-flex',
-        background: dark ? '#1A2E1F' : '#F0FDF4',
+        background: dark ? '#102A33' : '#C4F9FF',
         borderRadius: '12px',
         p: '3px',
-        border: '1px solid rgba(16,185,129,0.08)',
+        border: '1px solid rgba(13,152,186,0.08)',
         gap: '2px',
       }}
     >
@@ -59,7 +59,7 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
                   position: 'absolute',
                   inset: 0,
                   borderRadius: 8,
-                  background: 'rgba(16,185,129,0.12)',
+                  background: 'rgba(13,152,186,0.12)',
                 }}
               />
             )}
@@ -69,7 +69,7 @@ export default function SubTabs({ tabs, active, onChange }: Props) {
                 zIndex: 1,
                 fontSize: '0.78rem',
                 fontWeight: isActive ? 600 : 400,
-                color: isActive ? '#10B981' : '#6B7280',
+                color: isActive ? '#0D98BA' : '#6B7280',
                 whiteSpace: 'nowrap',
                 transition: 'color 0.2s',
               }}

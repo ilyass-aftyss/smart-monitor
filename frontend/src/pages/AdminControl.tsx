@@ -32,12 +32,12 @@ interface AdminThemeConfig {
 }
 
 const DEFAULT_CONFIG: AdminThemeConfig = {
-  sidebarBg: '#0F1F14',
-  sidebarFg: '#F0FDF4',
-  sidebarPrimary: '#10B981',
-  primaryMain: '#10B981',
-  primaryLight: '#34D399',
-  primaryDark: '#059669',
+  sidebarBg: '#091E24',
+  sidebarFg: '#C4F9FF',
+  sidebarPrimary: '#0D98BA',
+  primaryMain: '#0D98BA',
+  primaryLight: '#88F4FF',
+  primaryDark: '#097782',
   borderRadius: 12,
   animationSpeed: 1,
   compactMode: false,
@@ -147,7 +147,7 @@ export default function AdminControlPanel() {
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant="h4" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Palette style={{ color: '#10B981' }} />
+            <Palette style={{ color: '#0D98BA' }} />
             Panneau d'Administration
           </Typography>
           <Typography variant="body2" sx={{ color: '#6B7280', mt: 0.5 }}>
@@ -159,7 +159,7 @@ export default function AdminControlPanel() {
             Réinitialiser
           </Button>
           <Button variant="contained" startIcon={saved ? <Eye /> : <Save />} onClick={saveConfig}
-            sx={{ textTransform: 'none', bgcolor: '#10B981', color: '#fff', '&:hover': { bgcolor: '#059669' } }}>
+            sx={{ textTransform: 'none', bgcolor: '#0D98BA', color: '#fff', '&:hover': { bgcolor: '#097782' } }}>
             {saved ? 'Sauvegardé !' : 'Sauvegarder'}
           </Button>
         </Box>
@@ -167,7 +167,7 @@ export default function AdminControlPanel() {
 
       <Paper sx={{ mb: 3, p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#10B981' }}>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#0D98BA' }}>
             Aperçu en temps réel
           </Typography>
           <Typography variant="body2" sx={{ color: '#6B7280', flex: 1 }}>
@@ -178,7 +178,7 @@ export default function AdminControlPanel() {
             icon={dark ? <EyeOff /> : <Eye />}
             size="small"
             onClick={toggleTheme}
-            sx={{ cursor: 'pointer', bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981' }}
+            sx={{ cursor: 'pointer', bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA' }}
           />
         </Box>
       </Paper>
@@ -190,14 +190,14 @@ export default function AdminControlPanel() {
           variant="scrollable"
           scrollButtons="auto"
           sx={{
-            '& .MuiTabs-indicator': { height: 3, background: '#10B981', borderRadius: '3px 3px 0 0' },
+            '& .MuiTabs-indicator': { height: 3, background: '#0D98BA', borderRadius: '3px 3px 0 0' },
           }}
         >
           {TABS.map((tab) => (
             <Tab key={tab.id} label={tab.label}
               icon={<tab.icon style={{ width: 18, height: 18 }} />}
               sx={{ minWidth: 140, textTransform: 'none', fontWeight: 600, fontSize: '0.8rem',
-                '&.Mui-selected': { color: '#10B981' } }} />
+                '&.Mui-selected': { color: '#0D98BA' } }} />
           ))}
         </Tabs>
       </Paper>
@@ -233,15 +233,15 @@ export default function AdminControlPanel() {
       {activeTab === 1 && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#10B981' }}>Réglages</Typography>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Réglages</Typography>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="subtitle2" fontWeight={600}>Rayon de bordure</Typography>
-                <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>{config.borderRadius}px</Typography>
+                <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>{config.borderRadius}px</Typography>
               </Box>
               <Slider value={config.borderRadius} min={0} max={24} step={1}
                 onChange={(_, v) => handleNumberChange('borderRadius', v as number)}
-                sx={{ color: '#10B981' }} valueLabelDisplay="auto" />
+                sx={{ color: '#0D98BA' }} valueLabelDisplay="auto" />
             </Box>
             <FormControlLabel
               control={<Switch checked={config.compactMode} onChange={(e) => handleBooleanChange('compactMode', e.target.checked)} size="small" />}
@@ -250,7 +250,7 @@ export default function AdminControlPanel() {
             />
           </Paper>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#10B981' }}>Animations</Typography>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Animations</Typography>
             <FormControlLabel
               control={<Switch checked={config.showAnimations} onChange={(e) => handleBooleanChange('showAnimations', e.target.checked)} size="small" />}
               label="Animations activées"
@@ -263,28 +263,28 @@ export default function AdminControlPanel() {
       {activeTab === 2 && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#10B981' }}>Dimensions</Typography>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Dimensions</Typography>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="subtitle2" fontWeight={600}>Largeur sidebar</Typography>
-                <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>{config.sidebarWidth}px</Typography>
+                <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>{config.sidebarWidth}px</Typography>
               </Box>
               <Slider value={config.sidebarWidth} min={200} max={400} step={16}
                 onChange={(_, v) => handleNumberChange('sidebarWidth', v as number)}
-                sx={{ color: '#10B981' }} valueLabelDisplay="auto" />
+                sx={{ color: '#0D98BA' }} valueLabelDisplay="auto" />
             </Box>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="subtitle2" fontWeight={600}>Hauteur header</Typography>
-                <Typography variant="caption" sx={{ color: '#10B981', fontFamily: '"JetBrains Mono", monospace' }}>{config.headerHeight}px</Typography>
+                <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>{config.headerHeight}px</Typography>
               </Box>
               <Slider value={config.headerHeight} min={48} max={80} step={4}
                 onChange={(_, v) => handleNumberChange('headerHeight', v as number)}
-                sx={{ color: '#10B981' }} valueLabelDisplay="auto" />
+                sx={{ color: '#0D98BA' }} valueLabelDisplay="auto" />
             </Box>
           </Paper>
           <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#10B981' }}>Aperçu</Typography>
+            <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Aperçu</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
               {[
                 { label: 'Largeur', value: `${config.sidebarWidth}px` },
@@ -296,7 +296,7 @@ export default function AdminControlPanel() {
                   <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant="body2" fontWeight={700} fontFamily='"JetBrains Mono", monospace' sx={{ color: '#10B981' }}>
+                  <Typography variant="body2" fontWeight={700} fontFamily='"JetBrains Mono", monospace' sx={{ color: '#0D98BA' }}>
                     {item.value}
                   </Typography>
                 </Paper>
