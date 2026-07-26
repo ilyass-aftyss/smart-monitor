@@ -90,7 +90,7 @@ export default function AlertsPage() {
         />
       </Box>
 
-      <Paper sx={{ p: 2, mb: 2.5 }}>
+      <div className="glass-card" style={{ padding: 16, marginBottom: 20 }}>
         <Typography sx={{ fontSize: '0.67rem', color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
           Seuils optimaux fraisier (microclimat froid)
         </Typography>
@@ -108,9 +108,9 @@ export default function AlertsPage() {
             </Box>
           ))}
         </Box>
-      </Paper>
+      </div>
 
-      <Paper sx={{ overflow: 'hidden' }}>
+      <div className="glass-card" style={{ overflow: 'hidden' }}>
         {loading ? (
           <Box sx={{ p: 2 }}>
             {Array.from({ length: 6 }).map((_, i) => (
@@ -205,7 +205,7 @@ export default function AlertsPage() {
             </TableBody>
           </Table>
         )}
-      </Paper>
+      </div>
     </Box>
   )
 }

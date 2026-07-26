@@ -136,9 +136,8 @@ export default function AskIAPage() {
 
   return (
     <Box sx={{ height: 'calc(100vh - 110px)', display: 'flex', gap: 1.5 }}>
-      <Paper sx={{
-        width: 260, flexShrink: 0, borderRadius: '12px',
-        bgcolor: surface, border: `1px solid ${border}`,
+      <div className="glass-card" style={{
+        width: 260, flexShrink: 0,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <Box sx={{ p: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -205,11 +204,10 @@ export default function AskIAPage() {
             </Box>
           ))}
         </Box>
-      </Paper>
+      </div>
 
-      <Paper sx={{
-        flex: 1, borderRadius: '12px',
-        bgcolor: surface, border: `1px solid ${border}`,
+      <div className="glass-card" style={{
+        flex: 1,
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
         <Box sx={{
@@ -329,7 +327,7 @@ export default function AskIAPage() {
             L'assistant IA peut faire des erreurs. Vérifiez les informations importantes.
           </Typography>
         </Box>
-      </Paper>
+      </div>
     </Box>
   )
 }

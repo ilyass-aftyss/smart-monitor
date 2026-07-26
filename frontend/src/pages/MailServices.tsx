@@ -149,10 +149,9 @@ export default function MailServicesPage() {
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1.5, flex: 1, overflow: 'hidden' }}>
-        <Paper sx={{
-          p: 2, width: 300, flexShrink: 0, height: '100%', borderRadius: '12px', overflow: 'hidden',
+        <div className="glass-card" style={{
+          padding: 16, width: 300, flexShrink: 0, height: '100%', overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
-          bgcolor: surface, border: `1px solid ${border}`,
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <EmailIcon sx={{ fontSize: '0.9rem', color: accent }} />
@@ -200,11 +199,9 @@ export default function MailServicesPage() {
                 Aucun destinataire
               </Typography>
             ) : emails.map((entry) => (
-              <Paper key={entry.address} sx={{
-                px: 1.5, py: 1, borderRadius: '8px',
-                display: 'flex', alignItems: 'center', gap: 1,
-                bgcolor: dark ? '#091E24' : '#F8FAF9',
-                border: `1px solid ${border}`,
+              <div className="glass-card" key={entry.address} style={{
+                padding: '8px 12px',
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <Box sx={{
                   width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
@@ -219,7 +216,7 @@ export default function MailServicesPage() {
                     <DeleteIcon sx={{ fontSize: '0.8rem' }} />
                   </IconButton>
                 </Tooltip>
-              </Paper>
+              </div>
             ))}
           </Box>
 
@@ -234,12 +231,11 @@ export default function MailServicesPage() {
               Les alertes sont envoyées à tous les destinataires lorsque les seuils sont dépassés.
             </Typography>
           </Box>
-        </Paper>
+        </div>
 
-        <Paper sx={{
-          p: 2, flex: 1, borderRadius: '12px', overflow: 'hidden',
+        <div className="glass-card" style={{
+          padding: 16, flex: 1, overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
-          bgcolor: surface, border: `1px solid ${border}`,
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <SettingsIcon sx={{ fontSize: '0.9rem', color: accent }} />
@@ -352,7 +348,7 @@ export default function MailServicesPage() {
               {saved ? 'Enregistré ✓' : 'Enregistrer la configuration'}
             </Button>
           </Box>
-        </Paper>
+        </div>
       </Box>
     </Box>
   )

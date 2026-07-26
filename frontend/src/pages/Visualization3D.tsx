@@ -731,11 +731,9 @@ export default function Visualization3DPage() {
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1.5, flex: 1, overflow: 'hidden' }}>
-        <Paper sx={{
-          width: 220, flexShrink: 0, p: 2,
-          border: '1px solid rgba(13,152,186,0.15)',
-          background: '#091E24',
-          display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto',
+        <div className="glass-card" style={{
+          width: 220, flexShrink: 0, padding: 16,
+          display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto',
         }}>
           <Box>
             <Typography variant="caption" sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace',
@@ -833,10 +831,10 @@ export default function Visualization3DPage() {
               ))}
             </Box>
           )}
-        </Paper>
+        </div>
 
-        <Paper className="viz3d-canvas" sx={{
-          flex: 1, overflow: 'hidden', border: '1px solid rgba(13,152,186,0.2)',
+        <div className="glass-card viz3d-canvas" style={{
+          flex: 1, overflow: 'hidden',
           position: 'relative', cursor: 'default',
         }}>
           <Canvas
@@ -908,7 +906,7 @@ export default function Visualization3DPage() {
               Rotation - Scroll: Zoom - Cliquer capteur: Donnees
             </Typography>
           </Box>
-        </Paper>
+        </div>
       </Box>
     </Box>
   )

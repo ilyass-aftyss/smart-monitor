@@ -204,7 +204,6 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
   }, [location.pathname])
 
   const activePath = location.pathname
-  const bg     = dark ? '#091E24' : '#FFFFFF'
   const border = '1px solid rgba(13,152,186,0.08)'
   const textPri = dark ? '#C4F9FF' : '#0D3040'
 
@@ -219,7 +218,10 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: bg,
+      bgcolor: dark ? 'rgba(9,30,36,0.75)' : 'rgba(255,255,255,0.7)',
+      backdropFilter: 'blur(20px) saturate(160%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+      borderRight: dark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
       position: 'relative',
     }}>
       {/* Resize handle */}

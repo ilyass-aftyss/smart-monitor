@@ -44,7 +44,9 @@ function buildTheme(mode: ColorMode): Theme {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            backgroundColor: dark ? '#091E24' : '#F0F9FC',
+            background: dark
+              ? 'linear-gradient(135deg, #061218 0%, #0A1E28 40%, #071A22 100%)'
+              : 'linear-gradient(135deg, #E8F4F8 0%, #F0F9FC 100%)',
             color:           dark ? '#C4F9FF' : '#0D3040',
             scrollbarColor:  dark
               ? 'rgba(13,152,186,0.22) transparent'
@@ -62,9 +64,11 @@ function buildTheme(mode: ColorMode): Theme {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
-            backgroundColor: dark ? '#102A33' : '#FFFFFF',
-            border: `1px solid rgba(13,152,186,0.1)`,
-            boxShadow: dark ? 'none' : '0 1px 3px rgba(0,0,0,0.08)',
+            backgroundColor: dark ? 'rgba(16, 42, 51, 0.55)' : 'rgba(255, 255, 255, 0.65)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: `1px solid ${dark ? 'rgba(13,152,186,0.12)' : 'rgba(13,152,186,0.08)'}`,
+            boxShadow: dark ? '0 8px 32px rgba(0,0,0,0.35)' : '0 8px 32px rgba(0,0,0,0.06)',
           },
         },
       },

@@ -390,36 +390,36 @@ export default function MeteoPage() {
       </Box>
 
       {error && (
-        <Paper sx={{ p: 2, mb: 2.5, border: '1px solid rgba(239,68,68,0.4)' }}>
+        <div className="glass-card" style={{ padding: 16, marginBottom: 20 }}>
           <Typography sx={{ color: '#EF4444', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 1 }}>
             <AlertTriangle size={16} /> {error}
           </Typography>
-        </Paper>
+        </div>
       )}
 
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Thermometer size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Température</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.temperature_2m.toFixed(1)}°C
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Humidité</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.relative_humidity_2m.toFixed(0)}%
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Wind size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Vent</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
@@ -427,29 +427,29 @@ export default function MeteoPage() {
                   {now?.wind_speed_10m.toFixed(1)}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>km/h · {now ? degToCompass(now.wind_direction_10m) : '—'}</Typography>
-          </Paper>
+          </div>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Cloud size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>État</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ fontSize: '1.6rem', lineHeight: 1.2 }}>{curWeather?.icon}</Typography>}
             {curWeather && <Typography sx={{ fontSize: '0.6rem', color: textSec, mt: 0.2 }}>{curWeather.label}</Typography>}
-          </Paper>
+          </div>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Risque pluie</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {data?.hourly.precipitation_probability[0]?.toFixed(0) ?? '0'}%
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center' }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
             <Sun size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
             <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Rayonnement</Typography>
             {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
@@ -457,7 +457,7 @@ export default function MeteoPage() {
                   {data?.hourly.shortwave_radiation[0]?.toFixed(0) ?? '0'}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>W/m²</Typography>
-          </Paper>
+          </div>
         </Grid>
       </Grid>
 
@@ -471,7 +471,7 @@ export default function MeteoPage() {
         <>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Thermometer size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Température (24h)
@@ -479,10 +479,10 @@ export default function MeteoPage() {
                   <Chip label={`${now?.temperature_2m.toFixed(1)}°C actuel`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildLineChart('temperature_2m', '#0D98BA', '°C')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Probabilité de pluie
@@ -490,13 +490,13 @@ export default function MeteoPage() {
                   <Chip label="24h" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildLineChart('precipitation_probability', '#097782', '%', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
           </Grid>
 
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Wind size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Vent & Rafales
@@ -504,10 +504,10 @@ export default function MeteoPage() {
                   <Chip label={`${now?.wind_speed_10m.toFixed(1)} km/h`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildWindChart()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Rayonnement Solaire
@@ -515,21 +515,21 @@ export default function MeteoPage() {
                   <Chip label="W/m²" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildLineChart('shortwave_radiation', '#097782', 'W/m²', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
           </Grid>
 
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6} md={4}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
                   <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Humidité
                 </Typography>
                 <ReactECharts option={buildHumidityGauge()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Cloud size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Couverture Nuageuse
@@ -537,10 +537,10 @@ export default function MeteoPage() {
                   <Chip label={`${now?.cloud_cover.toFixed(0) ?? '—'}%`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildLineChart('cloud_cover', '#097782', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Paper sx={paperSx}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#88F4FF', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Gauge size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Pression Atm.
@@ -554,11 +554,11 @@ export default function MeteoPage() {
                   <Typography sx={{ fontSize: '0.72rem', color: textSec, mb: 1 }}>hPa</Typography>
                   <ReactECharts option={buildLineChart('pressure_msl', '#88F4FF', 'hPa')} style={{ height: 120 }} opts={{ renderer: 'canvas' }} />
                 </Box>
-              </Paper>
+              </div>
             </Grid>
           </Grid>
 
-          <Paper sx={{ p: 2.5, mb: 2 }}>
+          <div className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
             <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 2 }}>
               <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Prévisions 7 Jours
             </Typography>
@@ -572,10 +572,8 @@ export default function MeteoPage() {
                 const wind = data.daily.wind_speed_10m_max[i]
                 return (
                   <Grid item xs={6} sm={3} md={12/7} key={i} sx={{ minWidth: 0 }}>
-                    <Paper sx={{
-                      p: 1.5, textAlign: 'center',
-                      border: i === 0 ? '1px solid rgba(13,152,186,0.3)' : '1px solid rgba(13,152,186,0.06)',
-                      bgcolor: i === 0 ? 'rgba(13,152,186,0.04)' : 'transparent',
+                    <div className="glass-card" style={{
+                      padding: 12, textAlign: 'center',
                     }}>
                       <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: i === 0 ? '#0D98BA' : textSec, mb: 0.5 }}>
                         {i === 0 ? "Aujourd'hui" : formatDay(d)}
@@ -594,12 +592,12 @@ export default function MeteoPage() {
                           🌬 {wind.toFixed(0)} km/h
                         </Typography>
                       )}
-                    </Paper>
+                    </div>
                   </Grid>
                 )
               })}
             </Grid>
-          </Paper>
+          </div>
 
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mt: 1, mb: 1 }}>
             <Typography sx={{ fontSize: '0.6rem', color: textSec, opacity: 0.6, fontFamily: '"JetBrains Mono", monospace' }}>

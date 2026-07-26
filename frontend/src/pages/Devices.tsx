@@ -111,7 +111,7 @@ function WindowCard({ window: win, onOpeningChange }: { window: WindowData; onOp
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Paper sx={{ p: 2, textAlign: 'center' }}>
+      <div className="glass-card" style={{ padding: 16, textAlign: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1.5 }}>
           <Box sx={{
             px: 0.8, py: 0.3, borderRadius: '6px',
@@ -169,7 +169,7 @@ function WindowCard({ window: win, onOpeningChange }: { window: WindowData; onOp
         <Typography sx={{ color: textSec, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.6rem', display: 'block' }}>
           MAJ: {new Date(win.lastUpdate).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
         </Typography>
-      </Paper>
+      </div>
     </motion.div>
   )
 }

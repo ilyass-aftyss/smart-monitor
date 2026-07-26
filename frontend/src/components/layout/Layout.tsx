@@ -4,6 +4,7 @@ import { Box, IconButton } from '@mui/material'
 import Sidebar, { SIDEBAR_DEFAULT } from './Sidebar'
 import { useThemeMode } from '../../context/ThemeContext'
 import { Menu } from 'lucide-react'
+import bg from '../../assets/greenhouse-bg.jpg'
 
 export default function Layout() {
   const { mode } = useThemeMode()
@@ -38,9 +39,25 @@ export default function Layout() {
       minHeight: '100vh',
       width: '100%',
       position: 'relative',
-      background: dark ? '#091E24' : '#F8FAF9',
       display: 'flex',
     }}>
+      {/* Background image */}
+      <Box sx={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: -10,
+        backgroundImage: `url(${bg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        opacity: dark ? 0.25 : 0.55,
+      }} />
+      <Box sx={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: -10,
+        background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.2), rgba(255,255,255,0.5))',
+      }} />
+
       <Sidebar
         collapsed={sidebarCollapsed}
         mobileOpen={mobileSidebarOpen}
@@ -65,8 +82,10 @@ export default function Layout() {
           display: { xs: 'flex', md: 'none' },
           alignItems: 'center',
           px: 2, py: 1.5,
-          borderBottom: '1px solid rgba(13,152,186,0.08)',
-          bgcolor: dark ? '#091E24' : '#FFFFFF',
+          borderBottom: '1px solid oklch(1 0 0 / 10%)',
+          background: dark ? 'oklch(0.15 0.04 265 / 80%)' : 'oklch(1 0 0 / 80%)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
           position: 'sticky',
           top: 0,
           zIndex: 1100,
@@ -111,7 +130,7 @@ export default function Layout() {
           pb: 5,
           px: { xs: 2, sm: 3, md: 4 },
           pt: { xs: 2, md: 3 },
-          maxWidth: 1600,
+          maxWidth: 1400,
           width: '100%',
           mx: 'auto',
         }}>

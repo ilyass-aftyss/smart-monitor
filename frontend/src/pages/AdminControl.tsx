@@ -165,7 +165,7 @@ export default function AdminControlPanel() {
         </Box>
       </Box>
 
-      <Paper sx={{ mb: 3, p: 2 }}>
+      <div className="glass-card" style={{ marginBottom: 24, padding: 16 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
           <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#0D98BA' }}>
             Aperçu en temps réel
@@ -181,9 +181,9 @@ export default function AdminControlPanel() {
             sx={{ cursor: 'pointer', bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA' }}
           />
         </Box>
-      </Paper>
+      </div>
 
-      <Paper sx={{ mb: 3, overflow: 'hidden' }}>
+      <div className="glass-card" style={{ marginBottom: 24, overflow: 'hidden' }}>
         <Tabs
           value={activeTab}
           onChange={(_, v) => setActiveTab(v)}
@@ -200,7 +200,7 @@ export default function AdminControlPanel() {
                 '&.Mui-selected': { color: '#0D98BA' } }} />
           ))}
         </Tabs>
-      </Paper>
+      </div>
 
       {activeTab === 0 && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
@@ -211,7 +211,7 @@ export default function AdminControlPanel() {
             { key: 'sidebarBg' as keyof AdminThemeConfig, label: 'Fond Sidebar', desc: 'Arrière-plan sidebar' },
             { key: 'sidebarFg' as keyof AdminThemeConfig, label: 'Texte Sidebar', desc: 'Texte sidebar' },
           ].map(({ key, label, desc }) => (
-            <Paper key={key} sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <div className="glass-card" key={key} style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                   <Typography variant="subtitle2" fontWeight={700}>{label}</Typography>
@@ -225,14 +225,14 @@ export default function AdminControlPanel() {
                 InputProps={{
                   startAdornment: <Box sx={{ width: 24, height: 24, borderRadius: 4, mr: 1, background: config[key] as string, border: '1px solid rgba(0,0,0,0.1)' }} />,
                 }} />
-            </Paper>
+            </div>
           ))}
         </Box>
       )}
 
       {activeTab === 1 && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="glass-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Réglages</Typography>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
@@ -248,21 +248,21 @@ export default function AdminControlPanel() {
               label="Mode compact"
               labelPlacement="end"
             />
-          </Paper>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          </div>
+          <div className="glass-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Animations</Typography>
             <FormControlLabel
               control={<Switch checked={config.showAnimations} onChange={(e) => handleBooleanChange('showAnimations', e.target.checked)} size="small" />}
               label="Animations activées"
               labelPlacement="end"
             />
-          </Paper>
+          </div>
         </Box>
       )}
 
       {activeTab === 2 && (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="glass-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Dimensions</Typography>
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
@@ -282,8 +282,8 @@ export default function AdminControlPanel() {
                 onChange={(_, v) => handleNumberChange('headerHeight', v as number)}
                 sx={{ color: '#0D98BA' }} valueLabelDisplay="auto" />
             </Box>
-          </Paper>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          </div>
+          <div className="glass-card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Typography variant="h6" fontWeight={700} sx={{ color: '#0D98BA' }}>Aperçu</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
               {[
@@ -292,17 +292,17 @@ export default function AdminControlPanel() {
                 { label: 'Rayon', value: `${config.borderRadius}px` },
                 { label: 'Mode Compact', value: config.compactMode ? 'Oui' : 'Non' },
               ].map((item, i) => (
-                <Paper key={i} sx={{ p: 1.5, textAlign: 'center' }}>
+                <div className="glass-card" key={i} style={{ padding: 12, textAlign: 'center' }}>
                   <Typography variant="caption" sx={{ color: '#6B7280', fontSize: '0.6rem', display: 'block', mb: 0.5 }}>
                     {item.label}
                   </Typography>
                   <Typography variant="body2" fontWeight={700} fontFamily='"JetBrains Mono", monospace' sx={{ color: '#0D98BA' }}>
                     {item.value}
                   </Typography>
-                </Paper>
+                </div>
               ))}
             </Box>
-          </Paper>
+          </div>
         </Box>
       )}
     </Box>
