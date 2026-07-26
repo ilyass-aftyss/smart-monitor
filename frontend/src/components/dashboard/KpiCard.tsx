@@ -24,7 +24,7 @@ export function KpiCard({
 }: KpiCardProps) {
   return (
     <div
-      className={`glass-card group relative flex flex-col justify-between overflow-hidden p-4 sm:p-5 ${className}`}
+      className={`glass-card group relative flex flex-col p-4 sm:p-5 ${className}`}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
@@ -38,15 +38,17 @@ export function KpiCard({
         </span>
       </div>
 
-      <div className="mt-4 flex items-baseline gap-1.5">
-        <span className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
-          {value}
-        </span>
-        {unit && (
-          <span className="text-sm font-medium text-muted-foreground">{unit}</span>
-        )}
+      <div className="flex flex-1 items-center justify-center py-1">
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+            {value}
+          </span>
+          {unit && (
+            <span className="text-sm font-medium text-muted-foreground">{unit}</span>
+          )}
+        </div>
       </div>
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-center text-xs text-muted-foreground">{hint}</p>}
       {children}
     </div>
   )

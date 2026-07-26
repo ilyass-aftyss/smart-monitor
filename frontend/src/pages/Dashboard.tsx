@@ -31,7 +31,7 @@ function StatusRing({ score, label }: { score: number; label: string }) {
   const c = 2 * Math.PI * radius
   const dash = (score / 100) * c
   return (
-    <div className="glass-card-strong flex flex-col items-center justify-center gap-1 p-4">
+    <div className="glass-card-strong flex min-h-[180px] flex-col items-center justify-center gap-1.5 p-4">
       <div className="relative">
         <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
           <circle cx="50" cy="50" r={radius} fill="none" stroke="oklch(0.9 0.02 145)" strokeWidth="8" />
@@ -89,7 +89,7 @@ export default function DashboardPage() {
       <section className="mb-8">
         <SectionTitle icon={<Leaf className="h-4 w-4" />} title="Climat intérieur" />
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '1.25rem' }}>
           <KpiCard
             icon={Thermometer}
             label="Température"
@@ -97,7 +97,7 @@ export default function DashboardPage() {
             unit="°C"
             accent="text-orange-500"
             hint={`Point de rosée ${internal.dew_point?.toFixed(1) ?? '—'} °C`}
-            className="col-span-2 row-span-2 min-h-[220px]"
+            className="col-span-2 row-span-2 min-h-[240px]"
           />
 
           <KpiCard
@@ -107,7 +107,7 @@ export default function DashboardPage() {
             unit="%"
             accent="text-sky-600"
             hint={`Vapeur ${internal.partial_vapor_pressure?.toFixed(2) ?? '—'} hPa`}
-            className="col-span-2 min-h-[150px]"
+            className="col-span-2 min-h-[160px]"
           />
 
           <StatusRing score={status} label={statusLabel} />
@@ -121,13 +121,14 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '1.25rem', marginTop: '1.5rem' }}>
           <KpiCard
             icon={Lightbulb}
             label="Illuminance"
             value={internal.illuminance?.toString() ?? '—'}
             unit="lux"
             accent="text-amber-500"
+            className="min-h-[120px]"
           />
           <KpiCard
             icon={Gauge}
@@ -135,6 +136,7 @@ export default function DashboardPage() {
             value={internal.pressure?.toFixed(1) ?? '—'}
             unit="hPa"
             accent="text-indigo-500"
+            className="min-h-[120px]"
           />
           <KpiCard
             icon={Droplets}
@@ -142,6 +144,7 @@ export default function DashboardPage() {
             value={internal.dew_point?.toFixed(1) ?? '—'}
             unit="°C"
             accent="text-cyan-600"
+            className="min-h-[120px]"
           />
           <KpiCard
             icon={Wind2}
@@ -149,6 +152,7 @@ export default function DashboardPage() {
             value={internal.partial_vapor_pressure?.toFixed(2) ?? '—'}
             unit="hPa"
             accent="text-teal-600"
+            className="min-h-[120px]"
           />
         </div>
       </section>
@@ -156,14 +160,14 @@ export default function DashboardPage() {
       <section>
         <SectionTitle icon={<Sun className="h-4 w-4" />} title="Conditions extérieures" />
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '1.25rem' }}>
           <KpiCard
             icon={Thermometer}
             label="Température ext."
             value={external.temperature?.toFixed(1) ?? '—'}
             unit="°C"
             accent="text-orange-500"
-            className="col-span-2 row-span-2 min-h-[220px]"
+            className="col-span-2 row-span-2 min-h-[240px]"
             hint={`Station · RSSI ${external.rssi ?? '—'} dBm`}
           />
           <KpiCard
@@ -172,7 +176,7 @@ export default function DashboardPage() {
             value={external.humidity?.toFixed(1) ?? '—'}
             unit="%"
             accent="text-sky-600"
-            className="col-span-2 min-h-[150px]"
+            className="col-span-2 min-h-[160px]"
           />
           <KpiCard
             icon={Wind}
@@ -180,6 +184,7 @@ export default function DashboardPage() {
             value={external.wind_speed?.toFixed(1) ?? '—'}
             unit={`km/h · ${external.wind_cardinal ?? '—'}`}
             accent="text-slate-600"
+            className="min-h-[120px]"
           />
           <KpiCard
             icon={CloudRain}
@@ -187,17 +192,18 @@ export default function DashboardPage() {
             value={external.rain?.toFixed(1) ?? '—'}
             unit="mm"
             accent="text-blue-600"
+            className="min-h-[120px]"
           />
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3" style={{ gap: '1.25rem', marginTop: '1.5rem' }}>
           <KpiCard
             icon={Sun}
             label="Irradiance solaire"
             value={external.radiation?.toFixed(1) ?? '—'}
             unit="W/m²"
             accent="text-yellow-500"
-            className="lg:col-span-2"
+            className="lg:col-span-2 min-h-[120px]"
           />
           <KpiCard
             icon={BatteryMedium}
@@ -205,6 +211,7 @@ export default function DashboardPage() {
             value={external.battery_v?.toFixed(3) ?? '—'}
             unit="V"
             accent="text-emerald-600"
+            className="min-h-[120px]"
           />
         </div>
       </section>

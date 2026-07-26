@@ -218,10 +218,10 @@ export default function Sidebar({ collapsed, mobileOpen, sidebarWidth, onToggleC
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: dark ? 'rgba(9,30,36,0.75)' : 'rgba(255,255,255,0.7)',
-      backdropFilter: 'blur(20px) saturate(160%)',
-      WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-      borderRight: dark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.06)',
+      bgcolor: 'var(--glass-bg-strong)',
+      backdropFilter: 'blur(var(--glass-blur)) saturate(160%)',
+      WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(160%)',
+      borderRight: '1px solid var(--glass-border)',
       position: 'relative',
     }}>
       {/* Resize handle */}
