@@ -1,367 +1,304 @@
-import { useState, useEffect } from 'react'
-import { Box, Typography, Paper, ToggleButton, ToggleButtonGroup, Grid, Skeleton, TextField, Button, Chip, Slider } from '@mui/material'
-import ReactECharts from 'echarts-for-react'
-import { internalApi, externalApi } from '../services/api'
-import { useThemeMode } from '../context/ThemeContext'
-import type { InternalData, ExternalData } from '../types'
+import { useMemo, useState, useEffect } from "react"
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
+import {
+  Thermometer,
+  Droplets,
+  Sparkles,
+  Sun,
+  Wind,
+  CloudRain,
+  Gauge,
+  Lightbulb,
+  Calendar,
+} from "lucide-react"
+import { internalApi, externalApi } from "../services/api"
+import { mockInternal, mockExternal, makeHistory } from "../lib/mockSensors"
+import type { InternalData, ExternalData } from "../types"
 
-const INTERNAL_METRICS = [
-  { key: 'temperature', label: 'Temperature',     unit: 'C',  color: '#0D98BA' },
-  { key: 'co2',         label: 'CO2',             unit: 'ppm', color: '#0D98BA' },
-  { key: 'humidity',    label: 'Humidite',         unit: '%',   color: '#0D98BA' },
-  { key: 'voc',         label: 'VOC',             unit: 'ppb', color: '#0D98BA' },
-  { key: 'vpd',         label: 'VPD',             unit: 'kPa', color: '#097782' },
-  { key: 'pressure',    label: 'Pression Atm.',   unit: 'hPa', color: '#097782' },
-  { key: 'dew_point',   label: 'Pt. de Rosee',    unit: 'C',   color: '#097782' },
-]
+const RANGES = ["24h", "7j", "30j"] as const
+type Range = (typeof RANGES)[number]
 
-const EXTERNAL_METRICS = [
-  { key: 'radiation' as keyof ExternalData,   label: 'Irradiance Solaire',  unit: 'W/m2', color: '#0D98BA' },
-  { key: 'wind_speed' as keyof ExternalData,  label: 'Vent',                unit: 'km/h', color: '#0D98BA' },
-  { key: 'humidity' as keyof ExternalData,    label: 'Humidite Ext.',       unit: '%',    color: '#0D98BA' },
-  { key: 'temperature' as keyof ExternalData, label: 'Temp. Ext.',          unit: 'C',    color: '#0D98BA' },
-  { key: 'rain' as keyof ExternalData,        label: 'Precipitations',      unit: 'mm',   color: '#0D98BA' },
-  { key: 'battery_v' as keyof ExternalData,   label: 'Batterie',            unit: 'V',    color: '#0D98BA' },
-]
-
-const OPTIMAL: Record<string, { low?: number; high?: number }> = {
-  temperature: { low: 18,  high: 23   },
-  humidity:    { low: 70,  high: 75   },
-  co2:         { low: 800, high: 1000 },
+interface SeriesPoint {
+  time: string
+  value: number
 }
 
-const TIME_RANGES = [
-  { value: 1,   label: '1h'  },
-  { value: 24,  label: '24h' },
-  { value: 168, label: '7j'  },
-  { value: 720, label: '30j' },
-]
-
-function pad(n: number) { return String(n).padStart(2, '0') }
-function toLocalDT(d: Date) {
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+function toPoint(data: any[], key: string): SeriesPoint[] {
+  if (!data || data.length === 0) return []
+  return data.map((d: any) => ({
+    time: new Date(d.timestamp).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+    value: parseFloat(((d[key] as number) || 0).toFixed(2)),
+  }))
 }
 
-function buildOption(
-  data: any[], metricKey: string, color: string, unit: string,
-  opt: { low?: number; high?: number } | undefined,
-  dark: boolean,
-  labelColor: string, axisColor: string, gridColor: string,
-  tooltipBg: string, tooltipTxt: string,
-  zoomStart: number, zoomEnd: number,
-) {
-  const ts   = data.map((d: any) => new Date(d.timestamp).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }))
-  const vals = data.map((d: any) => parseFloat(((d[metricKey] as number) || 0).toFixed(2)))
-  const allVals = vals.filter(Boolean) as number[]
-  const minV = allVals.length ? Math.min(...allVals) : 0
-  const maxV = allVals.length ? Math.max(...allVals) : 100
-  const pad  = (maxV - minV) * 0.12 || 1
-
-  return {
-    backgroundColor: 'transparent',
-    animation: true,
-    grid: { top: 20, right: 16, bottom: 28, left: 56 },
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: tooltipBg,
-      borderColor: 'rgba(13,152,186,0.3)',
-      borderWidth: 1,
-      padding: [8, 12],
-      textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-      formatter: (p: any) => `<b style="color:#0D98BA;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">${p[0].axisValue}</span>`,
-    },
-    dataZoom: [
-      { type: 'inside', start: zoomStart, end: zoomEnd },
-    ],
-    xAxis: {
-      type: 'category', data: ts, boundaryGap: false,
-      axisLine: { lineStyle: { color: axisColor } },
-      axisTick: { show: false },
-      axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace', rotate: 20, interval: Math.max(0, Math.floor(ts.length / 8) - 1) },
-      splitLine: { show: false },
-    },
-    yAxis: {
-      type: 'value',
-      min: minV - pad, max: maxV + pad,
-      axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { color: labelColor, fontSize: 9, fontFamily: '"JetBrains Mono", monospace' },
-      splitLine: { lineStyle: { color: gridColor, type: 'dashed' } },
-    },
-    series: [{
-      type: 'line', data: vals, smooth: 0.3, symbol: 'none',
-      lineStyle: { color, width: 2 },
-      areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' }, { offset:1, color:'rgba(13,152,186,0)' }] } },
-      markArea: opt ? { silent:true, itemStyle:{ color:'rgba(13,152,186,0.06)' }, data:[[{ yAxis: opt.low??0 },{ yAxis: opt.high??9999 }]] } : undefined,
-    }],
-  }
-}
-
-function downloadCSV(
-  data: any[],
-  metrics: { key: string; label: string }[],
-  filename: string,
-) {
-  if (data.length === 0) return
-  const header = ['timestamp', ...metrics.map((m) => `${m.label} (${m.key})`)]
-  const rows = data.map((d) => {
-    const ts = new Date(d.timestamp)
-    const dateStr = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,'0')}-${String(ts.getDate()).padStart(2,'0')} ${String(ts.getHours()).padStart(2,'0')}:${String(ts.getMinutes()).padStart(2,'0')}`
-    const values = metrics.map((m) => {
-      const v = (d as any)[m.key as string]
-      return v != null ? v.toFixed(2) : ''
-    })
-    return [dateStr, ...values].join(';')
-  })
-  const bom = '\uFEFF'
-  const csv = bom + header.join(';') + '\n' + rows.join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = filename
-  document.body.appendChild(a); a.click()
-  document.body.removeChild(a); URL.revokeObjectURL(url)
+interface ChartCardProps {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  value: string
+  accent: string
+  data: SeriesPoint[]
+  color: string
+  kind: "area" | "line" | "bar"
+  className?: string
 }
 
 function ChartCard({
-  title, unit, children, zoomRange, onZoomChange, metricKey, optimal,
-}: {
-  title: string; unit: string; children: React.ReactNode;
-  zoomRange: [number, number]; onZoomChange: (range: [number, number]) => void;
-  metricKey: string; optimal?: { low?: number; high?: number };
-}) {
+  icon: Icon,
+  label,
+  value,
+  accent,
+  data,
+  color,
+  kind,
+  className = "",
+}: ChartCardProps) {
   return (
-    <Paper sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
-            {title}
-          </Typography>
-          {optimal && (
-            <Chip label={`optimal ${optimal.low} - ${optimal.high}`} size="small"
-              sx={{ height: 18, fontSize: '0.55rem', bgcolor: 'rgba(13,152,186,0.08)', color: '#6B7280',
-                fontFamily: '"JetBrains Mono", monospace' }} />
+    <div className={`glass-card p-4 sm:p-5 ${className}`}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/70 ${accent}`}>
+            <Icon className="h-4 w-4" />
+          </span>
+          <span className="truncate text-sm font-medium text-foreground/80">{label}</span>
+        </div>
+        <span className="text-lg font-black tracking-tight text-foreground">{value}</span>
+      </div>
+
+      <div className="mt-3 h-40 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          {kind === "area" ? (
+            <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`g-${label}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.5} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="oklch(0.9 0.01 150 / 40%)" vertical={false} />
+              <XAxis dataKey="time" tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} width={40} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="value" stroke={color} strokeWidth={2} fill={`url(#g-${label})`} />
+            </AreaChart>
+          ) : kind === "line" ? (
+            <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <CartesianGrid stroke="oklch(0.9 0.01 150 / 40%)" vertical={false} />
+              <XAxis dataKey="time" tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} width={40} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Line type="monotone" dataKey="value" stroke={color} strokeWidth={2} dot={false} />
+            </LineChart>
+          ) : (
+            <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <CartesianGrid stroke="oklch(0.9 0.01 150 / 40%)" vertical={false} />
+              <XAxis dataKey="time" tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 10, fill: "oklch(0.5 0.02 150)" }} width={40} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
+            </BarChart>
           )}
-        </Box>
-        <Typography sx={{ fontSize: '0.65rem', color: '#6B7280', fontFamily: '"JetBrains Mono", monospace' }}>
-          {unit}
-        </Typography>
-      </Box>
-      {children}
-      <Box sx={{ mt: 1.5, px: 0.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-          <Typography sx={{ fontSize: '0.6rem', color: '#6B7280', fontFamily: '"JetBrains Mono", monospace' }}>
-            {zoomRange[0].toFixed(0)}%
-          </Typography>
-          <Typography sx={{ fontSize: '0.6rem', color: '#6B7280', fontFamily: '"JetBrains Mono", monospace' }}>
-            {zoomRange[1].toFixed(0)}%
-          </Typography>
-        </Box>
-        <Slider
-          value={zoomRange}
-          onChange={(_, v) => onZoomChange(v as [number, number])}
-          min={0} max={100} step={1}
-          size="small"
-          sx={{
-            color: '#0D98BA',
-            py: 0,
-            '& .MuiSlider-thumb': { width: 12, height: 12 },
-            '& .MuiSlider-rail': { bgcolor: 'rgba(13,152,186,0.15)' },
-          }}
-        />
-      </Box>
-    </Paper>
+        </ResponsiveContainer>
+      </div>
+    </div>
   )
 }
 
-export default function HistoryPage() {
-  const { mode } = useThemeMode()
-  const dark = mode === 'dark'
-  const textSec    = '#6B7280'
-  const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-  const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
-  const labelColor = '#6B7280'
-  const tooltipBg  = dark ? '#102A33' : '#FFFFFF'
-  const tooltipTxt = dark ? '#C4F9FF' : '#0D3040'
+const tooltipStyle = {
+  background: "oklch(1 0 0 / 90%)",
+  border: "1px solid oklch(1 0 0 / 60%)",
+  borderRadius: 12,
+  fontSize: 12,
+  boxShadow: "0 8px 24px oklch(0.2 0.03 150 / 12%)",
+  backdropFilter: "blur(12px)",
+} as const
 
-  const [hours,      setHours]      = useState<number | null>(24)
+function buildMockHistory(range: Range) {
+  const points = range === "24h" ? 24 : range === "7j" ? 24 : 30
+  const s = mockInternal
+  const e = mockExternal
+  return {
+    indoorTemp: makeHistory(s.temperature, 4, points),
+    indoorHum: makeHistory(s.humidity, 6, points),
+    co2: makeHistory(s.co2, 40, points),
+    lux: makeHistory(s.illuminance ?? 542, 120, points),
+    pressure: makeHistory(s.pressure, 3, points),
+    outdoorTemp: makeHistory(e.temperature, 5, points),
+    wind: makeHistory(e.wind_speed + 6, 4, points),
+    rain: makeHistory((e.rain ?? 0) + 1, 1.2, points),
+    irradiance: makeHistory(e.radiation, 120, points),
+  }
+}
+
+export default function HistoryPage() {
+  const [range, setRange] = useState<Range>("24h")
   const [internalData, setInternal] = useState<InternalData[]>([])
   const [externalData, setExternal] = useState<ExternalData[]>([])
-  const [loading,    setLoading]    = useState(true)
-  const [customMode, setCustomMode] = useState(false)
-  const now = new Date()
-  const [dateFrom, setDateFrom] = useState(toLocalDT(new Date(now.getTime() - 24*3600_000)))
-  const [dateTo,   setDateTo]   = useState(toLocalDT(now))
+  const [apiFailed, setApiFailed] = useState(false)
 
-  const [zooms, setZooms] = useState<Record<string, [number, number]>>({})
-
-  const getZoom = (key: string, fallback: [number, number] = [0, 100]): [number, number] => zooms[key] ?? fallback
-  const setZoom = (key: string, range: [number, number]) => setZooms((prev) => ({ ...prev, [key]: range }))
-
-  const fetchByHours = (h: number) => {
-    setLoading(true)
-    Promise.all([
-      internalApi.history(h, 2000),
-      externalApi.history(h, 2000),
-    ]).then(([i, e]) => {
-      setInternal(i.data)
-      setExternal(e.data)
-      setLoading(false)
-    }).catch(() => setLoading(false))
-  }
-
-  const fetchCustom = () => {
-    const from = new Date(dateFrom), to = new Date(dateTo)
-    if (isNaN(from.getTime()) || isNaN(to.getTime()) || from >= to) return
-    const diffH = Math.ceil((to.getTime() - from.getTime()) / 3_600_000)
-    setLoading(true)
-    Promise.all([
-      internalApi.history(diffH, 2000),
-      externalApi.history(diffH, 2000),
-    ]).then(([i, e]) => {
-      const fit = (d: InternalData) => { const ts = new Date(d.timestamp).getTime(); return ts >= from.getTime() && ts <= to.getTime() }
-      const fex = (d: ExternalData) => { const ts = new Date(d.timestamp).getTime(); return ts >= from.getTime() && ts <= to.getTime() }
-      setInternal(i.data.filter(fit))
-      setExternal(e.data.filter(fex))
-      setLoading(false)
-    }).catch(() => setLoading(false))
-  }
+  const hoursMap: Record<Range, number> = { "24h": 24, "7j": 168, "30j": 720 }
 
   useEffect(() => {
-    if (!customMode && hours !== null) fetchByHours(hours)
-  }, [hours, customMode])
+    setApiFailed(false)
+    const h = hoursMap[range]
+    Promise.all([
+      internalApi.history(h, 500),
+      externalApi.history(h, 500),
+    ]).then(([i, e]) => {
+      if (i.data?.length > 0 || e.data?.length > 0) {
+        setInternal(i.data)
+        setExternal(e.data)
+      } else {
+        setApiFailed(true)
+      }
+    }).catch(() => setApiFailed(true))
+  }, [range])
 
-  const dtFieldSx = {
-    '& .MuiOutlinedInput-root': {
-      color: dark ? '#C4F9FF' : '#0D3040', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.78rem',
-      '& fieldset': { borderColor: 'rgba(13,152,186,0.2)' },
-      '&:hover fieldset': { borderColor: '#0D98BA' },
-    },
-    '& .MuiInputLabel-root': { color: textSec, fontSize: '0.78rem' },
-    '& input::-webkit-calendar-picker-indicator': { filter: dark ? 'invert(0.6)' : 'none' },
-  }
+  const series = useMemo(() => {
+    if (apiFailed || internalData.length === 0) {
+      return buildMockHistory(range)
+    }
+    return {
+      indoorTemp: toPoint(internalData, "temperature"),
+      indoorHum: toPoint(internalData, "humidity"),
+      co2: toPoint(internalData, "co2"),
+      lux: toPoint(internalData, "illuminance_lux"),
+      pressure: toPoint(internalData, "pressure"),
+      outdoorTemp: toPoint(externalData, "temperature"),
+      wind: toPoint(externalData, "wind_speed"),
+      rain: toPoint(externalData, "rain"),
+      irradiance: toPoint(externalData, "radiation"),
+    }
+  }, [internalData, externalData, apiFailed, range])
+
+  const last = (arr: SeriesPoint[]) => arr?.[arr.length - 1]
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>Historique des Donnees</Typography>
-          <Typography variant="body2" sx={{ color: textSec, mt: 0.3 }}>
-            {internalData.length + externalData.length} mesures · zones colorees = plage optimale fraisier
-          </Typography>
-        </Box>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+            Historique
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Évolution des capteurs sur la période sélectionnée
+          </p>
+        </div>
+        <div className="glass-card flex items-center gap-1 p-1">
+          <span className="grid h-8 w-8 place-items-center text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+          </span>
+          {RANGES.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                range === r
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground/70 hover:bg-white/60"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, alignItems: 'flex-end' }}>
-          <ToggleButtonGroup value={customMode ? null : hours} exclusive size="small"
-            onChange={(_, v) => { if (v !== null) { setCustomMode(false); setHours(v) } }}
-            sx={{ '& .MuiToggleButton-root': { color: textSec, borderColor: 'rgba(13,152,186,0.15)', fontFamily: '"JetBrains Mono", monospace', px: 1.8, fontSize: '0.78rem',
-              '&.Mui-selected': { bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA' } } }}>
-            {TIME_RANGES.map((r) => <ToggleButton key={r.value} value={r.value}>{r.label}</ToggleButton>)}
-            <ToggleButton value={-1} selected={customMode} onClick={() => { setCustomMode(true); setHours(null) }}
-              sx={{ '&.Mui-selected': { bgcolor: 'rgba(245,158,11,0.1)', color: '#F59E0B !important' } }}>
-              Personnalisee
-            </ToggleButton>
-          </ToggleButtonGroup>
-
-          {customMode && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-              <TextField label="Du" type="datetime-local" size="small" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} InputLabelProps={{ shrink: true }} sx={dtFieldSx} />
-              <Typography sx={{ color: textSec, fontSize: '0.8rem' }}>→</Typography>
-              <TextField label="Au" type="datetime-local" size="small" value={dateTo} onChange={(e) => setDateTo(e.target.value)} InputLabelProps={{ shrink: true }} sx={dtFieldSx} />
-              <Button variant="outlined" size="small" onClick={fetchCustom}
-                sx={{ borderColor: 'rgba(245,158,11,0.4)', color: '#F59E0B', textTransform: 'none', '&:hover': { borderColor: '#F59E0B', bgcolor: 'rgba(245,158,11,0.06)' } }}>
-                Chercher
-              </Button>
-            </Box>
-          )}
-        </Box>
-      </Box>
-
-      <Paper sx={{ p: 2.5, mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#0D98BA' }} />
-            <Typography variant="subtitle2" fontWeight={700}>Historique Interieur</Typography>
-          </Box>
-          <Chip
-            label="CSV"
-            size="small"
-            onClick={() => downloadCSV(internalData, INTERNAL_METRICS, `interieur_${hours ?? 'custom'}h.csv`)}
-            sx={{
-              height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA',
-              border: '1px solid rgba(13,152,186,0.25)',
-              fontFamily: '"JetBrains Mono", monospace',
-              transition: 'all 0.15s',
-              '&:hover': { bgcolor: 'rgba(13,152,186,0.2)', borderColor: '#0D98BA' },
-            }}
-          />
-        </Box>
-        <Grid container spacing={2}>
-          {INTERNAL_METRICS.map((m) => {
-            const opt = OPTIMAL[m.key]
-            const zoomKey = `int-${m.key}`
-            const zoomRange = getZoom(zoomKey, [0, 100])
-            return (
-              <Grid item xs={12} md={6} key={m.key}>
-                <ChartCard
-                  title={m.label} unit={m.unit}
-                  metricKey={m.key} optimal={opt}
-                  zoomRange={zoomRange}
-                  onZoomChange={(r) => setZoom(zoomKey, r)}
-                >
-                  {loading
-                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                    : <ReactECharts option={buildOption(internalData, m.key, '#0D98BA', m.unit, opt, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
-                  }
-                </ChartCard>
-              </Grid>
-            )
-          })}
-        </Grid>
-      </Paper>
-
-      <Paper sx={{ p: 2.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#097782' }} />
-            <Typography variant="subtitle2" fontWeight={700}>Historique Exterieur</Typography>
-          </Box>
-          <Chip
-            label="CSV"
-            size="small"
-            onClick={() => downloadCSV(externalData, EXTERNAL_METRICS as any, `exterieur_${hours ?? 'custom'}h.csv`)}
-            sx={{
-              height: 22, fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer',
-              bgcolor: 'rgba(13,152,186,0.12)', color: '#0D98BA',
-              border: '1px solid rgba(13,152,186,0.25)',
-              fontFamily: '"JetBrains Mono", monospace',
-              transition: 'all 0.15s',
-              '&:hover': { bgcolor: 'rgba(13,152,186,0.2)', borderColor: '#0D98BA' },
-            }}
-          />
-        </Box>
-        <Grid container spacing={2}>
-          {EXTERNAL_METRICS.map((m) => {
-            const zoomKey = `ext-${m.key as string}`
-            const zoomRange = getZoom(zoomKey, [0, 100])
-            return (
-              <Grid item xs={12} md={6} key={m.key as string}>
-                <ChartCard
-                  title={m.label} unit={m.unit}
-                  metricKey={m.key as string}
-                  zoomRange={zoomRange}
-                  onZoomChange={(r) => setZoom(zoomKey, r)}
-                >
-                  {loading
-                    ? <Skeleton variant="rounded" height={200} sx={{ bgcolor: dark ? 'rgba(13,152,186,0.04)' : 'rgba(0,0,0,0.04)' }} />
-                    : <ReactECharts option={buildOption(externalData, m.key as string, '#0D98BA', m.unit, undefined, dark, labelColor, axisColor, gridColor, tooltipBg, tooltipTxt, zoomRange[0], zoomRange[1])} style={{ height: 200 }} opts={{ renderer: 'canvas' }} />
-                  }
-                </ChartCard>
-              </Grid>
-            )
-          })}
-        </Grid>
-      </Paper>
-    </Box>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ChartCard
+          icon={Thermometer}
+          label="Température intérieure"
+          value={`${last(series.indoorTemp)?.value.toFixed(1) ?? '—'} °C`}
+          accent="text-orange-500"
+          data={series.indoorTemp}
+          color="var(--chart-4)"
+          kind="area"
+        />
+        <ChartCard
+          icon={Droplets}
+          label="Humidité intérieure"
+          value={`${last(series.indoorHum)?.value.toFixed(1) ?? '—'} %`}
+          accent="text-sky-600"
+          data={series.indoorHum}
+          color="var(--chart-2)"
+          kind="area"
+        />
+        <ChartCard
+          icon={Sparkles}
+          label="CO₂"
+          value={`${Math.round(last(series.co2)?.value ?? 0)} ppm`}
+          accent="text-emerald-600"
+          data={series.co2}
+          color="var(--chart-1)"
+          kind="bar"
+        />
+        <ChartCard
+          icon={Lightbulb}
+          label="Illuminance"
+          value={`${Math.round(last(series.lux)?.value ?? 0)} lux`}
+          accent="text-amber-500"
+          data={series.lux}
+          color="var(--chart-3)"
+          kind="area"
+        />
+        <ChartCard
+          icon={Thermometer}
+          label="Température extérieure"
+          value={`${last(series.outdoorTemp)?.value.toFixed(1) ?? '—'} °C`}
+          accent="text-orange-500"
+          data={series.outdoorTemp}
+          color="var(--chart-4)"
+          kind="line"
+        />
+        <ChartCard
+          icon={Sun}
+          label="Irradiance solaire"
+          value={`${Math.round(last(series.irradiance)?.value ?? 0)} W/m²`}
+          accent="text-yellow-500"
+          data={series.irradiance}
+          color="var(--chart-3)"
+          kind="area"
+        />
+        <ChartCard
+          icon={Wind}
+          label="Vent"
+          value={`${last(series.wind)?.value.toFixed(1) ?? '—'} km/h`}
+          accent="text-slate-600"
+          data={series.wind}
+          color="var(--chart-5)"
+          kind="line"
+        />
+        <ChartCard
+          icon={CloudRain}
+          label="Pluie"
+          value={`${last(series.rain)?.value.toFixed(1) ?? '—'} mm`}
+          accent="text-blue-600"
+          data={series.rain}
+          color="var(--chart-2)"
+          kind="bar"
+        />
+        <ChartCard
+          icon={Gauge}
+          label="Pression atmosphérique"
+          value={`${last(series.pressure)?.value.toFixed(1) ?? '—'} hPa`}
+          accent="text-indigo-500"
+          data={series.pressure}
+          color="var(--chart-5)"
+          kind="line"
+          className="lg:col-span-2"
+        />
+      </div>
+    </div>
   )
 }
