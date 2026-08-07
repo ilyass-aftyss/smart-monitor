@@ -49,6 +49,17 @@ export const externalApi = {
   history: (hours = 24, limit = 200) => api.get(`/api/external/history?hours=${hours}&limit=${limit}`),
 }
 
+export const historyApi = {
+  exportCsv: () => api.get('/api/csv/export', { responseType: 'blob' }),
+}
+
+export const telemetryApi = {
+  /** Données brutes temps réel depuis la station (proxy backend → ngrok → station) */
+  raw:    () => api.get('/api/telemetry/raw'),
+  /** Statut de la connexion HTTP au serveur distant */
+  status: () => api.get('/api/telemetry/status'),
+}
+
 export const devicesApi = {
   list:         () => api.get('/api/devices/'),
   updateStatus: (id: string, status: string) => api.patch(`/api/devices/${id}/status`, { status }),
