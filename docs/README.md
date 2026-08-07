@@ -9,9 +9,9 @@ Plateforme industrielle de surveillance environnementale avec visualisation 3D i
 | Logiciel | Version minimale | Téléchargement |
 |----------|-----------------|----------------|
 | **Docker Desktop** | 24+ | https://www.docker.com/products/docker-desktop |
-| **Node.js** | 18+ | https://nodejs.org (LTS recommandé) |
+| **Node.js** | Non requis | Le frontend est construit et servi par Docker |
 
-> Le frontend tourne en **natif sur Windows** (pas dans Docker), ce qui évite les problèmes réseau lors du `npm install`.
+> Le frontend, le backend et PostgreSQL tournent tous dans Docker. Node.js n'est pas nécessaire sur le PC local.
 
 ---
 
@@ -24,24 +24,13 @@ REM Double-cliquez sur start.bat  OU  exécutez dans PowerShell :
 .\start.bat
 ```
 
-Le script :
-1. Lance PostgreSQL + Backend via Docker
-2. Attend que l'API soit prête
-3. Installe les dépendances npm (première fois uniquement)
-4. Lance le frontend Vite
+Le script lance PostgreSQL, le backend FastAPI et le frontend Nginx via Docker.
 
 ### Option B — Démarrage manuel
 
-**Terminal 1 (PowerShell / CMD) — Docker :**
+**PowerShell / CMD :**
 ```bat
 docker-compose up -d --build
-```
-
-**Terminal 2 — Frontend :**
-```bat
-cd frontend
-npm install
-npm run dev
 ```
 
 ### Arrêt
@@ -56,7 +45,7 @@ REM puis Ctrl+C dans la fenêtre du frontend
 
 | URL | Service |
 |-----|---------|
-| **http://localhost:5173** | Interface web (frontend) |
+| **http://localhost:3000** | Interface web (frontend Docker) |
 | http://localhost:8000/docs | API Swagger (backend) |
 | localhost:5432 | PostgreSQL |
 
