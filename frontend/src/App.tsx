@@ -14,7 +14,6 @@ import MeteoPage from './pages/Meteo'
 import Visualization3DPage from './pages/Visualization3D'
 import AdminControlPage from './pages/AdminControl'
 import MailServicesPage from './pages/MailServices'
-import CustomCursor from './components/common/CustomCursor'
 
 function AutoLogin({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, login } = useAuthStore()
@@ -45,11 +44,11 @@ function AutoLogin({ children }: { children: React.ReactNode }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#060d1e',
-        color: '#e2ecf8',
+        bgcolor: '#091E24',
+        color: '#C4F9FF',
         gap: 2
       }}>
-        <CircularProgress size={40} sx={{ color: '#00aaff' }} />
+        <CircularProgress size={40} sx={{ color: '#0D98BA' }} />
         <Typography variant="body2" sx={{ fontFamily: '"JetBrains Mono", monospace' }}>
           Connexion automatique...
         </Typography>
@@ -65,7 +64,6 @@ function AppRoutes() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <CustomCursor />
       <BrowserRouter>
         <Routes>
           <Route
@@ -79,10 +77,10 @@ function AppRoutes() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="history"   element={<HistoryPage />} />
-            <Route path="meteo" element={<MeteoPage />} />
-            <Route path="devices"       element={<DevicesPage />} />
+            <Route path="meteo"     element={<MeteoPage />} />
+            <Route path="devices"   element={<DevicesPage />} />
             <Route path="alerts"    element={<AlertsPage />} />
-            <Route path="ask"      element={<AskIAPage />} />
+            <Route path="ask"       element={<AskIAPage />} />
             <Route path="3d"        element={<Visualization3DPage />} />
             <Route path="mail"      element={<MailServicesPage />} />
             <Route path="admin"     element={<AdminControlPage />} />

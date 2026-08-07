@@ -8,9 +8,7 @@ import {
   Bot,
   ChevronDown,
   LogOut,
-  User,
   Settings,
-  HelpCircle,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -51,7 +49,7 @@ export function AppSidebar() {
   const navigate = useNavigate()
   const { username, role, logout } = useAuthStore()
   const { mode } = useThemeMode()
-  const dark = mode === 'dark'
+  const dark = false
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -117,42 +115,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-full" style={{ background: dark ? 'rgba(0,170,255,0.15)' : 'rgba(0,112,212,0.1)', color: dark ? '#00aaff' : '#0070d4', fontSize: '0.75rem', fontWeight: 700 }}>
-                    {username?.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{username}</span>
-                    <span className="truncate text-xs" style={{ color: dark ? '#8aaccc' : '#6b7280' }}>{role === 'admin' ? 'Administrateur' : 'Observateur'}</span>
-                  </div>
-                  <ChevronDown className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-(--radix-popper-anchor-width)" align="end">
-                <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                <DropdownMenuItem>
-                  <User className="size-4" /> Profil
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="size-4" /> Paramètres
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="size-4" /> Aide
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { logout(); navigate('/login') }} style={{ color: '#e8334a' }}>
-                  <LogOut className="size-4" /> Déconnexion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
