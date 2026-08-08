@@ -1,134 +1,308 @@
-import { motion } from 'framer-motion'
-import { useLatestSensorData } from '../hooks/useSensorData'
-import HeroPanel from '../components/dashboard/HeroPanel'
-import WaterFlowChart from '../components/dashboard/WaterFlowChart'
-import PowerConsumptionChart from '../components/dashboard/PowerConsumptionChart'
-import GrowthRateChart from '../components/dashboard/GrowthRateChart'
-import CO2Chart from '../components/dashboard/CO2Chart'
-import MetricMiniCard from '../components/dashboard/MetricMiniCard'
+import {
+  Thermometer,
+  Droplets,
+  Wind,
+  CloudRain,
+  Sun,
+  BatteryMedium,
+  Gauge,
+  Sparkles,
+  Lightbulb,
+  Leaf,
+  Clock3,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+} from "lucide-react"
+import { KpiCard } from "../components/dashboard/KpiCard"
+import { useLatestSensorData } from "../hooks/useSensorData"
 
-// ── Icons for metric cards ──────────────────────────────────────────────────
-function ThermoIcon({ color }: { color: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path d="M12 3a2 2 0 0 0-2 2v9.17A4 4 0 1 0 14 14V5a2 2 0 0 0-2-2Z" stroke={color} strokeWidth="1.8"/>
-      <circle cx="12" cy="17" r="2" fill={color} opacity="0.8"/>
-    </svg>
-  )
-}
-function DropletIcon({ color }: { color: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path d="M12 3C12 3 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-12-7-12Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round"/>
-    </svg>
-  )
-}
-function SunIcon({ color }: { color: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="4" stroke={color} strokeWidth="1.8"/>
-      <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )
-}
-function LeafIcon({ color }: { color: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path d="M17 8C8 10 5.9 16.17 3.82 19.06A1 1 0 0 0 5 20.54c3.13-.92 7-2.9 9.36-6.15C15.17 13.3 16.43 11.35 17 8Z" stroke={color} strokeWidth="1.8" strokeLinejoin="round"/>
-      <path d="M3 21c2.5-2 4.83-5 6-8" stroke={color} strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )
+/* ─── helpers ─────────────────────────────────────────────────────────────── */
+
+/** Formate un timestamp ISO ou "YYYY-MM-DD HH:MM:SS" → heure locale HH:MM:SS */
+function fmtTime(ts?: string | null): string {
+  if (!ts) return "—"
+  try {
+    return new Date(ts.replace(" ", "T")).toLocaleTimeString("fr-FR", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    })
+  } catch { return ts }
 }
 
-// Greenhouse background image — hydroponic rows interior
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1585320806297-9794b3e4aaae?auto=format&fit=crop&w=1400&q=80'
+/** Formate une valeur numérique avec N décimales ou retourne "—" */
+function fv(v?: number | null, dec = 1): string {
+  return v != null ? v.toFixed(dec) : "—"
+}
+
+/* ─── sub-components ──────────────────────────────────────────────────────── */
+
+function SectionTitle({ icon, title, sub }: { icon: React.ReactNode; title: string; sub?: string }) {
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/60 backdrop-blur text-primary">
+          {icon}
+        </span>
+        <h2 className="text-lg font-bold tracking-tight text-foreground">{title}</h2>
+      </div>
+      {sub && <p className="mt-0.5 ml-9 text-xs text-muted-foreground font-mono">{sub}</p>}
+    </div>
+  )
+}
+
+function StatusRing({ score, label }: { score: number; label: string }) {
+  const radius = 42
+  const c = 2 * Math.PI * radius
+  const dash = (score / 100) * c
+  const ringColor =
+    score > 75 ? "#10B981" : score > 50 ? "#0D98BA" : score > 25 ? "#F59E0B" : "#EF4444"
+  return (
+    <div className="glass-card-strong flex min-h-[180px] flex-col items-center justify-center gap-1.5 p-4">
+      <div className="relative">
+        <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="oklch(0.9 0.02 145)" strokeWidth="8" />
+          <circle
+            cx="50" cy="50" r={radius} fill="none"
+            stroke={ringColor} strokeWidth="8" strokeLinecap="round"
+            strokeDasharray={`${dash} ${c}`}
+          />
+        </svg>
+        <div className="absolute inset-0 grid place-items-center">
+          <span className="text-xl font-black text-foreground">{score}%</span>
+        </div>
+      </div>
+      <span className="text-xs font-semibold text-foreground/80">{label}</span>
+      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Indice climatique</span>
+    </div>
+  )
+}
+
+/** Affichage pendant le premier chargement */
+function LoadingOverlay() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
+      <RefreshCw className="h-8 w-8 animate-spin text-primary/60" />
+      <span className="text-sm font-medium">Connexion à la station…</span>
+      <span className="text-xs font-mono">Interrogation du capteur HD50 + station météo</span>
+    </div>
+  )
+}
+
+/* ─── page ────────────────────────────────────────────────────────────────── */
 
 export default function DashboardPage() {
-  const { internal } = useLatestSensorData(30000)
+  const { internal, external, loading, lastUpdate } = useLatestSensorData(20000)
 
-  const temp     = internal?.temperature != null ? internal.temperature.toFixed(1) : '23'
-  const humidity = internal?.humidity     != null ? Math.round(internal.humidity)  : '68'
-  const co2      = internal?.co2          != null ? Math.round(internal.co2)       : 900
+  /* Calcul score climatique — uniquement si on a les données réelles */
+  const temp = internal?.temperature ?? null
+  const hum  = internal?.humidity  ?? null
+  const score = (temp != null && hum != null)
+    ? Math.round(
+        (Math.max(0, 100 - Math.abs(temp - 24) * 4) +
+         Math.max(0, 100 - Math.abs(hum  - 60) * 1.5)) / 2
+      )
+    : 0
+  const scoreLabel =
+    score > 75 ? "Optimal" : score > 50 ? "Correct" : score > 25 ? "Attention" : "—"
+
+  /* Timestamp affiché : timestamp capteur si dispo, sinon heure du fetch */
+  const displayTime =
+    internal?.timestamp
+      ? fmtTime(internal.timestamp)
+      : lastUpdate?.toLocaleTimeString("fr-FR") ?? "—"
+
+  const isConnected = !loading && (internal != null || external != null)
+
+  if (loading && internal == null) return <LoadingOverlay />
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, height: '100%' }}>
+    <div className="space-y-8">
 
-      {/* ── TOP ROW: Hero + Right charts ─────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 280px',
-        gap: 14,
-        minHeight: 330,
-      }}>
-        {/* Hero panel */}
-        <HeroPanel imageUrl={HERO_IMAGE} />
+      {/* ── Header ── */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+            Vue d'ensemble
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Données temps réel — station physique Serre Fraisier
+          </p>
+        </div>
 
-        {/* Right charts column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <WaterFlowChart />
-          <PowerConsumptionChart />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Live indicator */}
+          <span
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              fontSize: "0.72rem", fontFamily: '"JetBrains Mono", monospace', fontWeight: 600,
+              padding: "4px 12px", borderRadius: 8,
+              background: isConnected ? "rgba(16,185,129,0.09)" : "rgba(239,68,68,0.08)",
+              color: isConnected ? "#10B981" : "#EF4444",
+              border: `1px solid ${isConnected ? "rgba(16,185,129,0.22)" : "rgba(239,68,68,0.2)"}`,
+            }}
+          >
+            {isConnected
+              ? <Wifi size={12} />
+              : <WifiOff size={12} />}
+            {isConnected ? "Station connectée" : "En attente de la station…"}
+          </span>
+
+          {/* Timestamp */}
+          <span className="flex items-center gap-2 rounded-xl border border-cyan-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+            <Clock3 className="h-4 w-4 text-cyan-700" />
+            <span className="text-xs text-slate-500">Dernière lecture</span>
+            <span className="font-mono text-sm text-cyan-800">{displayTime}</span>
+          </span>
         </div>
       </div>
 
-      {/* ── BOTTOM ROW: Metric cards + Growth Rate + CO2 ─────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '240px 1fr 240px',
-        gap: 14,
-        minHeight: 220,
-      }}>
-        {/* 2×2 Metric cards */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 10,
-            alignContent: 'start',
-          }}
-        >
-          <MetricMiniCard
-            label="Indoor Climate"
-            value={temp}
+      {/* ── Bloc intérieur — Capteur HD50 ── */}
+      <section>
+        <SectionTitle
+          icon={<Leaf className="h-4 w-4" />}
+          title="Climat intérieur — Capteur HD50"
+          sub={internal?.timestamp ? `Acquisition : ${fmtTime(internal.timestamp)}` : undefined}
+        />
+
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "1.25rem" }}>
+          <KpiCard
+            icon={Thermometer}
+            label="Température"
+            value={fv(internal?.temperature)}
             unit="°C"
-            icon={<ThermoIcon color="#f97316" />}
-            color="#f97316"
-            delay={0.35}
+            accent="text-orange-500"
+            hint={internal?.dew_point != null ? `Point de rosée ${fv(internal.dew_point)} °C` : undefined}
+            className="col-span-2 row-span-2 min-h-[240px]"
           />
-          <MetricMiniCard
-            label="Air Moisture"
-            value={humidity}
+          <KpiCard
+            icon={Droplets}
+            label="Humidité"
+            value={fv(internal?.humidity)}
             unit="%"
-            icon={<DropletIcon color="#06b6d4" />}
-            color="#06b6d4"
-            delay={0.4}
+            accent="text-sky-600"
+            hint={internal?.partial_vapor_pressure != null
+              ? `Vapeur ${fv(internal.partial_vapor_pressure, 2)} hPa`
+              : undefined}
+            className="col-span-2 min-h-[160px]"
           />
-          <MetricMiniCard
-            label="Light Level"
-            value="15"
-            unit="H"
-            icon={<SunIcon color="#eab308" />}
-            color="#eab308"
-            delay={0.45}
+          <StatusRing score={score} label={scoreLabel} />
+          <KpiCard
+            icon={Sparkles}
+            label="CO₂"
+            value={fv(internal?.co2, 0)}
+            unit="ppm"
+            accent="text-emerald-600"
           />
-          <MetricMiniCard
-            label="EC Level"
-            value="2.1"
-            unit="mS"
-            icon={<LeafIcon color="#729C51" />}
-            color="#729C51"
-            delay={0.5}
-          />
-        </motion.div>
+        </div>
 
-        {/* Growth Rate chart */}
-        <GrowthRateChart />
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "1.25rem", marginTop: "1.5rem" }}>
+          <KpiCard
+            icon={Lightbulb}
+            label="Illuminance"
+            value={fv(internal?.illuminance, 0)}
+            unit="lux"
+            accent="text-amber-500"
+            className="min-h-[120px]"
+          />
+          <KpiCard
+            icon={Gauge}
+            label="Pression atm."
+            value={fv(internal?.pressure)}
+            unit="hPa"
+            accent="text-indigo-500"
+            className="min-h-[120px]"
+          />
+          <KpiCard
+            icon={Droplets}
+            label="Point de rosée"
+            value={fv(internal?.dew_point)}
+            unit="°C"
+            accent="text-cyan-600"
+            className="min-h-[120px]"
+          />
+          <KpiCard
+            icon={Wind}
+            label="Vapeur partielle"
+            value={fv(internal?.partial_vapor_pressure, 2)}
+            unit="hPa"
+            accent="text-teal-600"
+            className="min-h-[120px]"
+          />
+        </div>
+      </section>
 
-        {/* CO2 chart */}
-        <CO2Chart liveData={internal} />
-      </div>
+      {/* ── Bloc extérieur — Station météo + Capteur solaire ── */}
+      <section>
+        <SectionTitle
+          icon={<Sun className="h-4 w-4" />}
+          title={external?.device_name
+            ? `Conditions extérieures — ${external.device_name}`
+            : "Conditions extérieures"}
+          sub={
+            [
+              external?.timestamp ? `Acquisition : ${fmtTime(external.timestamp)}` : null,
+              external?.rssi != null ? `RSSI ${external.rssi} dBm` : null,
+            ].filter(Boolean).join(" · ") || undefined
+          }
+        />
+
+        {/* Météo */}
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "1.25rem" }}>
+          <KpiCard
+            icon={Thermometer}
+            label="Température ext."
+            value={fv(external?.temperature, 2)}
+            unit="°C"
+            accent="text-orange-500"
+            className="col-span-2 row-span-2 min-h-[240px]"
+          />
+          <KpiCard
+            icon={Droplets}
+            label="Humidité ext."
+            value={fv(external?.humidity, 2)}
+            unit="%"
+            accent="text-sky-600"
+            className="col-span-2 min-h-[160px]"
+          />
+          <KpiCard
+            icon={Wind}
+            label="Vent"
+            value={fv(external?.wind_speed)}
+            unit={`km/h${external?.wind_cardinal ? " · " + external.wind_cardinal : ""}`}
+            accent="text-slate-600"
+            className="min-h-[120px]"
+          />
+          <KpiCard
+            icon={CloudRain}
+            label="Pluie"
+            value={fv(external?.rain)}
+            unit="mm"
+            accent="text-blue-600"
+            className="min-h-[120px]"
+          />
+        </div>
+
+        {/* Solaire */}
+        <div className="grid grid-cols-2 lg:grid-cols-3" style={{ gap: "1.25rem", marginTop: "1.5rem" }}>
+          <KpiCard
+            icon={Sun}
+            label="Irradiance solaire"
+            value={fv(external?.radiation)}
+            unit="W/m²"
+            accent="text-yellow-500"
+            hint={external?.solar_device_name ?? undefined}
+            className="lg:col-span-2 min-h-[120px]"
+          />
+          <KpiCard
+            icon={BatteryMedium}
+            label="Batterie capteur solaire"
+            value={fv(external?.battery_v, 3)}
+            unit="V"
+            accent="text-emerald-600"
+            className="min-h-[120px]"
+          />
+        </div>
+      </section>
     </div>
   )
 }
