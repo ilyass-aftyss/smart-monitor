@@ -89,13 +89,13 @@ interface WeatherData {
 
 export default function MeteoPage() {
   const { mode } = useThemeMode()
-  const dark = mode === 'dark'
-  const textSec    = dark ? '#8aaccc' : '#5a7090'
-  const tooltipBg  = dark ? '#0a1628' : '#ffffff'
-  const tooltipTxt = dark ? '#e2ecf8' : '#1a2540'
+  const dark = false
+  const textSec    = '#6B7280'
+  const tooltipBg  = dark ? '#102A33' : '#FFFFFF'
+  const tooltipTxt = dark ? '#C4F9FF' : '#0D3040'
   const axisColor  = dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
   const gridColor  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'
-  const labelColor = dark ? '#8aaccc' : '#5a7090'
+  const labelColor = '#6B7280'
 
   const [data, setData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -198,10 +198,7 @@ export default function MeteoPage() {
   const now = data?.current
   const curWeather = now ? wmoInfo(now.weather_code) : null
 
-  function tempColor(v: number): string { if (v >= 35) return '#ef4444'; if (v >= 28) return '#f97316'; if (v >= 20) return '#f59e0b'; if (v >= 10) return '#3b82f6'; return '#06b6d4' }
-  function humColor(v: number): string { if (v >= 80) return '#06b6d4'; if (v >= 60) return '#3b82f6'; if (v >= 40) return '#8b5cf6'; return '#f97316' }
-
-  function buildLineChart(key: keyof WeatherData['hourly'], color: string, unit: string, label: string, yMin?: number, yMax?: number) {
+  function buildLineChart(key: keyof WeatherData['hourly'], color: string, unit: string, yMin?: number, yMax?: number) {
     if (!data) return {}
     const vals = data.hourly[key] as (number | null)[]
     const labels = data.hourly.time.map(t => formatTime(t))
@@ -213,20 +210,13 @@ export default function MeteoPage() {
     return {
       backgroundColor: 'transparent',
       animation: true,
-      animationDuration: 500,
+      animationDuration: 300,
       grid: { top: 20, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
-        axisPointer: {
-          type: 'cross',
-          snap: true,
-          z: 100,
-          label: { show: true, backgroundColor: color, color: '#fff', fontSize: 9 },
-          lineStyle: { color, width: 1, type: 'dashed', opacity: 0.5 },
-        },
-        backgroundColor: tooltipBg, borderColor: `${color}55`, borderWidth: 1, padding: [8, 12],
+        backgroundColor: tooltipBg, borderColor: 'rgba(13,152,186,0.3)', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
-        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:${color};font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
+        formatter: (p: any) => p[0].value == null ? '' : `<b style="color:#0D98BA;font-size:13px">${p[0].value} ${unit}</b><br/><span style="opacity:0.6;font-size:10px">⏱ ${p[0].axisValue}</span>`,
       },
       xAxis: {
         type: 'category', data: labels, boundaryGap: false,
@@ -243,18 +233,14 @@ export default function MeteoPage() {
         splitLine: { lineStyle: { color: gridColor, type: 'dashed' } },
       },
       series: [{
-        type: 'line', data: vals, smooth: 0.4,
+        type: 'line', data: vals, smooth: 0.3,
         symbol: 'circle', symbolSize: 3,
         showSymbol: false,
-        lineStyle: { color, width: 2.5, shadowColor: `${color}44`, shadowBlur: 8 },
-        itemStyle: { color, borderColor: dark ? '#0a1628' : '#fff', borderWidth: 2 },
-        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:`${color}40` },{ offset:1, color:`${color}05` }] } },
+        lineStyle: { color, width: 2 },
+        itemStyle: { color, borderColor: dark ? '#102A33' : '#fff', borderWidth: 1 },
+        areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' },{ offset:1, color:'rgba(13,152,186,0)' }] } },
       }],
     }
-  }
-
-  function buildAreaChart(key: keyof WeatherData['hourly'], color: string, unit: string) {
-    return buildLineChart(key, color, unit, '', 0)
   }
 
   function buildWindChart() {
@@ -264,23 +250,16 @@ export default function MeteoPage() {
     const gusts = data.hourly.wind_gusts_10m as (number | null)[]
     const allVals = [...speed.filter(v => v !== null), ...gusts.filter(v => v !== null)] as number[]
     const maxV = allVals.length ? Math.max(...allVals) : 10
-    const pad = (maxV - maxV) * 0.15 || 2
+    const pad = 2
 
     return {
       backgroundColor: 'transparent',
       animation: true,
-      animationDuration: 500,
+      animationDuration: 300,
       grid: { top: 24, right: 16, bottom: 36, left: 52 },
       tooltip: {
         trigger: 'axis',
-        axisPointer: {
-          type: 'cross',
-          snap: true,
-          z: 100,
-          label: { show: true, backgroundColor: '#06b6d4', color: '#fff', fontSize: 9 },
-          lineStyle: { color: '#06b6d4', width: 1, type: 'dashed', opacity: 0.5 },
-        },
-        backgroundColor: tooltipBg, borderColor: '#06b6d455', borderWidth: 1, padding: [8, 12],
+        backgroundColor: tooltipBg, borderColor: 'rgba(13,152,186,0.3)', borderWidth: 1, padding: [8, 12],
         textStyle: { color: tooltipTxt, fontFamily: '"JetBrains Mono", monospace', fontSize: 11 },
         formatter: (p: any) => {
           let html = ''
@@ -306,17 +285,17 @@ export default function MeteoPage() {
       },
       series: [
         {
-          name: 'Vent', type: 'line', data: speed, smooth: 0.4,
+          name: 'Vent', type: 'line', data: speed, smooth: 0.3,
           symbol: 'none',
-          lineStyle: { color: '#06b6d4', width: 2.5, shadowColor: '#06b6d444', shadowBlur: 8 },
-          itemStyle: { color: '#06b6d4' },
-          areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'#06b6d440' },{ offset:1, color:'#06b6d405' }] } },
+          lineStyle: { color: '#0D98BA', width: 2 },
+          itemStyle: { color: '#0D98BA' },
+          areaStyle: { color: { type: 'linear', x:0, y:0, x2:0, y2:1, colorStops: [{ offset:0, color:'rgba(13,152,186,0.2)' },{ offset:1, color:'rgba(13,152,186,0)' }] } },
         },
         {
           name: 'Rafales', type: 'line', data: gusts, smooth: 0.3,
-          symbol: 'diamond', symbolSize: 4, showSymbol: false,
-          lineStyle: { color: '#f97316', width: 1.5, type: 'dashed' },
-          itemStyle: { color: '#f97316' },
+          symbol: 'none',
+          lineStyle: { color: '#097782', width: 1.5, type: 'dashed' },
+          itemStyle: { color: '#097782' },
         },
       ],
     }
@@ -337,10 +316,10 @@ export default function MeteoPage() {
           lineStyle: {
             width: 12,
             color: [
-              [0.3, '#f97316'],
-              [0.5, '#8b5cf6'],
-              [0.8, '#3b82f6'],
-              [1, '#06b6d4'],
+              [0.3, '#F59E0B'],
+              [0.6, '#88F4FF'],
+              [0.8, '#0D98BA'],
+              [1, '#097782'],
             ],
           },
         },
@@ -358,7 +337,7 @@ export default function MeteoPage() {
           top: '32%',
           style: {
             text: `${v.toFixed(0)}%`,
-            fill: dark ? '#e2ecf8' : '#1a2540',
+            fill: dark ? '#C4F9FF' : '#0D3040',
             font: 'bold 28px "JetBrains Mono", monospace',
             textAlign: 'center',
           },
@@ -379,21 +358,18 @@ export default function MeteoPage() {
     }
   }
 
-  const paperSx = (color: string) => ({
+  const paperSx = {
     p: 2.5,
-    border: `1px solid ${color}15`,
     height: '100%',
-  })
+  }
 
   return (
     <Box>
-      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, flexWrap: 'wrap', gap: 1.5 }}>
         <Box>
           <Typography variant="h5" fontWeight={700}>Météo</Typography>
           <Typography variant="body2" sx={{ color: textSec, mt: 0.3, display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <MapPin size={13} /> Station météo professionnelle · Open-Meteo
-            <Chip label="Mise à jour en temps réel" size="small" sx={{ height: 18, fontSize: '0.6rem', bgcolor: dark ? 'rgba(0,232,122,0.07)' : 'rgba(16,185,129,0.08)', color: dark ? '#00e87a' : '#10b981', border: `1px solid ${dark ? 'rgba(0,232,122,0.2)' : 'rgba(16,185,129,0.2)'}`, ml: 0.5 }} />
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -401,12 +377,12 @@ export default function MeteoPage() {
             <Chip
               label={`Dernière mise à jour : ${lastUpdate.toLocaleTimeString('fr-FR')}`}
               size="small"
-              sx={{ bgcolor: dark ? 'rgba(0,170,255,0.07)' : 'rgba(0,80,160,0.06)', color: textSec,
-                border: `1px solid ${dark ? 'rgba(0,170,255,0.15)' : 'rgba(0,80,160,0.1)'}`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
+              sx={{ bgcolor: 'rgba(13,152,186,0.07)', color: textSec,
+                border: '1px solid rgba(13,152,186,0.15)', fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
             />
           )}
           <Tooltip title="Rafraîchir">
-            <IconButton onClick={fetchData} size="small" sx={{ color: textSec, '&:hover': { color: dark ? '#00aaff' : '#0070d4' } }}>
+            <IconButton onClick={fetchData} size="small" sx={{ color: textSec, '&:hover': { color: '#0D98BA' } }}>
               <RefreshCw size={16} />
             </IconButton>
           </Tooltip>
@@ -414,105 +390,74 @@ export default function MeteoPage() {
       </Box>
 
       {error && (
-        <Paper sx={{ p: 2, mb: 2.5, border: '1px solid #ef444440', bgcolor: dark ? 'rgba(239,68,68,0.05)' : 'rgba(239,68,68,0.03)' }}>
-          <Typography sx={{ color: '#ef4444', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <div className="glass-card" style={{ padding: 16, marginBottom: 20 }}>
+          <Typography sx={{ color: '#EF4444', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 1 }}>
             <AlertTriangle size={16} /> {error}
           </Typography>
-        </Paper>
+        </div>
       )}
 
-      {/* KPI Cards */}
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
-        {/* Temperature */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: `1px solid ${now ? tempColor(now.temperature_2m) : '#888'}20`,
-            background: dark ? `linear-gradient(135deg, rgba(10,22,48,0.9), ${now ? tempColor(now.temperature_2m) : '#888'}08)` : `linear-gradient(135deg, #fff, ${now ? tempColor(now.temperature_2m) : '#888'}06)`,
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: now ? tempColor(now.temperature_2m) : '#888', opacity:0.7 },
-          }}>
-            <Thermometer size={16} style={{ color: now ? tempColor(now.temperature_2m) : textSec, marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>Température</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: now ? tempColor(now.temperature_2m) : textSec, fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Thermometer size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Température</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.temperature_2m.toFixed(1)}°C
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
-        {/* Humidity */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: `1px solid ${now ? humColor(now.relative_humidity_2m) : '#888'}20`,
-            background: dark ? `linear-gradient(135deg, rgba(10,22,48,0.9), ${now ? humColor(now.relative_humidity_2m) : '#888'}08)` : `linear-gradient(135deg, #fff, ${now ? humColor(now.relative_humidity_2m) : '#888'}06)`,
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: now ? humColor(now.relative_humidity_2m) : '#888', opacity:0.7 },
-          }}>
-            <Droplets size={16} style={{ color: now ? humColor(now.relative_humidity_2m) : textSec, marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>Humidité</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: now ? humColor(now.relative_humidity_2m) : textSec, fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Humidité</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.relative_humidity_2m.toFixed(0)}%
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
-        {/* Wind */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: '1px solid #06b6d420',
-            background: dark ? 'linear-gradient(135deg, rgba(10,22,48,0.9), rgba(6,182,212,0.06))' : 'linear-gradient(135deg, #fff, rgba(6,182,212,0.04))',
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: '#06b6d4', opacity:0.7 },
-          }}>
-            <Wind size={16} style={{ color: '#06b6d4', marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>Vent</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#06b6d4', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Wind size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Vent</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {now?.wind_speed_10m.toFixed(1)}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>km/h · {now ? degToCompass(now.wind_direction_10m) : '—'}</Typography>
-          </Paper>
+          </div>
         </Grid>
-        {/* Weather */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: '1px solid rgba(168,85,247,0.2)',
-            background: dark ? 'linear-gradient(135deg, rgba(10,22,48,0.9), rgba(168,85,247,0.06))' : 'linear-gradient(135deg, #fff, rgba(168,85,247,0.04))',
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: '#a855f7', opacity:0.7 },
-          }}>
-            <Cloud size={16} style={{ color: '#a855f7', marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>État</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Cloud size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>État</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
               : <Typography sx={{ fontSize: '1.6rem', lineHeight: 1.2 }}>{curWeather?.icon}</Typography>}
             {curWeather && <Typography sx={{ fontSize: '0.6rem', color: textSec, mt: 0.2 }}>{curWeather.label}</Typography>}
-          </Paper>
+          </div>
         </Grid>
-        {/* Rain Probability */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: '1px solid #3b82f620',
-            background: dark ? 'linear-gradient(135deg, rgba(10,22,48,0.9), rgba(59,130,246,0.06))' : 'linear-gradient(135deg, #fff, rgba(59,130,246,0.04))',
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: '#3b82f6', opacity:0.7 },
-          }}>
-            <Droplets size={16} style={{ color: '#3b82f6', marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>Risque pluie</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Droplets size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Risque pluie</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {data?.hourly.precipitation_probability[0]?.toFixed(0) ?? '0'}%
                 </Typography>}
-          </Paper>
+          </div>
         </Grid>
-        {/* Solar Radiation */}
         <Grid item xs={6} sm={3} md={1.5}>
-          <Paper sx={{ p: 1.5, textAlign: 'center', border: '1px solid #eab30820',
-            background: dark ? 'linear-gradient(135deg, rgba(10,22,48,0.9), rgba(234,179,8,0.06))' : 'linear-gradient(135deg, #fff, rgba(234,179,8,0.04))',
-            position: 'relative', overflow: 'hidden',
-            '&::before': { content: '""', position: 'absolute', top:0, left:0, width:3, height:'100%', bgcolor: '#eab308', opacity:0.7 },
-          }}>
-            <Sun size={16} style={{ color: '#eab308', marginBottom: 4 }} />
-            <Typography sx={{ fontSize: '0.55rem', color: textSec, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.3 }}>Rayonnement</Typography>
-            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(0,170,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
-              : <Typography sx={{ color: '#eab308', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
+          <div className="glass-card" style={{ padding: 12, textAlign: 'center' }}>
+            <Sun size={16} style={{ color: '#0D98BA', marginBottom: 4 }} />
+            <Typography sx={{ fontSize: '0.55rem', color: textSec, mb: 0.3 }}>Rayonnement</Typography>
+            {loading ? <Skeleton height={28} width={60} sx={{ mx: 'auto', bgcolor: dark ? 'rgba(13,152,186,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              : <Typography sx={{ color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1.2 }}>
                   {data?.hourly.shortwave_radiation[0]?.toFixed(0) ?? '0'}
                 </Typography>}
             <Typography sx={{ fontSize: '0.6rem', color: textSec }}>W/m²</Typography>
-          </Paper>
+          </div>
         </Grid>
       </Grid>
 
@@ -524,101 +469,97 @@ export default function MeteoPage() {
         </Box>
       ) : !data ? null : (
         <>
-          {/* Charts Row 1: Temperature + Rain */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx('#f59e0b')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#f59e0b', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Thermometer size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Température (24h)
                   </Typography>
-                  <Chip label={`${now?.temperature_2m.toFixed(1)}°C actuel`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#f59e0b'}10`, color: '#f59e0b', border: `1px solid ${'#f59e0b'}22` }} />
+                  <Chip label={`${now?.temperature_2m.toFixed(1)}°C actuel`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildLineChart('temperature_2m', '#f59e0b', '°C', 'Température')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+                <ReactECharts option={buildLineChart('temperature_2m', '#0D98BA', '°C')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+              </div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx('#3b82f6')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Probabilité de pluie
                   </Typography>
-                  <Chip label="24h" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#3b82f6'}10`, color: '#3b82f6', border: `1px solid ${'#3b82f6'}22` }} />
+                  <Chip label="24h" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildAreaChart('precipitation_probability', '#3b82f6', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+                <ReactECharts option={buildLineChart('precipitation_probability', '#097782', '%', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+              </div>
             </Grid>
           </Grid>
 
-          {/* Charts Row 2: Wind + Solar Radiation */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx('#06b6d4')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#06b6d4', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Wind size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Vent & Rafales
                   </Typography>
-                  <Chip label={`${now?.wind_speed_10m.toFixed(1)} km/h`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#06b6d4'}10`, color: '#06b6d4', border: `1px solid ${'#06b6d4'}22` }} />
+                  <Chip label={`${now?.wind_speed_10m.toFixed(1)} km/h`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(13,152,186,0.1)', color: '#0D98BA', border: '1px solid rgba(13,152,186,0.2)' }} />
                 </Box>
                 <ReactECharts option={buildWindChart()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Paper sx={paperSx('#eab308')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#eab308', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Rayonnement Solaire
                   </Typography>
-                  <Chip label="W/m²" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#eab308'}10`, color: '#eab308', border: `1px solid ${'#eab308'}22` }} />
+                  <Chip label="W/m²" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildAreaChart('shortwave_radiation', '#eab308', 'W/m²')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+                <ReactECharts option={buildLineChart('shortwave_radiation', '#097782', 'W/m²', 0)} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+              </div>
             </Grid>
           </Grid>
 
-          {/* Charts Row 3: Humidity Gauge + Cloud Cover + Pressure */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6} md={4}>
-              <Paper sx={paperSx('#3b82f6')}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em', mb: 1 }}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 1 }}>
                   <Droplets size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Humidité
                 </Typography>
                 <ReactECharts option={buildHumidityGauge()} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+              </div>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <Paper sx={paperSx('#a855f7')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#a855f7', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#097782', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Cloud size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Couverture Nuageuse
                   </Typography>
-                  <Chip label={`${now?.cloud_cover.toFixed(0) ?? '—'}%`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#a855f7'}10`, color: '#a855f7', border: `1px solid ${'#a855f7'}22` }} />
+                  <Chip label={`${now?.cloud_cover.toFixed(0) ?? '—'}%`} size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(5,150,105,0.1)', color: '#097782', border: '1px solid rgba(5,150,105,0.2)' }} />
                 </Box>
-                <ReactECharts option={buildAreaChart('cloud_cover', '#a855f7', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
-              </Paper>
+                <ReactECharts option={buildLineChart('cloud_cover', '#097782', '%')} style={{ height: 220 }} opts={{ renderer: 'canvas' }} />
+              </div>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Paper sx={paperSx('#10b981')}>
+              <div className="glass-card" style={{ padding: 20, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#10b981', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#88F4FF', fontFamily: '"JetBrains Mono", monospace' }}>
                     <Gauge size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Pression Atm.
                   </Typography>
-                  <Chip label="hPa" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: `${'#10b981'}10`, color: '#10b981', border: `1px solid ${'#10b981'}22` }} />
+                  <Chip label="hPa" size="small" sx={{ height: 18, fontSize: '0.58rem', bgcolor: 'rgba(52,211,153,0.1)', color: '#88F4FF', border: '1px solid rgba(52,211,153,0.2)' }} />
                 </Box>
                 <Box sx={{ textAlign: 'center', py: 1 }}>
-                  <Typography sx={{ color: '#10b981', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '2rem', lineHeight: 1 }}>
+                  <Typography sx={{ color: '#88F4FF', fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, fontSize: '2rem', lineHeight: 1 }}>
                     {now?.pressure_msl.toFixed(1)}
                   </Typography>
                   <Typography sx={{ fontSize: '0.72rem', color: textSec, mb: 1 }}>hPa</Typography>
-                  <ReactECharts option={buildAreaChart('pressure_msl', '#10b981', 'hPa')} style={{ height: 120 }} opts={{ renderer: 'canvas' }} />
+                  <ReactECharts option={buildLineChart('pressure_msl', '#88F4FF', 'hPa')} style={{ height: 120 }} opts={{ renderer: 'canvas' }} />
                 </Box>
-              </Paper>
+              </div>
             </Grid>
           </Grid>
 
-          {/* 7-Day Forecast */}
-          <Paper sx={{ p: 2.5, mb: 2, border: '1px solid rgba(168,85,247,0.15)' }}>
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#a855f7', fontFamily: '"JetBrains Mono", monospace', textTransform: 'uppercase', letterSpacing: '0.06em', mb: 2 }}>
+          <div className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#0D98BA', fontFamily: '"JetBrains Mono", monospace', mb: 2 }}>
               <Sun size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Prévisions 7 Jours
             </Typography>
             <Grid container spacing={1}>
@@ -631,20 +572,18 @@ export default function MeteoPage() {
                 const wind = data.daily.wind_speed_10m_max[i]
                 return (
                   <Grid item xs={6} sm={3} md={12/7} key={i} sx={{ minWidth: 0 }}>
-                    <Paper sx={{
-                      p: 1.5, textAlign: 'center',
-                      border: i === 0 ? '1px solid rgba(168,85,247,0.3)' : `1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                      background: i === 0 ? (dark ? 'rgba(168,85,247,0.06)' : 'rgba(168,85,247,0.04)') : 'transparent',
+                    <div className="glass-card" style={{
+                      padding: 12, textAlign: 'center',
                     }}>
-                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: i === 0 ? '#a855f7' : textSec, mb: 0.5 }}>
+                      <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, color: i === 0 ? '#0D98BA' : textSec, mb: 0.5 }}>
                         {i === 0 ? "Aujourd'hui" : formatDay(d)}
                       </Typography>
                       <Typography sx={{ fontSize: '1.3rem', lineHeight: 1.2 }}>{wi.icon}</Typography>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: dark ? '#e2ecf8' : '#1a2540', fontFamily: '"JetBrains Mono", monospace', mt: 0.3 }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: dark ? '#C4F9FF' : '#0D3040', fontFamily: '"JetBrains Mono", monospace', mt: 0.3 }}>
                         {tMax?.toFixed(0) ?? '—'}° / {tMin?.toFixed(0) ?? '—'}°
                       </Typography>
                       {prec != null && prec > 0 && (
-                        <Typography sx={{ fontSize: '0.55rem', color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace', mt: 0.2 }}>
+                        <Typography sx={{ fontSize: '0.55rem', color: '#097782', fontFamily: '"JetBrains Mono", monospace', mt: 0.2 }}>
                           💧 {prec.toFixed(1)}mm
                         </Typography>
                       )}
@@ -653,14 +592,13 @@ export default function MeteoPage() {
                           🌬 {wind.toFixed(0)} km/h
                         </Typography>
                       )}
-                    </Paper>
+                    </div>
                   </Grid>
                 )
               })}
             </Grid>
-          </Paper>
+          </div>
 
-          {/* Footer Info */}
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1, mt: 1, mb: 1 }}>
             <Typography sx={{ fontSize: '0.6rem', color: textSec, opacity: 0.6, fontFamily: '"JetBrains Mono", monospace' }}>
               Données fournies par Open-Meteo · API gratuite · Modèle GFS/ECMWF
