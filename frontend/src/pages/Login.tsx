@@ -9,8 +9,8 @@ import { useThemeMode } from '../context/ThemeContext'
 export default function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuthStore()
-  const { mode, toggle } = useThemeMode()
-  const dark = mode === 'dark'
+  const { mode } = useThemeMode()
+  const dark = false
 
   const [username,     setUsername]     = useState('')
   const [password,     setPassword]     = useState('')
@@ -64,23 +64,6 @@ export default function LoginPage() {
           backgroundSize: '50px 50px',
         }} />
       )}
-
-      {/* Theme toggle */}
-      <Box
-        onClick={toggle}
-        sx={{
-          position: 'fixed', top: 20, right: 20,
-          px: 1.4, py: 0.6, borderRadius: '20px', cursor: 'pointer', userSelect: 'none',
-          border: `1px solid ${border}`, bgcolor: dark ? 'rgba(0,170,255,0.06)' : '#fff',
-          boxShadow: dark ? 'none' : '0 1px 4px rgba(0,0,0,0.08)',
-          '&:hover': { borderColor: primary },
-          display: 'flex', alignItems: 'center',
-        }}
-      >
-        <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, color: primary, fontFamily: '"JetBrains Mono", monospace', whiteSpace: 'nowrap' }}>
-          {dark ? '☀ Mode clair' : '◑ Mode sombre'}
-        </Typography>
-      </Box>
 
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
