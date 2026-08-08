@@ -18,7 +18,7 @@ const METRICS = [
 
 export default function ExternalPage() {
   const { mode } = useThemeMode()
-  const dark = mode === 'dark'
+  const dark = false
   const textSec    = dark ? '#8aaccc' : '#5a7090'
   const tooltipBg  = dark ? '#0a1628' : '#ffffff'
   const tooltipTxt = dark ? '#e2ecf8' : '#1a2540'
@@ -130,8 +130,8 @@ export default function ExternalPage() {
             <Chip
               label={`Acquisition : ${latest ? new Date(latest.timestamp).toLocaleTimeString('fr-FR') : '—'}`}
               size="small"
-              sx={{ bgcolor: dark ? 'rgba(0,232,122,0.07)' : 'rgba(16,185,129,0.08)', color: dark ? '#00e87a' : '#10b981',
-                border: `1px solid ${dark ? 'rgba(0,232,122,0.2)' : 'rgba(16,185,129,0.2)'}`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
+              sx={{ bgcolor: dark ? 'rgba(0,232,122,0.07)' : 'rgba(13,152,186,0.08)', color: dark ? '#00e87a' : '#10b981',
+                border: `1px solid ${dark ? 'rgba(0,232,122,0.2)' : 'rgba(13,152,186,0.2)'}`, fontFamily: '"JetBrains Mono", monospace', fontSize: '0.67rem' }}
             />
           )}
           <Box
